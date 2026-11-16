@@ -1,0 +1,50 @@
+import type { Metadata } from 'next';
+import { EnquiryBlock } from '@/components/common/EnquiryBlock';
+import { AboutSection } from '@/components/home/AboutSection';
+import { BrandsSection } from '@/components/home/BrandsSection';
+import { HeroSection } from '@/components/home/HeroSection';
+import { HistorySection } from '@/components/home/HistorySection';
+import { HomeReveals } from '@/components/home/HomeReveals';
+import { PresenceSection } from '@/components/home/PresenceSection';
+import { SmoothScroll } from '@/components/home/SmoothScroll';
+import { SEO_CONFIG } from '@/constants/config';
+import { getCompany, getHomeBrands } from '@/lib/content';
+import { jsonLd, pageMetadata } from '@/lib/seo';
+import { getSiteUrl } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  ...pageMetadata({ title: SEO_CONFIG.DEFAULT_TITLE, path: '/' }),
+  title: { absolute: SEO_CONFIG.DEFAULT_TITLE },
+};
+
+// Order matters: effects run top to bottom, and pinned sections (hero, history)
+// must be created before the triggers below them measure the pin spacing.
+export default async function HomePage() {
+  const [company, brands] = await Promise.all([getCompany(), getHomeBrands()]);
+  const site = getSiteUrl();
+  const organization = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'BMK Group',
+    url: site,
+    logo: `${site}/assets/logo/bmk.svg`,
+    foundingDate: String(company.FOUNDED),
+    email: company.contact.email,
+    telephone: company.contact.phone,
+    address: { '@type': 'PostalAddress', streetAddress: company.contact.address, addressLocality: 'Dubai', addressCountry: 'AE' },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(organization) }} />
+      <SmoothScroll />
+      <HeroSection years={company.YEARS} />
+      <AboutSection heading={company.intro.heading} paragraphs={company.intro.short} />
+      <PresenceSection locations={company.locations} defaultLocation={company.defaultLocation} />
+      <BrandsSection partner={brands.partner} own={brands.own} filters={brands.filters} />
+      <HistorySection milestones={company.milestones} />
+      <EnquiryBlock types={company.enquiryTypes} id="contact" title="Let's do business together" animated />
+      <HomeReveals />
+    </>
+  );
+}
