@@ -6,7 +6,6 @@ import { useMemo, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { PlusIcon, SearchIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { Linkify } from '@/components/faq/Linkify';
 import { HOME, href } from '@/lib/routes';
 import type { Faq, FaqTopic } from '@/types/company';
 
@@ -47,22 +46,8 @@ function FaqItem({ f, forceOpen }: { f: Faq; forceOpen: boolean }) {
           <PlusIcon />
         </span>
       </summary>
-      <div className="faq-a">
-        {f.a.map((p) => (
-          <p key={p}>
-            <Linkify text={p} />
-          </p>
-        ))}
-        {f.list && (
-          <ul>
-            {f.list.map((x) => (
-              <li key={x}>
-                <Linkify text={x} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {/* CMS rich text, cleaned on the server (src/lib/html.ts) */}
+      <div className="faq-a" dangerouslySetInnerHTML={{ __html: f.html }} />
     </details>
   );
 }
@@ -74,7 +59,7 @@ export function FaqExplorer({ faqs, topics }: { faqs: Faq[]; topics: FaqTopic[] 
   const term = q.trim().toLowerCase();
 
   const visible = useMemo(() => {
-    const text = (f: Faq) => [f.q, ...f.a, ...(f.list || [])].join(' ').toLowerCase();
+    const text = (f: Faq) => `${f.q} ${f.text}`.toLowerCase();
     return new Set(faqs.filter((f) => (!topic || f.topic === topic) && (!term || term.split(/\s+/).every((t) => text(f).includes(t)))));
   }, [faqs, topic, term]);
 
@@ -113,15 +98,15 @@ export function FaqExplorer({ faqs, topics }: { faqs: Faq[]; topics: FaqTopic[] 
                 <section key={t.id}>
                   <h2 className="mb-2 text-xs tracking-[0.14em] text-muted uppercase">{t.name}</h2>
                   {items.map((f) => (
-                    <FaqItem key={f.q} f={f} forceOpen={!!term} />
+                    <FaqItem key={f.id} f={f} forceOpen={!!term} />
                   ))}
                 </section>
               );
             })}
             {visible.size === 0 && (
               <div className="rounded-2xl bg-mist p-10">
-                <p className="text-[28px] leading-tight tracking-[-0.04em]">No questions match your search</p>
-                <p className="t-body mt-3 text-muted">Try other words, or ask our team directly.</p>
+                <p className="text-[28px] leading-tight tracking-[-0.04em]">{faqs.length ? 'No questions match your search' : 'No questions yet'}</p>
+                <p className="t-body mt-3 text-muted">{faqs.length ? 'Try other words, or ask our team directly.' : 'Ask our team directly and we will get back to you.'}</p>
               </div>
             )}
           </div>

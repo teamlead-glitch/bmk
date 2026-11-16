@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { FaqExplorer } from '@/components/faq/FaqExplorer';
-import { getCompany } from '@/lib/content';
+import { getFaqs } from '@/lib/content';
 import { jsonLd, pageMetadata } from '@/lib/seo';
+
+// Questions come from the CMS: rebuilt at most every 5 minutes, or at once via POST /api/revalidate/
+export const revalidate = 300;
 
 export const metadata: Metadata = pageMetadata({
   title: 'FAQ',
@@ -11,20 +14,20 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function FaqPage() {
-  const { faqs, faqTopics } = await getCompany();
+  const { faqs, topics } = await getFaqs();
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faqs.map((f) => ({
       '@type': 'Question',
       name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: [...f.a, ...(f.list || [])].join(' ') },
+      acceptedAnswer: { '@type': 'Answer', text: f.text },
     })),
   };
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
-      <FaqExplorer faqs={faqs} topics={faqTopics} />
+      {faqs.length > 0 && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />}
+      <FaqExplorer faqs={faqs} topics={topics} />
     </>
   );
 }

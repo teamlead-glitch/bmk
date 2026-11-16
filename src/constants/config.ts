@@ -1,7 +1,7 @@
 // Environment access lives here and in src/lib/* only, always with a safe fallback.
 
-// CMS API (server and browser). Not live yet: content comes from src/data via
-// src/lib/content.ts until NEXT_PUBLIC_API_URI points at the CMS.
+// CMS API (server and browser). FAQ reads it (GET /v1/faqs); other content still comes from src/data via
+// src/lib/content.ts until each function is moved to the CMS.
 export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_URI || '',
 };

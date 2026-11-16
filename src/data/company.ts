@@ -1,4 +1,4 @@
-import type { Contact, Country, CoreValue, Entity, EnquiryType, Faq, FaqTopic, Milestone } from '@/types/company';
+import type { Contact, Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types/company';
 
 // Company content (from the design reference; the CMS replaces it).
 // Read it through src/lib/content.ts, never directly from pages.
@@ -196,45 +196,4 @@ export const enquiryTypes: EnquiryType[] = [
   { type: 'Dealership Enquiry', title: 'Let’s build something valuable together.', text: 'Apply to become an authorised dealer for one or more BMK brands.' },
   { type: 'Retail Sales Enquiry', title: 'Connect with BMK. Grow with confidence.', text: 'Enquire about retail supply, pricing, and product availability.' },
   { type: 'General Enquiry', title: 'Your next opportunity starts here.', text: 'All other enquiries - partnerships, corporate, media, and more.' },
-];
-
-// ── FAQ: the client's 8 questions, verbatim ──────────────────────────────────
-// `a` is an array of paragraphs; `list` an optional bullet list after the first paragraph.
-export const faqTopics: FaqTopic[] = [
-  { id: 'company', name: 'About BMK Group' },
-  { id: 'brands', name: 'Brands & distribution' },
-  { id: 'buy', name: 'Where to buy' },
-  { id: 'partners', name: 'Partnerships' },
-];
-
-export const faqs: Faq[] = [
-  { topic: 'company', q: 'What is BMK Group’s core business model?', a: ['BMK Group operates as an integrated consumer technology enterprise. Our business spans international supply chain management, authorized tier-one brand distribution (including Nikon, Canon, Fujifilm, Sony, Samsung, and LG), dedicated consumer retail stores, and the design and manufacturing of proprietary brands in consumer electronics and home appliances.'] },
-  {
-    topic: 'company',
-    q: 'Which proprietary brands are developed by BMK Group?',
-    a: ['BMK Group owns and operates two distinct brands:'],
-    list: ['SEEKEN: Smartwatches, audio devices, smart lifestyle electronics, and a Made-in-India range of home and kitchen appliances (explore online: seeken.com | seeken.co.in).', 'TEAM Appliances: Modern kitchen and household appliances, acquired by BMK Group in 2023 (visit: teamappliances.co).'],
-  },
-  { topic: 'company', q: 'Where does BMK Group have direct corporate entities?', a: ['BMK Group has registered operating entities and regional offices across six countries: the UAE, Singapore, Malaysia, Zambia, the Democratic Republic of Congo, and India.'] },
-  { topic: 'brands', q: 'Which brands does BMK Group distribute in India?', a: ['Through our Indian entity, BMK International, we distribute leading appliance and consumer tech brands in Kerala: Samsung, Sujata, Prestige, Voltas, and Symphony, alongside our own Made-in-India SEEKEN Home and Kitchen Appliances.'] },
-  {
-    topic: 'brands',
-    q: 'Which camera brands does BMK Group officially distribute globally?',
-    a: [],
-    list: [
-      'In the Democratic Republic of the Congo, BMK Group operates via ETS HB Trading & BMK Gulf as the official distributor of Fujifilm cameras and accessories.',
-      'In Zambia, BMK Group operates via SEEKEN ELECTRONICS LIMITED as the official distributor of Nikon cameras and accessories.',
-      'Across the wider Middle East, the group maintains long-standing distribution channels for leading imaging and consumer tech brands including Canon, Sony, Samsung, LG, Sharp, and SanDisk.',
-    ],
-  },
-  {
-    topic: 'buy',
-    q: 'Where can retail consumers shop for BMK Group products in India?',
-    a: [
-      'Customers can purchase Samsung, Sujata, Prestige, Voltas, Symphony, and SEEKEN products directly from our retail store:',
-      'Bhome Appliances, located at 3/288, Near St. Jude Church, Unichira, Thrikkakara, Ernakulam, Kerala – 682021. You can also shop SEEKEN appliances online in India at seeken.co.in.',
-    ],
-  },
-  { topic: 'buy', q: 'Where can I buy SEEKEN products in Malaysia?', a: ['SEEKEN smartwatches, audio devices, and accessories are distributed nationwide across Malaysia through our regional office, Seeken Electronics SDN. BHD., located in Oasis Square Ara Damansara, Petaling Jaya.'] },
-  { topic: 'partners', q: 'How can vendors, retailers, or commercial clients partner with BMK Group?', a: ['For distribution inquiries, wholesale partnerships, or corporate bulk sourcing, contact our central logistics team at info@bmkintl.com or call +971 4 232 4747.'] },
 ];
