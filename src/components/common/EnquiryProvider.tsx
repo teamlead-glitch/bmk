@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Arrow } from '@/components/common/Arrow';
 import { CloseIcon } from '@/components/common/Icons';
 import { Stage } from '@/components/common/Stage';
+import { FieldError, Honeypot, useEnquirySubmit } from '@/components/common/useEnquirySubmit';
 import { trackLead } from '@/lib/gtm';
 import type { TemplateId } from '@/types/catalogue';
 
@@ -12,11 +13,111 @@ import type { TemplateId } from '@/types/catalogue';
 // Any element with data-enquire="Distribution Enquiry" (or an empty value) opens
 // the popup with that type preselected, so server components need no JS of their
 // own. Product pages call useEnquiry().open({ product }).
-// TODO(back end): forms only show the success state, as in the design. POST the
-// fields to the CMS enquiry endpoint (handoff doc: "Enquiry management") before
-// calling trackLead.
+// The form is posted to the CMS through /api/enquiry/ (src/lib/enquiry.ts);
+// trackLead runs only after the CMS saved it.
 
 export const ENQUIRY_TYPES = ['Distribution Enquiry', 'Dealership Enquiry', 'Retail Sales Enquiry', 'General Enquiry'];
+const ID = 'enq';
+
+/** The popup's form. Its own component so the sending state resets with each open. */
+function EnquiryForm({ type, product, onSent }: { type?: string; product?: EnquiryProduct | null; onSent: () => void }) {
+  const { pending, error, errors, onSubmit, fieldProps } = useEnquirySubmit(
+    (f) => ({
+      ...f,
+      name: f.name,
+      email: f.email,
+      message: f.message,
+      type: product ? 'Product Enquiry' : f.type,
+      subject: product ? `Product enquiry: ${product.brandName} ${product.name}`.slice(0, 200) : f.type,
+    }),
+    (input) => {
+      onSent();
+      trackLead('enquiry_popup', product ? 'Product Enquiry' : input.type);
+    },
+  );
+
+  return (
+    <form className="grid gap-4" onSubmit={onSubmit}>
+      <Honeypot />
+      {product ? (
+        <div className="flex items-center gap-4 rounded-2xl bg-mist p-3">
+          <div className="w-20 shrink-0">
+            <Stage name={product.name} glyph={product.glyph} src={product.thumb} className="!rounded-lg" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted">
+              {product.brandName} · {product.categoryName}
+            </p>
+            <p className="truncate font-semibold">{product.name}</p>
+          </div>
+        </div>
+      ) : (
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Enquiry type</span>
+          <select name="type" required className="field" defaultValue={type && ENQUIRY_TYPES.includes(type) ? type : ''} {...fieldProps('type', ID)}>
+            <option value="" disabled>
+              Select a type
+            </option>
+            {ENQUIRY_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <FieldError name="type" idPrefix={ID} errors={errors} />
+        </label>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Full name</span>
+          <input name="name" required maxLength={120} className="field" autoComplete="name" {...fieldProps('name', ID)} />
+          <FieldError name="name" idPrefix={ID} errors={errors} />
+        </label>
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Company</span>
+          <input name="company" maxLength={150} className="field" autoComplete="organization" {...fieldProps('company', ID)} />
+          <FieldError name="company" idPrefix={ID} errors={errors} />
+        </label>
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Email</span>
+          <input name="email" type="email" required maxLength={190} className="field" autoComplete="email" {...fieldProps('email', ID)} />
+          <FieldError name="email" idPrefix={ID} errors={errors} />
+        </label>
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Phone</span>
+          <input name="phone" type="tel" maxLength={40} className="field" autoComplete="tel" {...fieldProps('phone', ID)} />
+          <FieldError name="phone" idPrefix={ID} errors={errors} />
+        </label>
+      </div>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Country</span>
+        <input name="country" maxLength={100} className="field" autoComplete="country-name" {...fieldProps('country', ID)} />
+        <FieldError name="country" idPrefix={ID} errors={errors} />
+      </label>
+      <label className="grid gap-1.5 text-sm">
+        <span className="font-medium">Message</span>
+        <textarea
+          name="message"
+          rows={3}
+          required
+          maxLength={5000}
+          className="field"
+          defaultValue={product ? `I'd like more information about the ${product.name}.` : ''}
+          {...fieldProps('message', ID)}
+        />
+        <FieldError name="message" idPrefix={ID} errors={errors} />
+      </label>
+      {error && (
+        <p className="text-sm text-danger" role="alert">
+          {error}
+        </p>
+      )}
+      <button className="btn btn-navy mt-1 w-full" disabled={pending} aria-busy={pending}>
+        {pending ? 'Sending…' : 'Send enquiry'} <Arrow />
+      </button>
+    </form>
+  );
+}
 
 export interface EnquiryProduct {
   name: string;
@@ -127,72 +228,7 @@ export function EnquiryProvider({ children }: { children: ReactNode }) {
                   </button>
                 </div>
               ) : (
-                <form
-                  className="grid gap-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const type = (e.currentTarget.elements.namedItem('type') as HTMLSelectElement | null)?.value;
-                    setSent(true);
-                    trackLead('enquiry_popup', product ? 'Product Enquiry' : type);
-                  }}
-                >
-                  {product ? (
-                    <div className="flex items-center gap-4 rounded-2xl bg-mist p-3">
-                      <div className="w-20 shrink-0">
-                        <Stage name={product.name} glyph={product.glyph} src={product.thumb} className="!rounded-lg" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted">
-                          {product.brandName} · {product.categoryName}
-                        </p>
-                        <p className="truncate font-semibold">{product.name}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="grid gap-1.5 text-sm">
-                      <span className="font-medium">Enquiry type</span>
-                      <select name="type" required className="field" defaultValue={state.type && ENQUIRY_TYPES.includes(state.type) ? state.type : ''}>
-                        <option value="" disabled>
-                          Select a type
-                        </option>
-                        {ENQUIRY_TYPES.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  )}
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="grid gap-1.5 text-sm">
-                      <span className="font-medium">Full name</span>
-                      <input name="name" required className="field" autoComplete="name" />
-                    </label>
-                    <label className="grid gap-1.5 text-sm">
-                      <span className="font-medium">Company</span>
-                      <input name="company" className="field" autoComplete="organization" />
-                    </label>
-                    <label className="grid gap-1.5 text-sm">
-                      <span className="font-medium">Email</span>
-                      <input name="email" type="email" required className="field" autoComplete="email" />
-                    </label>
-                    <label className="grid gap-1.5 text-sm">
-                      <span className="font-medium">Phone</span>
-                      <input name="phone" type="tel" className="field" autoComplete="tel" />
-                    </label>
-                  </div>
-                  <label className="grid gap-1.5 text-sm">
-                    <span className="font-medium">Country</span>
-                    <input name="country" className="field" autoComplete="country-name" />
-                  </label>
-                  <label className="grid gap-1.5 text-sm">
-                    <span className="font-medium">Message</span>
-                    <textarea name="message" rows={3} className="field" defaultValue={product ? `I'd like more information about the ${product.name}.` : ''} />
-                  </label>
-                  <button className="btn btn-navy mt-1 w-full">
-                    Send enquiry <Arrow />
-                  </button>
-                </form>
+                <EnquiryForm type={state.type} product={product} onSent={() => setSent(true)} />
               )}
             </div>
           </div>,

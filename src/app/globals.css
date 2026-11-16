@@ -10,6 +10,11 @@
 .field {
   @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-[15px] transition-[border-color,box-shadow] outline-none focus:border-navy focus:shadow-[0_0_0_3px_rgb(31_72_125_/_0.15)];
 }
+/* Field the enquiry API rejected (Next.js addition) */
+.field[aria-invalid='true'],
+.select:has([aria-invalid='true']) select {
+  border-color: var(--color-danger);
+}
 @keyframes panel-in {
   from {
     opacity: 0;
@@ -177,6 +182,8 @@
   --color-muted: #585858;
   --color-line: #dddcdc;
   --color-star: #ffc107;
+  /* Form errors (Next.js addition: the design has no error state) */
+  --color-danger: #b42318;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
