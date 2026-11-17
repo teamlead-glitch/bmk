@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { CmsListing, CmsListingFromUrl } from '@/components/catalogue/CmsListing';
-import { getBrandPage, getBrandSlugs } from '@/lib/content';
+import { getBrandPage, getBrandSeo, getBrandSlugs } from '@/lib/content';
 import { href } from '@/lib/routes';
-import { jsonLd, pageMetadata } from '@/lib/seo';
-import { siteUrl } from '@/lib/site-url';
+import { mapSeoToMetadata } from '@/lib/seo-mapper';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -16,7 +15,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await getBrandPage(id);
   if (!data || 'redirect' in data) return {};
   const brand = data.brand!;
-  return pageMetadata({
+  // CMS SEO block (title, description, robots, Open Graph, Twitter); canonical on this site
+  return mapSeoToMetadata(await getBrandSeo(brand.slug), {
     title: `${brand.name} products`,
     description: brand.intro.slice(0, 160) || `${brand.name} products from BMK Group.`,
     path: `/brand/${brand.slug}/`,
@@ -30,30 +30,12 @@ export default async function BrandPage({ params }: Props) {
   if (!data) notFound();
   if ('redirect' in data) permanentRedirect(href(`/brand/${data.redirect}`)); // slug renamed in the CMS
 
-  const brand = data.brand!;
-  const { first } = data;
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: `${brand.name} products`,
-    url: siteUrl(`/brand/${brand.slug}/`),
-    about: { '@type': 'Brand', name: brand.name, ...(brand.logo && { logo: brand.logo }) },
-    mainEntity: {
-      '@type': 'ItemList',
-      numberOfItems: first.total,
-      itemListElement: first.items.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: siteUrl(`/product/${p.slug}/`), name: p.name })),
-    },
-  };
-
   // The unfiltered first page is in the static HTML (crawlable product links); in the
   // browser the listing follows the URL's category tab and loads more pages as you scroll.
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
-      <Suspense fallback={<CmsListing data={data} />}>
-        <CmsListingFromUrl data={data} />
-      </Suspense>
-    </>
+    <Suspense fallback={<CmsListing data={data} />}>
+      <CmsListingFromUrl data={data} />
+    </Suspense>
   );
 }
 

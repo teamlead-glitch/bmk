@@ -47,35 +47,42 @@ src/
     (site)/                  every other page + layout (floating navbar, drawer, footer)
       template.tsx           page fade-in on navigation
     not-found.tsx, error.tsx 404 wall, "couldn't load" (5xx)
-    robots.ts, sitemap.ts    from the content layer
+    robots.ts, sitemap.ts    from the content layer (CMS categories, brands, products)
+    api/list/[kind]          list pages for the browser (products: infinite scroll, filters, sort)
+    api/enquiry              contact form + enquiry popup -> CMS POST /v1/enquiries
     api/search               search suggestions for the navbar panel
-    api/revalidate, preview  CMS cache clear + preview (ready for the CMS)
+    api/revalidate           CMS cache clear after a save (secret header)
     api/csp-report           CSP violation logs
   components/
-    layout/                  navbars, mega menu (both designs), search panel, catalogue menu, footer
-    common/                  shared UI: buttons/arrows, stage, product card, crumbs, pill bar, enquiry popup…
-    home/                    one file per homepage section + its motion (GSAP, Lenis)
-    catalogue/               listing (filters, sort, sheet, heroes, empty states)
+    header/  footer/         navbars, mega menu, search panel, catalogue menu; footer
+    common/                  shared UI: arrows, stage, product card, crumbs, pill bar…
+    enquiry/                 enquiry popup, enquiry block, form submit hook
+    home/                    homepage sections (hero/, presence/, brands/, history/) + motion
+    catalogue/               CMS listings: All products, category, brand (filters, heroes)
+    search/                  search results (static catalogue)
     product/                 gallery + lightbox, summary, section bar, overview, specs, strips
     about/ faq/ contact/ legal/ company/   page sections
-  data/                      sample content from the design (CMS replaces it)
   lib/
-    content.ts               THE content layer: every page reads data here
-    catalogue.ts, search.ts  catalogue rules (templates, highlights, search)
-    cms-fetch.ts, server-api.ts, preview.ts   CMS fetch with cache/retry/last-good copy
-    seo.ts, site-url.ts      metadata, canonical, JSON-LD
-    gsap.ts, gtm.ts, routes.ts
-  constants/                 config (env), site settings, legacy redirects
-  types/                     catalogue + company types
-  proxy.ts                   preview hand-off, lowercase URLs, legacy redirects, 410s
-public/                      design assets, hero video, map/globe dot data
+    content.ts               the one import point for page data (re-exports api/ + static/)
+    api/                     CMS API: products, product-listings, brands-categories,
+                             contact-settings, faqs, home-banner; server-api (serverGet),
+                             cms-fetch (cache/retry/last-good), slug-redirect, cms-mappers
+    seo.ts, seo-mapper.ts    page metadata; CMS seo block -> metadata (canonical on this site)
+    site-url.ts, routes.ts   site address, URLs; sanitize-html.ts (CMS rich text)
+    gsap.ts, gtm.ts
+  services/                  browser fetchers: api.ts ({ success, data, error }), list-api.ts, enquiry.ts
+  static/                    designer's static content without a CMS endpoint yet (data/ + loaders)
+  constants/                 config (env), listing sizes, enquiry types, brand colour, redirects
+  types/                     one file per resource + common.ts (ApiResponse, CMS seo)
+  proxy.ts                   lowercase URLs, legacy redirects, 410s
+public/                      design assets, map/globe dot data
 ```
 
 ## Design notes carried over
 
 - **Mega menu:** two designs exist and the client has not chosen. Default is "categories"; set `NEXT_PUBLIC_MEGA_MENU=brands` for the brands-only design (`src/constants/site.ts`).
-- **Forms** (enquiry popup, contact form) show the success state only. Wire them to the CMS enquiry endpoint (see `TODO(back end)` in `EnquiryProvider.tsx` and `ContactForm.tsx`).
-- **Social links** are `#` and office maps are placeholders until BMK supplies URLs and Google Maps embeds.
+- **Forms** (enquiry popup, contact form) post to the CMS through `/api/enquiry/`. Retail Sales and General types still need the CMS values confirmed (`src/constants/enquiry.ts`).
+- **Office maps** are placeholders until BMK supplies Google Maps embeds. Social links come from the CMS contact settings.
 - **Motion:** GSAP (ScrollTrigger, SplitText, Flip, Draggable, Inertia) and Lenis on the homepage; everything respects `prefers-reduced-motion`. Don't put a CSS `transition` on `transform` for elements GSAP animates.
 
 See `CLAUDE.md` for working rules and `docs/DEPLOYMENT.md` for going live.

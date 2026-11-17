@@ -19,7 +19,8 @@ export interface PageSeo {
 export function pageMetadata({ title, description, path, image, index = true }: PageSeo): Metadata {
   const desc = description || SEO_CONFIG.DEFAULT_DESCRIPTION;
   const canonical = siteUrl(path);
-  const img = image ? siteUrl(image) : siteUrl(SEO_CONFIG.DEFAULT_SHARE_IMAGE);
+  // CMS images are absolute (CMS host); the site's own assets are paths
+  const img = image ? (/^https?:\/\//i.test(image) ? image : siteUrl(image)) : siteUrl(SEO_CONFIG.DEFAULT_SHARE_IMAGE);
   const images = [{ url: img, width: image ? undefined : 1200, height: image ? undefined : 630, alt: image ? title : SEO_CONFIG.SHARE_IMAGE_ALT }];
   return {
     title,
@@ -30,7 +31,3 @@ export function pageMetadata({ title, description, path, image, index = true }: 
     twitter: { card: 'summary_large_image', title, description: desc, images: [img] },
   };
 }
-
-
-/** JSON-LD script body: escape "<" so the content can't close the script tag */
-export const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');

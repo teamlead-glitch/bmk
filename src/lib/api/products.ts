@@ -1,9 +1,10 @@
 import { cache } from 'react';
-import { API_CONFIG } from '@/constants/config';
 import { LISTING_PAGE_SIZE } from '@/constants/listing';
 import { getCmsBrands } from '@/lib/api/brands-categories';
-import { cmsGet } from '@/lib/api/cms-fetch';
 import { brandColor, isSlug, mediaUrl, text, type CmsRef } from '@/lib/api/cms-mappers';
+import { serverGet, serverGetData } from '@/lib/api/server-api';
+import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
+import type { CmsSeo } from '@/types/common';
 import { cleanHtml } from '@/lib/sanitize-html';
 import type { CardProduct } from '@/types/catalogue';
 import type { ProductPage, ProductSort } from '@/types/listing';
@@ -11,7 +12,7 @@ import type { ProductDetail } from '@/types/product';
 
 /* ---------- Products (CMS: GET /v1/products, /v1/products/{slug}) ---------- */
 // getProducts: one page of products for the listings (the browser loads more pages,
-// filters and sorts through /api/products/, which calls it). getProduct: the product page.
+// filters and sorts through /api/list/products/, which calls it). getProduct: the product page.
 
 type CmsProductItem = {
   slug?: string | null;
@@ -53,16 +54,14 @@ const EMPTY_PAGE: ProductPage = { items: [], total: 0, page: 1, lastPage: 1 };
 
 /** One page of products. CMS down -> CmsUnavailableError. */
 export async function getProducts(q: { category?: string; brands?: string[]; sort?: ProductSort; page?: number; perPage?: number }): Promise<ProductPage> {
-  if (!API_CONFIG.BASE_URL) return EMPTY_PAGE;
-  const params = new URLSearchParams();
-  if (q.category) params.set('category', q.category);
-  if (q.brands?.length) params.set('brand', [...q.brands].sort().join(',')); // sorted: one cache entry per filter set
-  params.set('sort', q.sort ?? 'latest');
-  params.set('per_page', String(q.perPage ?? LISTING_PAGE_SIZE));
-  params.set('page', String(q.page ?? 1));
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/products?${params}`);
-  if (!found) return EMPTY_PAGE;
-  const body = json as CmsProductList;
+  const body = await serverGet<CmsProductList>('/v1/products', {
+    category: q.category,
+    brand: q.brands?.length ? [...q.brands].sort().join(',') : undefined, // sorted: one cache entry per filter set
+    sort: q.sort ?? 'latest',
+    per_page: q.perPage ?? LISTING_PAGE_SIZE,
+    page: q.page ?? 1,
+  });
+  if (!body) return EMPTY_PAGE;
   return {
     items: (body.data ?? []).map(toCmsCard).filter((p): p is CardProduct => !!p),
     total: Number(body.meta?.total) || 0,
@@ -87,25 +86,20 @@ type CmsProductDetail = {
   attributes?: { name?: string | null; values?: string[] | null }[] | null;
   highlights?: CmsSpec[] | null;
   specification_groups?: { name?: string | null; specifications?: CmsSpec[] | null }[] | null;
-  seo?: {
-    meta_title?: string | null;
-    meta_description?: string | null;
-    robots?: { index?: boolean } | null;
-    open_graph?: { image?: { url?: string | null } | null } | null;
-  } | null;
+  seo?: CmsSeo | null;
 };
 
 /**
  * /product/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current product). CMS down -> error.tsx.
  */
-export const getProduct = cache(async (slug: string): Promise<ProductDetail | { redirect: string } | null> => {
-  if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/products/${encodeURIComponent(slug)}`);
-  const p = found ? (json as { data?: CmsProductDetail })?.data : undefined;
+export const getProduct = cache(async (slug: string): Promise<DetailsResult<ProductDetail>> => {
+  if (!isSlug(slug)) return null;
+  const p = await serverGetData<CmsProductDetail>(`/v1/products/${encodeURIComponent(slug)}`);
   const current = text(p?.slug);
   if (!p || !current) return null;
-  if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
+  const moved = getRedirectSlug(slug, current);
+  if (moved) return { redirect: moved };
 
   const name = text(p.name) || current;
   const brandSlug = text(p.brand?.slug);
@@ -154,12 +148,7 @@ export const getProduct = cache(async (slug: string): Promise<ProductDetail | { 
     category: cat ? { slug: catSlug, name: text(cat.title) } : null,
     highlights: specRows(p.highlights, 'h').slice(0, 3).map(({ label, value }) => ({ label, value })),
     specGroups,
-    seo: {
-      title: text(p.seo?.meta_title) || name,
-      description: text(p.seo?.meta_description) || text(p.short_description),
-      index: p.seo?.robots?.index !== false,
-      image: mediaUrl(p.seo?.open_graph?.image?.url) ?? images[0]?.src ?? null,
-    },
+    seo: p.seo ?? null,
     fromBrand: others(byBrand),
     inCategory: others(byCategory),
   };
@@ -167,7 +156,6 @@ export const getProduct = cache(async (slug: string): Promise<ProductDetail | { 
 
 /** Every product slug (sitemap, build): all pages of GET /v1/products, 48 at a time */
 export const getProductSlugs = cache(async (): Promise<string[]> => {
-  if (!API_CONFIG.BASE_URL) return [];
   const slugs: string[] = [];
   for (let page = 1, last = 1; page <= last && page <= 50; page++) {
     const res = await getProducts({ page, perPage: 48 });

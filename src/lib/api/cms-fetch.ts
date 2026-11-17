@@ -1,5 +1,4 @@
 import { unstable_cache } from 'next/cache';
-import { withPreviewToken } from '@/lib/api/cms-preview';
 import { cmsHeaders } from '@/lib/api/cms-headers';
 
 /* ---------- CMS API FETCH (shared cache + retry + last good copy) ---------- */
@@ -111,9 +110,8 @@ function isJunkSlug(url: string): boolean {
   }
 }
 
-export async function cmsGet(url: string, token?: string): Promise<CmsResult> {
+export async function cmsGet(url: string): Promise<CmsResult> {
   if (isJunkSlug(url)) return { found: false, json: null };
-  if (token) return load(withPreviewToken(url, token)); // preview: never cached
 
   let pending = inflight.get(url);
   if (!pending) {

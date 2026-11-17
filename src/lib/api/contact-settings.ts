@@ -1,16 +1,13 @@
 import { cache } from 'react';
-import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/api/cms-fetch';
 import { mediaUrl } from '@/lib/api/cms-mappers';
+import { serverGetData } from '@/lib/api/server-api';
 import type { Contact, SocialId } from '@/types/contact';
 
 /* ---------- Site contact details (CMS: GET /v1/settings/contact) ---------- */
 // { data: { phone, email, office_address, social: { facebook, twitter, youtube, instagram, linkedin } } }
-// Footer, Contact Us, legal pages and the homepage JSON-LD. Empty fields are hidden.
+// Footer, Contact Us and the legal pages. Empty fields are hidden.
 
-type CmsContact = {
-  data?: { phone?: string | null; email?: string | null; office_address?: string | null; social?: Record<string, string | null> | null };
-};
+type CmsContact = { phone?: string | null; email?: string | null; office_address?: string | null; social?: Record<string, string | null> | null };
 
 // Footer order (the design's), CMS key -> icon
 const SOCIALS: { key: string; id: SocialId; label: string }[] = [
@@ -24,12 +21,7 @@ const SOCIALS: { key: string; id: SocialId; label: string }[] = [
 const NO_CONTACT: Contact = { phone: null, email: null, address: [], social: [] };
 
 export const getContact = cache(async (): Promise<Contact> => {
-  if (!API_CONFIG.BASE_URL) {
-    console.warn('[contact] NEXT_PUBLIC_API_URI is not set: no contact details');
-    return NO_CONTACT;
-  }
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/settings/contact`);
-  const data = found ? (json as CmsContact)?.data : undefined;
+  const data = await serverGetData<CmsContact>('/v1/settings/contact');
   if (!data) return NO_CONTACT;
 
   const email = String(data.email ?? '').trim();

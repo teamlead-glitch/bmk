@@ -1,6 +1,5 @@
 import { cache } from 'react';
-import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/api/cms-fetch';
+import { serverGetData } from '@/lib/api/server-api';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { Faq, FaqTopic } from '@/types/faq';
 
@@ -10,7 +9,7 @@ import type { Faq, FaqTopic } from '@/types/faq';
 
 type CmsFaq = { id?: number | string; question?: string; answer?: string };
 type CmsFaqCategory = { id?: number | string; name?: string; faqs?: CmsFaq[] };
-type CmsFaqAnswer = { data?: { categories?: CmsFaqCategory[]; uncategorized?: CmsFaq[] } };
+type CmsFaqs = { categories?: CmsFaqCategory[]; uncategorized?: CmsFaq[] };
 
 const GENERAL_TOPIC: FaqTopic = { id: 'general', name: 'General' };
 
@@ -22,13 +21,8 @@ function toFaq(f: CmsFaq, topic: string): Faq | null {
 }
 
 export const getFaqs = cache(async (): Promise<{ faqs: Faq[]; topics: FaqTopic[] }> => {
-  if (!API_CONFIG.BASE_URL) {
-    console.warn('[faq] NEXT_PUBLIC_API_URI is not set: the FAQ page has no questions');
-    return { faqs: [], topics: [] };
-  }
   // CMS down -> CmsUnavailableError -> error.tsx. 404/410 -> an empty list, never a fake 404 page.
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/faqs`);
-  const data = found ? (json as CmsFaqAnswer)?.data : undefined;
+  const data = await serverGetData<CmsFaqs>('/v1/faqs');
 
   const faqs: Faq[] = [];
   const topics: FaqTopic[] = [];

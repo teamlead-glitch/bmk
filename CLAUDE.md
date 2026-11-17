@@ -7,7 +7,7 @@ The approved design reference is the Vite repo `bmk` (preview https://bmkbyphita
 
 ## Content
 - Every page reads data through `@/lib/content` (`src/lib/content.ts`), which re-exports the two groups below. Never import `src/static/data/*` from pages.
-- CMS API code lives in `src/lib/api/`, one file per function: `products.ts`, `product-listings.ts`, `brands-categories.ts`, `contact-settings.ts`, `faqs.ts`, `home-banner.ts`, plus `cms-fetch.ts` (`cmsGet`), `cms-headers.ts`, `cms-preview.ts`, `cms-mappers.ts`. Nothing in `src/lib/api/` imports from `src/static/`.
+- CMS API code lives in `src/lib/api/`, one file per function: `products.ts`, `product-listings.ts`, `brands-categories.ts`, `contact-settings.ts`, `faqs.ts`, `home-banner.ts`, plus `server-api.ts` (`serverGet`: every read goes through it), `cms-fetch.ts` (`cmsGet`: cache, retries, last good copy), `cms-headers.ts`, `cms-mappers.ts`, `slug-redirect.ts`. Detail pages map the CMS `seo` block with `mapSeoToMetadata` (`src/lib/seo-mapper.ts`). Nothing in `src/lib/api/` imports from `src/static/`.
 - The designer's static content (no endpoint yet) lives in `src/static/`: sample data in `static/data/`, its loaders (`company-content.ts`, `catalogue-content.ts`) and helpers. When an endpoint is ready, add the API file in `src/lib/api/`, keep the same return type, and delete the static part. Keep slimming: only the fields the UI shows go to client components.
 - Only 404/410 from the CMS mean "not found". A CMS failure must never become a 404 (`CmsUnavailableError` → `error.tsx`).
 
@@ -18,7 +18,7 @@ The approved design reference is the Vite repo `bmk` (preview https://bmkbyphita
 
 ## Structure
 - Components are grouped by site section: `header/`, `footer/`, `common/` (shared UI), `enquiry/` (popup, forms), `home/` (one subfolder per section: `hero/`, `presence/`, `brands/`, `history/`), `catalogue/` (CMS listings), `search/`, `product/`, `about/`, `faq/`, `contact/`, `legal/`, `company/`.
-- Elsewhere in `src/`: `types/` (one file per resource), `constants/` (page sizes, enquiry types, brand colour, config), `services/` (browser fetchers for this site's `/api/*` routes), `lib/api/` (CMS API), `lib/` (other helpers: routes, SEO, site URL, GTM, GSAP, HTML sanitising), `static/` (designer's static content).
+- Elsewhere in `src/`: `types/` (one file per resource), `constants/` (page sizes, enquiry types, brand colour, config), `services/` (browser fetchers for this site's `/api/*` routes: `api.ts` returns `{ success, data, error }`, `list-api.ts` calls `/api/list/[kind]/`), `lib/api/` (CMS API), `lib/` (other helpers: routes, SEO, site URL, GTM, GSAP, HTML sanitising), `static/` (designer's static content).
 - Server components render the markup; small client components own state and motion. Homepage motion components must stay in page order (pinned sections are measured top to bottom): `SmoothScroll` first, `HomeReveals` last.
 - Styles live in `src/app/globals.css` (ported from the design). Keep class names in sync with the design repo. The catalogue navbar rules are scoped to `.site-nav`; the homepage navbar is animated by GSAP and must not get CSS transform transitions.
 

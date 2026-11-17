@@ -11,8 +11,7 @@ import { ProductStrip } from '@/components/product/ProductStrip';
 import { ProductSummary } from '@/components/product/ProductSummary';
 import { getProduct, getProductSlugs } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
-import { jsonLd, pageMetadata } from '@/lib/seo';
-import { siteUrl } from '@/lib/site-url';
+import { mapSeoToMetadata } from '@/lib/seo-mapper';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -22,9 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = await getProduct(slug);
   if (!p || 'redirect' in p) return {};
-  const meta = pageMetadata({ title: p.seo.title, description: p.seo.description, path: `/product/${p.slug}/`, image: p.seo.image });
-  // "Index" switched off for this product in the CMS
-  return p.seo.index ? meta : { ...meta, robots: { index: false, follow: true } };
+  // CMS SEO block (title, description, robots, Open Graph, Twitter); canonical on this site
+  return mapSeoToMetadata(p.seo, { path: `/product/${p.slug}/`, title: p.name, description: p.short, image: p.images[0]?.src });
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -39,21 +37,9 @@ export default async function ProductPage({ params }: Props) {
   const enquiry: EnquiryProduct = { name: p.name, brandName: p.brand.name, categoryName: p.category?.name ?? '', thumb: p.images[0]?.src, glyph: 'generic' };
   const hasOverview = p.descriptionHtml.length > 0;
   const hasSpecs = p.specGroups.length > 0;
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: p.name,
-    ...(p.modelNo && { model: p.modelNo }),
-    ...(p.short && { description: p.short }),
-    ...(p.brand.name && { brand: { '@type': 'Brand', name: p.brand.name } }),
-    ...(p.category && { category: p.category.name }),
-    url: siteUrl(`/product/${p.slug}/`),
-    ...(p.images.length > 0 && { image: p.images.map((im) => im.src) }),
-  };
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
       <section className="pt-[clamp(120px,10vw,152px)]">
         <div className="shell">
           <Crumbs

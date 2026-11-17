@@ -15,7 +15,7 @@ import type { CmsListingData, CountedOption } from '@/types/listing';
 
 /* ---------- PRODUCT LISTING FROM THE CMS (All products, category and brand pages) ---------- */
 // Same look as the design's listing, with the products coming from the CMS a page at a
-// time (GET /v1/products through /api/products/). Filters, sort and paging live in the URL
+// time (GET /v1/products through /api/list/products/). Filters, sort and paging live in the URL
 // (?cat=a,b&brand=c&sort=az&page=2) so every state can be linked; more pages load as the
 // visitor scrolls (infinite scroll), with "Load more" kept as the fallback. The unfiltered
 // first page comes with the server HTML.

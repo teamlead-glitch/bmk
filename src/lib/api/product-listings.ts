@@ -1,9 +1,9 @@
 import { cache } from 'react';
-import { API_CONFIG } from '@/constants/config';
-import { getCmsBrands, getCmsCategories, type CmsBrand, type CmsCategory } from '@/lib/api/brands-categories';
-import { cmsGet } from '@/lib/api/cms-fetch';
+import { getCmsBrand, getCmsBrands, getCmsCategories, type CmsCategory } from '@/lib/api/brands-categories';
 import { brandColor, isSlug, mediaUrl, text } from '@/lib/api/cms-mappers';
 import { getProducts } from '@/lib/api/products';
+import { serverGetData } from '@/lib/api/server-api';
+import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { CmsListingData, CountedOption } from '@/types/listing';
 
@@ -35,13 +35,13 @@ export const getAllProductsPage = cache(async (): Promise<CmsListingData> => {
  * /category/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current category). CMS down -> error.tsx.
  */
-export const getCategoryPage = cache(async (slug: string): Promise<CmsListingData | { redirect: string } | null> => {
-  if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/categories/${encodeURIComponent(slug)}`);
-  const c = found ? (json as { data?: CmsCategory })?.data : undefined;
+export const getCategoryPage = cache(async (slug: string): Promise<DetailsResult<CmsListingData>> => {
+  if (!isSlug(slug)) return null;
+  const c = await serverGetData<CmsCategory>(`/v1/categories/${encodeURIComponent(slug)}`);
   const current = text(c?.slug);
   if (!c || !current) return null;
-  if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
+  const moved = getRedirectSlug(slug, current);
+  if (moved) return { redirect: moved };
 
   const [categories, brandsList, first] = await Promise.all([categoryOptions(current), brandOptions(current), getProducts({ category: current, page: 1 })]);
 
@@ -65,13 +65,12 @@ export const getCategoryPage = cache(async (slug: string): Promise<CmsListingDat
  * /brand/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current brand). CMS down -> error.tsx.
  */
-export const getBrandPage = cache(async (slug: string): Promise<CmsListingData | { redirect: string } | null> => {
-  if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/brands/${encodeURIComponent(slug)}`);
-  const b = found ? (json as { data?: CmsBrand })?.data : undefined;
+export const getBrandPage = cache(async (slug: string): Promise<DetailsResult<CmsListingData>> => {
+  const b = await getCmsBrand(slug);
   const current = text(b?.slug);
   if (!b || !current) return null;
-  if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
+  const moved = getRedirectSlug(slug, current);
+  if (moved) return { redirect: moved };
 
   // Category tabs: the brand's categories, with its product count in each
   const cats = (b.categories ?? []).filter((c) => isSlug(text(c.slug)) && text(c.title));

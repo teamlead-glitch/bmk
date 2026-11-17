@@ -10,6 +10,6 @@ export interface Faq {
   q: string;
   /** Answer markup, cleaned on the server */
   html: string;
-  /** Answer as plain text: search and FAQPage JSON-LD */
+  /** Answer as plain text: the FAQ search */
   text: string;
 }

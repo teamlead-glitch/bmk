@@ -32,7 +32,7 @@ export function cleanHtml(html: string): string {
 
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 
-/** Plain text of a piece of markup (search index, JSON-LD). */
+/** Plain text of a piece of markup (FAQ search, brand intros). */
 export function htmlToText(html: string): string {
   return html
     .replace(/<[^>]*>/g, ' ')

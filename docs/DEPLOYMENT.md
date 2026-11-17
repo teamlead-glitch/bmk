@@ -23,7 +23,6 @@ Host: Vercel. Merging into `main` deploys production; every pull request gets a 
 1. Set `NEXT_PUBLIC_API_URI`, `CMS_API_KEY`, `REVALIDATE_SECRET`.
 2. Move the remaining static content (`src/static/company-content.ts`, `src/static/catalogue-content.ts`) to new files in `src/lib/api/` that use `cmsGet(...)`, keeping the same return types.
 3. Ask the CMS team to call `POST {site}/api/revalidate/` (header `x-revalidate-secret`) after every save; body `{ "tag": "cms:/product/{slug}" }` clears one record, `{}` clears everything.
-4. CMS preview links: `{site}/{page}/?token=…` (handled by `src/proxy.ts` → draft mode).
 
 ## Rollback
 In Vercel → Deployments, promote the last good `main` deployment, then fix forward on a branch.

@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchProductPage } from '@/services/products';
+import { listGet } from '@/services/list-api';
 import type { ProductPage } from '@/types/listing';
 
 /**
  * The pages a listing shows for one filter set: page 1 up to `pages`. The server's first
- * page is the seed; other pages are loaded from /api/products/ and kept by filter set
+ * page is the seed; other pages are loaded from /api/list/products/ and kept by filter set
  * ("category|brand|sort|page"), so going back to a filter set costs no new request.
  */
 export function useProductPages({
@@ -44,7 +44,14 @@ export function useProductPages({
   useEffect(() => {
     if (!missing.length) return;
     const ctl = new AbortController();
-    Promise.all(missing.map((page) => fetchProductPage({ category, brand, sort, page }, ctl.signal)))
+    Promise.all(
+      missing.map((page) =>
+        listGet('products', { category, brand, sort, page }, ctl.signal).then((res) => {
+          if (!res.success) throw new Error(res.error);
+          return res.data;
+        }),
+      ),
+    )
       .then((res) => setLoaded((prev) => ({ ...prev, ...Object.fromEntries(res.map((r, i) => [`${setKey}|${missing[i]}`, r])) })))
       .catch(() => !ctl.signal.aborted && setFailed(true));
     return () => ctl.abort();

@@ -1,7 +1,6 @@
 import { cache } from 'react';
-import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/api/cms-fetch';
 import { mediaUrl } from '@/lib/api/cms-mappers';
+import { serverGetData } from '@/lib/api/server-api';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
 /* ---------- Homepage hero (CMS: GET /v1/settings/home-banner) ---------- */
@@ -19,7 +18,7 @@ type CmsSlide = {
   button?: { text?: string | null; url?: string | null } | null;
   images?: { web?: CmsImage; mobile?: CmsImage } | null;
 };
-type CmsHomeBanner = { data?: { display_type?: string; video?: string | null; video_url?: string | null; slides?: CmsSlide[] } };
+type CmsHomeBanner = { display_type?: string; video?: string | null; video_url?: string | null; slides?: CmsSlide[] };
 
 /** YouTube id from watch, youtu.be, embed and shorts links */
 function youTubeId(url: unknown): string | null {
@@ -53,12 +52,7 @@ function toSlide(s: CmsSlide): HeroSlide | null {
 }
 
 export const getHomeBanner = cache(async (): Promise<HomeBanner> => {
-  if (!API_CONFIG.BASE_URL) {
-    console.warn('[home-banner] NEXT_PUBLIC_API_URI is not set: the hero has no background');
-    return NO_BANNER;
-  }
-  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/settings/home-banner`);
-  const data = found ? (json as CmsHomeBanner)?.data : undefined;
+  const data = await serverGetData<CmsHomeBanner>('/v1/settings/home-banner');
 
   switch (data?.display_type) {
     case 'video': {
