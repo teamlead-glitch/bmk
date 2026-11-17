@@ -4,7 +4,7 @@
 // insensitive, so "xt5" finds "X-T5".
 import type { BrandLite, CardProduct, CategoryLite, Group } from '@/types/catalogue';
 
-export const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 export function searchProducts(list: CardProduct[], q: string): CardProduct[] {
   const tokens = q.toLowerCase().split(/\s+/).map(norm).filter(Boolean);

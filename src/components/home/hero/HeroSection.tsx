@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element -- decorative SVGs and CMS images */
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
-import { HeroMotion } from '@/components/home/HeroMotion';
-import { HeroSlider } from '@/components/home/HeroSlider';
-import { HeroYouTube } from '@/components/home/HeroYouTube';
+import { HeroMotion } from '@/components/home/hero/HeroMotion';
+import { HeroSlider } from '@/components/home/hero/HeroSlider';
+import { HeroYouTube } from '@/components/home/hero/HeroYouTube';
 import { href } from '@/lib/routes';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 

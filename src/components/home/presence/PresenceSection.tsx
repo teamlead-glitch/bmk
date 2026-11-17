@@ -1,4 +1,4 @@
-import { PresenceMap } from '@/components/home/PresenceMap';
+import { PresenceMap } from '@/components/home/presence/PresenceMap';
 import type { Location } from '@/types/company';
 
 /** Group presence: dotted world map with a pin per country and a location card. */

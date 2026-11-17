@@ -21,7 +21,7 @@ Host: Vercel. Merging into `main` deploys production; every pull request gets a 
 
 ## When the CMS goes live
 1. Set `NEXT_PUBLIC_API_URI`, `CMS_API_KEY`, `REVALIDATE_SECRET`.
-2. Replace the function bodies in `src/lib/content.ts` with `cmsGet(...)` calls.
+2. Replace the remaining sample-data function bodies in `src/lib/content/` (`company.ts`, `static-catalogue.ts`) with `cmsGet(...)` calls.
 3. Ask the CMS team to call `POST {site}/api/revalidate/` (header `x-revalidate-secret`) after every save; body `{ "tag": "cms:/product/{slug}" }` clears one record, `{}` clears everything.
 4. CMS preview links: `{site}/{page}/?token=…` (handled by `src/proxy.ts` → draft mode).
 

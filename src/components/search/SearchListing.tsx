@@ -2,27 +2,26 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
-import { PageHero } from '@/components/catalogue/ListingHero';
-import { listingState, type ListingState, type Query } from '@/components/catalogue/listing-state';
+import { useEffect, useState } from 'react';
+import { EmptyBox, FacetCheck } from '@/components/catalogue/ListingParts';
+import { SearchHero } from '@/components/search/SearchHero';
+import { listingState, type ListingState } from '@/components/search/search-state';
 import { Arrow } from '@/components/common/Arrow';
-import { CheckIcon, ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
+import { ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
 import { ProductCard } from '@/components/common/ProductCard';
 import { POPULAR_SEARCHES } from '@/data/visuals';
 import type { ListingData } from '@/lib/content';
-import { href } from '@/lib/routes';
+import { href, NO_FILTERS, type Query } from '@/lib/routes';
 
-/** Reads filters from the URL. Wrap in <Suspense fallback={<Listing data query={EMPTY} />}>
+/** Reads the query and filters from the URL. Wrap in <Suspense fallback={<SearchListing data={data} />}>
  *  so the first page is in the server HTML (static), then follows the URL. */
-export function ListingFromUrl({ data }: { data: ListingData }) {
+export function SearchListingFromUrl({ data }: { data: ListingData }) {
   const params = useSearchParams();
-  return <Listing data={data} query={params} />;
+  return <SearchListing data={data} query={params} />;
 }
 
-export const EMPTY_QUERY: Query = { get: () => null };
-
-/** Search results. (All products, category and brand pages: CmsListing.tsx.) */
-export function Listing({ data, query }: { data: ListingData; query: Query }) {
+/** Search results. (All products, category and brand pages: src/components/catalogue/CmsListing.tsx.) */
+export function SearchListing({ data, query = NO_FILTERS }: { data: ListingData; query?: Query }) {
   const router = useRouter();
   const s = listingState(data, query);
   const [sheet, setSheet] = useState(false);
@@ -46,7 +45,7 @@ export function Listing({ data, query }: { data: ListingData; query: Query }) {
 
   return (
     <>
-      <PageHero data={data} s={s} />
+      <SearchHero data={data} s={s} />
       <section className="shell section-y !pt-12">
         {s.sidebar && (
           <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
@@ -140,16 +139,6 @@ export function Listing({ data, query }: { data: ListingData; query: Query }) {
   );
 }
 
-function Check({ on, label, n, to }: { on: boolean; label: string; n: number; to: string }) {
-  return (
-    <Link scroll={false} className="check" href={to} role="checkbox" aria-checked={on}>
-      <span className="check-box">{on && <CheckIcon />}</span>
-      {label}
-      <span className="check-count">{n}</span>
-    </Link>
-  );
-}
-
 function Facets({ s }: { s: ListingState }) {
   return (
     <>
@@ -163,7 +152,7 @@ function Facets({ s }: { s: ListingState }) {
               <div key={group?.id ?? 'all'}>
                 {group && <p className="mt-3 mb-1 px-2 text-[11px] tracking-[0.14em] text-muted uppercase first:mt-0">{group.name}</p>}
                 {opts.map((o) => (
-                  <Check key={o.id} on={s.selC.includes(o.id)} label={o.name} n={o.n} to={s.toggle('cat', o.id)} />
+                  <FacetCheck key={o.id} on={s.selC.includes(o.id)} label={o.name} n={o.n} to={s.toggle('cat', o.id)} />
                 ))}
               </div>
             ))}
@@ -177,7 +166,7 @@ function Facets({ s }: { s: ListingState }) {
           </summary>
           <div className="pb-4">
             {s.brandOpts.map((o) => (
-              <Check key={o.id} on={s.selB.includes(o.id)} label={o.name} n={o.n} to={s.toggle('brand', o.id)} />
+              <FacetCheck key={o.id} on={s.selB.includes(o.id)} label={o.name} n={o.n} to={s.toggle('brand', o.id)} />
             ))}
           </div>
         </details>
@@ -186,20 +175,10 @@ function Facets({ s }: { s: ListingState }) {
   );
 }
 
-function Box({ title, body, children }: { title: string; body: string; children: ReactNode }) {
-  return (
-    <div className="rounded-2xl bg-mist p-10 sm:p-14">
-      <p className="text-[28px] leading-tight tracking-[-0.04em]">{title}</p>
-      <p className="t-body mt-3 max-w-xl text-muted">{body}</p>
-      <div className="mt-8 flex flex-wrap gap-3">{children}</div>
-    </div>
-  );
-}
-
 /** Empty state: no search matches yet. */
 function Empty({ s }: { s: ListingState }) {
   return (
-    <Box title={s.q ? `No products match “${s.q}”` : 'Search the catalogue'} body={s.q ? 'Check the spelling, or search by model name or brand.' : 'Search by product, model name or brand.'}>
+    <EmptyBox title={s.q ? `No products match “${s.q}”` : 'Search the catalogue'} body={s.q ? 'Check the spelling, or search by model name or brand.' : 'Search by product, model name or brand.'}>
       {POPULAR_SEARCHES.map((t) => (
         <Link key={t} className="pill" href={href('/search', { q: t })}>
           {t}
@@ -208,6 +187,6 @@ function Empty({ s }: { s: ListingState }) {
       <Link className="btn btn-navy" href={href('/products')}>
         Browse all products <Arrow />
       </Link>
-    </Box>
+    </EmptyBox>
   );
 }

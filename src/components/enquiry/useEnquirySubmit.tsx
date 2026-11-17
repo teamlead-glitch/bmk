@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { readEnquiryForm, sendEnquiry, type EnquiryInput } from '@/lib/enquiry';
+import { readEnquiryForm, sendEnquiry } from '@/services/enquiry';
+import type { EnquiryInput } from '@/types/enquiry';
 
 /** Shared submit logic for the contact form and the enquiry popup:
  *  sending state, the error message and per-field errors from the API. */

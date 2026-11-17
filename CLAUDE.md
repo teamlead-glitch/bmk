@@ -6,17 +6,18 @@ This repo is the Next.js front end of the BMK Group website, hosted on Vercel.
 The approved design reference is the Vite repo `bmk` (preview https://bmkbyphitany.vercel.app). Visual changes must match it; don't redesign.
 
 ## Content
-- Every page reads data through `src/lib/content.ts`. Never import `src/data/*` from pages or components.
-- Today `content.ts` returns the design's sample data. When the CMS API is ready, replace each function body with `cmsGet(...)` (`src/lib/cms-fetch.ts`) and map the answer to the same return type. Keep slimming: only the fields the UI shows go to client components.
+- Every page reads data through `@/lib/content` (`src/lib/content/`, one file per resource, re-exported by `index.ts`). Never import `src/data/*` from pages or components.
+- CMS content (products, listings, contact, FAQ, home banner) is read with `cmsGet(...)` (`src/lib/cms-fetch.ts`); mapping helpers are in `src/lib/content/cms.ts`. `company.ts` and `static-catalogue.ts` still return the design's sample data: when their endpoint is ready, swap the body for `cmsGet(...)` and map the answer to the same return type. Keep slimming: only the fields the UI shows go to client components.
 - Only 404/410 from the CMS mean "not found". A CMS failure must never become a 404 (`CmsUnavailableError` → `error.tsx`).
 
 ## Caching
 - Cache Components is OFF on purpose (`next.config.ts`): pages are prerendered/ISR, data cached with `unstable_cache`, cleared by `POST /api/revalidate/` (header `x-revalidate-secret`). The homepage's GSAP pins and Lenis also need routes to unmount on navigation.
-- Never call `headers()`, `cookies()` or read `searchParams` in a page's normal path (it makes the page dynamic). URL filters are read in client components under `<Suspense>` (`ListingFromUrl`, `ContactOfficesFromUrl`).
+- Never call `headers()`, `cookies()` or read `searchParams` in a page's normal path (it makes the page dynamic). URL filters are read in client components under `<Suspense>` (`CmsListingFromUrl`, `SearchListingFromUrl`, `ContactOfficesFromUrl`).
 - `trailingSlash: true`: every URL ends with `/`, API routes included (`/api/search/?q=`).
 
 ## Structure
-- Components are grouped by area: `layout/`, `common/`, `home/`, `catalogue/`, `product/`, `about/`, `faq/`, `contact/`, `legal/`, `company/`.
+- Components are grouped by site section: `header/`, `footer/`, `common/` (shared UI), `enquiry/` (popup, forms), `home/` (one subfolder per section: `hero/`, `presence/`, `brands/`, `history/`), `catalogue/` (CMS listings), `search/`, `product/`, `about/`, `faq/`, `contact/`, `legal/`, `company/`.
+- Elsewhere in `src/`: `types/` (one file per resource), `constants/` (page sizes, enquiry types, config), `services/` (browser fetchers for this site's `/api/*` routes), `lib/` (server helpers).
 - Server components render the markup; small client components own state and motion. Homepage motion components must stay in page order (pinned sections are measured top to bottom): `SmoothScroll` first, `HomeReveals` last.
 - Styles live in `src/app/globals.css` (ported from the design). Keep class names in sync with the design repo. The catalogue navbar rules are scoped to `.site-nav`; the homepage navbar is animated by GSAP and must not get CSS transform transitions.
 

@@ -2,7 +2,7 @@ import type { Brand, Category, Group, Product, TemplateGroup, TemplateId } from 
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catalogue data (sample content from the design reference; the CMS replaces it).
-// Read it through src/lib/content.ts, never directly from pages.
+// Read it through @/lib/content (src/lib/content/), never directly from pages.
 //
 // Shape mirrors the planned back-end model (see the developer handoff doc):
 //   group (6) → category (20) → spec template → product

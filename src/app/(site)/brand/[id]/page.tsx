@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { CmsListing, CmsListingFromUrl } from '@/components/catalogue/CmsListing';
-import { EMPTY_QUERY } from '@/components/catalogue/Listing';
 import { getBrandPage, getBrandSlugs } from '@/lib/content';
 import { href } from '@/lib/routes';
 import { jsonLd, pageMetadata } from '@/lib/seo';
@@ -51,7 +50,7 @@ export default async function BrandPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
-      <Suspense fallback={<CmsListing data={data} query={EMPTY_QUERY} />}>
+      <Suspense fallback={<CmsListing data={data} />}>
         <CmsListingFromUrl data={data} />
       </Suspense>
     </>

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { CmsListing, CmsListingFromUrl } from '@/components/catalogue/CmsListing';
-import { EMPTY_QUERY } from '@/components/catalogue/Listing';
 import { getAllProductsPage } from '@/lib/content';
 import { jsonLd, pageMetadata } from '@/lib/seo';
 import { siteUrl } from '@/lib/site-url';
@@ -32,7 +31,7 @@ export default async function ProductsPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
-      <Suspense fallback={<CmsListing data={data} query={EMPTY_QUERY} />}>
+      <Suspense fallback={<CmsListing data={data} />}>
         <CmsListingFromUrl data={data} />
       </Suspense>
     </>

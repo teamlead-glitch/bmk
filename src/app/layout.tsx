@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
-import { EnquiryProvider } from '@/components/common/EnquiryProvider';
+import { EnquiryProvider } from '@/components/enquiry/EnquiryProvider';
 import { GtmPageView } from '@/components/common/GtmPageView';
 import { GTM_ID, SEO_CONFIG } from '@/constants/config';
 import { getSiteUrl } from '@/lib/site-url';

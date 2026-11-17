@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { Arrow } from '@/components/common/Arrow';
 import { CloseIcon } from '@/components/common/Icons';
 import { Stage } from '@/components/common/Stage';
-import { FieldError, Honeypot, useEnquirySubmit } from '@/components/common/useEnquirySubmit';
+import { FieldError, Honeypot, useEnquirySubmit } from '@/components/enquiry/useEnquirySubmit';
 import { trackLead } from '@/lib/gtm';
 import type { TemplateId } from '@/types/catalogue';
 
@@ -13,10 +13,10 @@ import type { TemplateId } from '@/types/catalogue';
 // Any element with data-enquire="Distribution Enquiry" (or an empty value) opens
 // the popup with that type preselected, so server components need no JS of their
 // own. Product pages call useEnquiry().open({ product }).
-// The form is posted to the CMS through /api/enquiry/ (src/lib/enquiry.ts);
+// The form is posted to the CMS through /api/enquiry/ (src/services/enquiry.ts);
 // trackLead runs only after the CMS saved it.
 
-export const ENQUIRY_TYPES = ['Distribution Enquiry', 'Dealership Enquiry', 'Retail Sales Enquiry', 'General Enquiry'];
+const ENQUIRY_TYPES = ['Distribution Enquiry', 'Dealership Enquiry', 'Retail Sales Enquiry', 'General Enquiry'];
 const ID = 'enq';
 
 /** The popup's form. Its own component so the sending state resets with each open. */
@@ -136,7 +136,7 @@ const EnquiryContext = createContext<{ open: (args?: OpenArgs) => void; close: (
 export const useEnquiry = () => useContext(EnquiryContext);
 
 /** Tell the navbar panels (mega menu, search, mobile menu) to close */
-export const closeNavPanels = () => document.dispatchEvent(new CustomEvent('bmk:panel', { detail: 'enquiry' }));
+const closeNavPanels = () => document.dispatchEvent(new CustomEvent('bmk:panel', { detail: 'enquiry' }));
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 

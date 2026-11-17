@@ -5,7 +5,7 @@ import { siteUrl } from '@/lib/site-url';
 /* ---------- PAGE METADATA ---------- */
 // Canonical and og:url always use this site's host (from env), the path given here.
 // When the CMS delivers SEO records (meta title, description, robots, OG fields,
-// schema markup), map them into this same function in src/lib/content.ts.
+// schema markup), map them into this same function in src/lib/content/.
 export interface PageSeo {
   title: string;
   description?: string;
@@ -31,8 +31,6 @@ export function pageMetadata({ title, description, path, image, index = true }: 
   };
 }
 
-/** "Nikon" → "Nikon | BMK Group" (the design's title format) */
-export const withSiteName = (title: string) => `${title} | ${SEO_CONFIG.SITE_NAME}`;
 
 /** JSON-LD script body: escape "<" so the content can't close the script tag */
 export const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');

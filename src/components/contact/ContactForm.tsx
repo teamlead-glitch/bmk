@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { CheckIcon } from '@/components/common/Icons';
-import { FieldError, Honeypot, useEnquirySubmit } from '@/components/common/useEnquirySubmit';
+import { FieldError, Honeypot, useEnquirySubmit } from '@/components/enquiry/useEnquirySubmit';
 import { trackLead } from '@/lib/gtm';
 
 const ID = 'contact';

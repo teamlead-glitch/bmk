@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AnchorScroll } from '@/components/common/AnchorScroll';
 import { Arrow } from '@/components/common/Arrow';
-import { NotFoundWall } from '@/components/legal/NotFoundWall';
-import { Footer } from '@/components/layout/Footer';
-import { SiteHeader } from '@/components/layout/SiteHeader';
+import { NotFoundWall } from '@/components/common/NotFoundWall';
+import { Footer } from '@/components/footer/Footer';
+import { SiteHeader } from '@/components/header/SiteHeader';
 import { getContact, getNavData } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 

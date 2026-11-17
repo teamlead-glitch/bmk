@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Crumbs } from '@/components/common/Crumbs';
-import type { EnquiryProduct } from '@/components/common/EnquiryProvider';
+import type { EnquiryProduct } from '@/components/enquiry/EnquiryProvider';
 import { brandVars } from '@/components/common/ProductCard';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { ProductOverview } from '@/components/product/ProductOverview';

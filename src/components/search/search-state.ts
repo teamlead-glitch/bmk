@@ -1,18 +1,11 @@
-// Listing rules (design: catalogue/src/listing.js): filters, sort and paging
-// live in the URL (?brand=a,b&cat=x&sort=az&page=2&q=…), so every state can be
-// linked to and the back button works. Pure: runs on the server (first render)
-// and in the browser.
+// Search results rules (design: catalogue/src/listing.js): query, filters, sort and
+// paging live in the URL (?q=…&brand=a,b&cat=x&sort=az&page=2), so every state can be
+// linked to and the back button works. Pure: runs on the server (first render) and in
+// the browser.
+import { SEARCH_PAGE_SIZE } from '@/constants/listing';
 import type { ListingData } from '@/lib/content';
-import { href } from '@/lib/routes';
+import { href, queryList as list, type Query } from '@/lib/routes';
 import { searchProducts } from '@/lib/search';
-
-export const PAGE_SIZE = 9;
-
-const list = (v: string | null) => (v ? v.split(',').filter(Boolean) : []);
-
-export interface Query {
-  get(key: string): string | null;
-}
 
 export function listingState({ ctx, base: all, brands, categories, groups }: ListingData, params: Query) {
   const q = (params.get('q') || '').trim();
@@ -29,7 +22,7 @@ export function listingState({ ctx, base: all, brands, categories, groups }: Lis
   const results = base
     .filter((p) => byB(p) && byC(p))
     .sort((a, b) => (sort === 'az' ? a.name.localeCompare(b.name) : b.released.localeCompare(a.released)));
-  const shown = results.slice(0, pages * PAGE_SIZE);
+  const shown = results.slice(0, pages * SEARCH_PAGE_SIZE);
 
   const brandOpts = brands
     .map((b) => ({ id: b.id, name: b.name, n: base.filter((p) => p.brandId === b.id && byC(p)).length }))

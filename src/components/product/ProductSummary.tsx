@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
 import { BrandMark } from '@/components/common/BrandMark';
-import type { EnquiryProduct } from '@/components/common/EnquiryProvider';
-import { EnquireProduct } from '@/components/product/EnquireProduct';
+import type { EnquiryProduct } from '@/components/enquiry/EnquiryProvider';
+import { EnquireProduct } from '@/components/enquiry/EnquireProduct';
 import { href } from '@/lib/routes';
-import type { ProductDetail } from '@/types/catalogue';
+import type { ProductDetail } from '@/types/product';
 
 /** Right column of the product hero: brand, name, model, summary, highlight tiles, CTAs. */
 export function ProductSummary({ p, enquiry, hasSpecs }: { p: ProductDetail; enquiry: EnquiryProduct; hasSpecs: boolean }) {

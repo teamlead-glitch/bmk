@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Crumbs } from '@/components/common/Crumbs';
 import { SearchIcon } from '@/components/common/Icons';
 import { BrandLink } from '@/components/common/SmartLink';
-import type { ListingState } from '@/components/catalogue/listing-state';
+import type { ListingState } from '@/components/search/search-state';
 import type { ListingData } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import { searchBrands, searchCategories } from '@/lib/search';
 
 
 /** Hero for Search. (All products and category pages: CmsListing.tsx.) */
-export function PageHero({ data, s }: { data: ListingData; s: ListingState }) {
+export function SearchHero({ data, s }: { data: ListingData; s: ListingState }) {
   return (
     <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
       <div className="shell">

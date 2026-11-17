@@ -1,5 +1,5 @@
-import { Footer } from '@/components/layout/Footer';
-import { HomeHeader } from '@/components/layout/HomeHeader';
+import { Footer } from '@/components/footer/Footer';
+import { HomeHeader } from '@/components/header/HomeHeader';
 import { getContact, getNavData } from '@/lib/content';
 
 /** Homepage chrome: the glass-pill navbar with the inline mobile menu. */

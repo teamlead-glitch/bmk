@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LISTING_PAGE_SIZE, getProducts, isSlug } from '@/lib/content';
-import type { ProductSort } from '@/types/catalogue';
+import { LISTING_PAGE_SIZE, MAX_LISTING_PAGES } from '@/constants/listing';
+import { getProducts, isSlug } from '@/lib/content';
+import type { ProductSort } from '@/types/listing';
 
 /* ---------- PRODUCT PAGES FOR THE LISTINGS (All products, category pages) ---------- */
 // GET /api/products/?category=a,b&brand=c,d&sort=latest|name_asc|name_desc&page=2
 // The browser calls this when filters, sort or the next page change; it reads the CMS
-// (GET /v1/products) through the shared cache in src/lib/content.ts.
+// (GET /v1/products) through the shared cache in src/lib/content/catalogue.ts.
 const SORTS: ProductSort[] = ['latest', 'name_asc', 'name_desc'];
-const MAX_PAGE = 100;
 const MAX_SLUGS = 20;
 
 /** "a,b" -> ["a","b"]; null when there are too many or one isn't a slug */
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   if (!SORTS.includes(sort)) return bad('invalid sort');
 
   const page = Number(q.get('page') || '1');
-  if (!Number.isInteger(page) || page < 1 || page > MAX_PAGE) return bad('invalid page');
+  if (!Number.isInteger(page) || page < 1 || page > MAX_LISTING_PAGES) return bad('invalid page');
 
   try {
     const body = await getProducts({ category: [...categories].sort().join(',') || undefined, brands, sort, page, perPage: LISTING_PAGE_SIZE });

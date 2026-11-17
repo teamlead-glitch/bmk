@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Companies, Journey, MissionValues, OurBrands, WhoWeAre } from '@/components/about/AboutSections';
 import { SectionPills } from '@/components/about/SectionPills';
-import { EnquiryBlock } from '@/components/common/EnquiryBlock';
+import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { PhotoHero } from '@/components/common/PhotoHero';
 import { getCompany, getHomeBrands } from '@/lib/content';
 import { HOME } from '@/lib/routes';

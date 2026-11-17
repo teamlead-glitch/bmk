@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { ContactOffices, ContactOfficesFromUrl } from '@/components/contact/ContactOffices';
-import { EnquiryBlock } from '@/components/common/EnquiryBlock';
+import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { MailIcon, PhoneIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
 import { getCompany, getContact, telHref } from '@/lib/content';

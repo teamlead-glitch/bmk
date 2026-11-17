@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- brand logos (SVG) */
 import { Arrow } from '@/components/common/Arrow';
-import { BrandsCarousel } from '@/components/home/BrandsCarousel';
+import { BrandsCarousel } from '@/components/home/brands/BrandsCarousel';
 import type { BrandLite } from '@/types/catalogue';
 
 /** Associated (partner) brands carousel with category filters, then BMK's own brands. */

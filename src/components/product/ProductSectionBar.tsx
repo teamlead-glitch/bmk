@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
-import type { EnquiryProduct } from '@/components/common/EnquiryProvider';
-import { EnquireProduct } from '@/components/product/EnquireProduct';
+import type { EnquiryProduct } from '@/components/enquiry/EnquiryProvider';
+import { EnquireProduct } from '@/components/enquiry/EnquireProduct';
 
 const SECTIONS = [
   ['overview', 'Overview'],

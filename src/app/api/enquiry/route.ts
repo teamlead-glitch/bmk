@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/constants/config';
 import { cmsHeaders } from '@/lib/cms-headers';
-import { ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES, type EnquiryResult } from '@/lib/enquiry';
+import { ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES } from '@/constants/enquiry';
+import type { EnquiryResult } from '@/types/enquiry';
 
 /* ---------- SEND AN ENQUIRY (contact form + enquiry popup) ---------- */
 // POST /api/enquiry/ { type, name, email, phone?, company?, country?, subject?, message }

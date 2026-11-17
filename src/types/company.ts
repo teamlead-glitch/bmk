@@ -1,21 +1,3 @@
-/** Site contact details, from the CMS setting GET /v1/settings/contact. Empty values are null / []. */
-export interface Contact {
-  phone: string | null;
-  email: string | null;
-  /** Office address, one entry per line */
-  address: string[];
-  social: SocialLink[];
-}
-
-export type SocialId = 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube';
-
-export interface SocialLink {
-  /** Also the icon file: /assets/icons/{id}.svg */
-  id: SocialId;
-  label: string;
-  href: string;
-}
-
 export interface Country {
   id: string;
   name: string;
@@ -50,22 +32,6 @@ export interface Milestone {
 export interface EnquiryType {
   type: string;
   title: string;
-  text: string;
-}
-
-export interface FaqTopic {
-  id: string;
-  name: string;
-}
-
-/** FAQ as pages get it from src/lib/content.ts (CMS GET /v1/faqs). */
-export interface Faq {
-  id: string;
-  topic: string;
-  q: string;
-  /** Answer markup, cleaned on the server */
-  html: string;
-  /** Answer as plain text: search and FAQPage JSON-LD */
   text: string;
 }
 

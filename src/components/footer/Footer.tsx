@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element -- SVG logo and icons */
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { FooterTagline } from '@/components/layout/FooterTagline';
+import { FooterTagline } from '@/components/footer/FooterTagline';
 import { telHref } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import type { Group } from '@/types/catalogue';
-import type { Contact } from '@/types/company';
+import type { Contact } from '@/types/contact';
 
 const LEGAL_LINKS: [string, string][] = [
   ['/privacy', 'Privacy Policy'],

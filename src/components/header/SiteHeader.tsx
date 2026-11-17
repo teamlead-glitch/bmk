@@ -6,10 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { ChevIcon, CloseIcon, SearchIcon } from '@/components/common/Icons';
-import { CatalogueMenu } from '@/components/layout/CatalogueMenu';
-import { MegaMenu } from '@/components/layout/MegaMenu';
-import { SearchPanel } from '@/components/layout/SearchPanel';
-import { usePanel, usePanelGroup } from '@/components/layout/usePanel';
+import { CatalogueMenu } from '@/components/header/CatalogueMenu';
+import { MegaMenu } from '@/components/header/MegaMenu';
+import { SearchPanel } from '@/components/header/SearchPanel';
+import { usePanel, usePanelGroup } from '@/components/header/usePanel';
 import { HOME, href } from '@/lib/routes';
 import type { NavData } from '@/types/catalogue';
 

@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import { EMPTY_QUERY, Listing, ListingFromUrl } from '@/components/catalogue/Listing';
+import { SearchListing, SearchListingFromUrl } from '@/components/search/SearchListing';
 import type { ListingData } from '@/lib/content';
 import { jsonLd } from '@/lib/seo';
 import { siteUrl } from '@/lib/site-url';
 
 /** Server wrapper: the unfiltered first page is in the static HTML (crawlable
  *  product links); in the browser the listing follows the URL's filters. */
-export function ListingPage({ data }: { data: ListingData }) {
+export function SearchPage({ data }: { data: ListingData }) {
   const { ctx } = data;
   const schema =
     ctx.kind === 'search'
@@ -25,8 +25,8 @@ export function ListingPage({ data }: { data: ListingData }) {
   return (
     <>
       {schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />}
-      <Suspense fallback={<Listing data={data} query={EMPTY_QUERY} />}>
-        <ListingFromUrl data={data} />
+      <Suspense fallback={<SearchListing data={data} />}>
+        <SearchListingFromUrl data={data} />
       </Suspense>
     </>
   );

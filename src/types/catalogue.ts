@@ -1,6 +1,6 @@
 // Catalogue model: group (6) → category (20) → spec template → product.
 // Mirrors the back-end model in the developer handoff document; the CMS will
-// return these shapes (see src/lib/content.ts).
+// return these shapes (see src/lib/content/).
 
 export type TemplateId = 'camera' | 'lens' | 'instantCamera' | 'film' | 'printer' | 'phone' | 'watch' | 'generic';
 
@@ -132,83 +132,4 @@ export interface NavData {
   categories: CategoryLite[];
   inHouseBrands: BrandLite[];
   partnerBrands: BrandLite[];
-}
-
-/* ---------- CMS catalogue (GET /v1/categories, /v1/products) ---------- */
-
-/** Product sort the CMS understands */
-export type ProductSort = 'latest' | 'name_asc' | 'name_desc';
-
-/** One page of products from GET /v1/products */
-export interface ProductPage {
-  items: CardProduct[];
-  total: number;
-  page: number;
-  lastPage: number;
-}
-
-/** A category page (/category/{slug}) from GET /v1/categories/{slug} */
-export interface CategoryInfo {
-  slug: string;
-  title: string;
-  short: string | null;
-  /** Hero photo: the category banner, else its image */
-  banner: string | null;
-  count: number;
-}
-
-/** A pill or filter option with its product count */
-export interface CountedOption {
-  id: string;
-  name: string;
-  n: number;
-}
-
-/** A brand page (/brand/{slug}) from GET /v1/brands/{slug} */
-export interface BrandInfo {
-  slug: string;
-  name: string;
-  /** Introduction as plain text (the CMS sends HTML) */
-  intro: string;
-  logo: string | null;
-  banner: string | null;
-  /** Brand colour and the label colour on top of it */
-  color: BrandColor;
-}
-
-/** A product listing page from the CMS: All products (/products), a category (/category/{slug}) or a brand (/brand/{slug}) */
-export interface CmsListingData {
-  kind: 'all' | 'category' | 'brand';
-  /** The category of a category page, else null */
-  category: CategoryInfo | null;
-  /** The brand of a brand page, else null */
-  brand: BrandInfo | null;
-  /** Categories with products: Category filter (All products), category tabs (brand page: counts within the brand) */
-  categories: CountedOption[];
-  /** Brands with products on this page (Brand filter; empty on a brand page) */
-  brands: CountedOption[];
-  /** First page, unfiltered, latest first: in the server HTML */
-  first: ProductPage;
-}
-
-/** A product page (/product/{slug}) from GET /v1/products/{slug} */
-export interface ProductDetail {
-  slug: string;
-  name: string;
-  modelNo: string | null;
-  short: string;
-  /** Description markup, cleaned on the server (src/lib/html.ts) */
-  descriptionHtml: string;
-  /** Main image first, then the gallery */
-  images: { src: string; alt: string }[];
-  brand: { slug: string; name: string; logo: string | null; color: BrandColor };
-  /** First category, null when the product has none */
-  category: { slug: string; name: string } | null;
-  highlights: Highlight[];
-  /** Specification groups ("Specifications" when the CMS group has no name); variable products add their options */
-  specGroups: { group: string; rows: { key: string; label: string; value: SpecValue }[] }[];
-  seo: { title: string; description: string; index: boolean; image: string | null };
-  /** Other products of the brand / of the category, up to 4 each */
-  fromBrand: CardProduct[];
-  inCategory: CardProduct[];
 }

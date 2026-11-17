@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { EnquiryBlock } from '@/components/common/EnquiryBlock';
+import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { AboutSection } from '@/components/home/AboutSection';
-import { BrandsSection } from '@/components/home/BrandsSection';
-import { HeroSection } from '@/components/home/HeroSection';
-import { HistorySection } from '@/components/home/HistorySection';
+import { BrandsSection } from '@/components/home/brands/BrandsSection';
+import { HeroSection } from '@/components/home/hero/HeroSection';
+import { HistorySection } from '@/components/home/history/HistorySection';
 import { HomeReveals } from '@/components/home/HomeReveals';
-import { PresenceSection } from '@/components/home/PresenceSection';
+import { PresenceSection } from '@/components/home/presence/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
 import { getCompany, getContact, getHomeBanner, getHomeBrands } from '@/lib/content';

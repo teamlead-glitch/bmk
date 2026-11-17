@@ -7,7 +7,7 @@ import { Arrow } from '@/components/common/Arrow';
 import { PlusIcon, SearchIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
 import { HOME, href } from '@/lib/routes';
-import type { Faq, FaqTopic } from '@/types/company';
+import type { Faq, FaqTopic } from '@/types/faq';
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 

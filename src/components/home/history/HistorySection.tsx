@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
 import { MilestoneCard } from '@/components/common/MilestoneCard';
-import { TimelineMotion } from '@/components/home/TimelineMotion';
+import { TimelineMotion } from '@/components/home/history/TimelineMotion';
 import { href } from '@/lib/routes';
 import type { Milestone } from '@/types/company';
 
