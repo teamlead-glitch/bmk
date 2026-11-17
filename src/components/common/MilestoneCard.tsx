@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- decorative photo and SVG icon */
-import { milestoneVisual } from '@/data/visuals';
+import { milestoneVisual } from '@/static/data/visuals';
 import type { Milestone } from '@/types/company';
 
 /** Timeline milestone card (homepage timeline and About › Our journey).

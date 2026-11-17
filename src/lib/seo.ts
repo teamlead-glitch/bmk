@@ -5,7 +5,7 @@ import { siteUrl } from '@/lib/site-url';
 /* ---------- PAGE METADATA ---------- */
 // Canonical and og:url always use this site's host (from env), the path given here.
 // When the CMS delivers SEO records (meta title, description, robots, OG fields,
-// schema markup), map them into this same function in src/lib/content/.
+// schema markup), map them into this same function in src/lib/api/.
 export interface PageSeo {
   title: string;
   description?: string;

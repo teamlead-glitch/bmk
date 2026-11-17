@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { PREVIEW_COOKIE } from '@/lib/preview';
+import { PREVIEW_COOKIE } from '@/lib/api/cms-preview';
 
 export const dynamic = 'force-dynamic';
 const MAX_AGE_SECONDS = 60 * 60;

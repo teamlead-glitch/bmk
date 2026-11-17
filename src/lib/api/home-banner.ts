@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/cms-fetch';
-import { mediaUrl } from '@/lib/content/cms';
+import { cmsGet } from '@/lib/api/cms-fetch';
+import { mediaUrl } from '@/lib/api/cms-mappers';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
 /* ---------- Homepage hero (CMS: GET /v1/settings/home-banner) ---------- */

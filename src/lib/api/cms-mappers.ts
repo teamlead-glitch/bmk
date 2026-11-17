@@ -1,4 +1,4 @@
-import { DEFAULT_BRAND_COLOR } from '@/data/media';
+import { DEFAULT_BRAND_COLOR } from '@/constants/brand';
 import type { BrandColor } from '@/types/catalogue';
 
 /* ---------- Mapping helpers for CMS answers (used by every content file) ---------- */

@@ -1,7 +1,8 @@
 // Catalogue rules: lookups, spec templates, card highlights, slim client shapes.
-// Pure functions over the catalogue data; used on the server (src/lib/content/) for the menus and search.
-import { brands, categories, groups, products, templates } from '@/data/catalogue';
-import { brandLogos, brandMenuImage, brandStyle, DEFAULT_BRAND_COLOR, productMedia } from '@/data/media';
+// Pure functions over the catalogue data; used by src/static/*-content.ts for the menus, search and homepage brands.
+import { brands, categories, groups, products, templates } from '@/static/data/catalogue';
+import { DEFAULT_BRAND_COLOR } from '@/constants/brand';
+import { brandLogos, brandMenuImage, brandStyle, productMedia } from '@/static/data/media';
 import type { Brand, BrandLite, CardProduct, Category, Product, SpecValue, TemplateId } from '@/types/catalogue';
 
 const byId = <T extends { id: string }>(list: T[], id: string | undefined | null) => list.find((x) => x.id === id);

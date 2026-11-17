@@ -9,7 +9,7 @@ import { listingState, type ListingState } from '@/components/search/search-stat
 import { Arrow } from '@/components/common/Arrow';
 import { ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
 import { ProductCard } from '@/components/common/ProductCard';
-import { POPULAR_SEARCHES } from '@/data/visuals';
+import { POPULAR_SEARCHES } from '@/static/data/visuals';
 import type { ListingData } from '@/lib/content';
 import { href, NO_FILTERS, type Query } from '@/lib/routes';
 

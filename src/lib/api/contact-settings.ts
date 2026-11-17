@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/cms-fetch';
-import { mediaUrl } from '@/lib/content/cms';
+import { cmsGet } from '@/lib/api/cms-fetch';
+import { mediaUrl } from '@/lib/api/cms-mappers';
 import type { Contact, SocialId } from '@/types/contact';
 
 /* ---------- Site contact details (CMS: GET /v1/settings/contact) ---------- */

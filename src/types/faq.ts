@@ -3,7 +3,7 @@ export interface FaqTopic {
   name: string;
 }
 
-/** FAQ as pages get it from src/lib/content/faq.ts (CMS GET /v1/faqs). */
+/** FAQ as pages get it from src/lib/api/faqs.ts (CMS GET /v1/faqs). */
 export interface Faq {
   id: string;
   topic: string;

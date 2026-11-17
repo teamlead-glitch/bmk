@@ -1,12 +1,12 @@
 import { cache } from 'react';
-import { brands, categories, groups, products } from '@/data/catalogue';
-import { countIn, toBrandLite, toCardProduct } from '@/lib/catalogue';
+import { brands, categories, groups, products } from '@/static/data/catalogue';
+import { countIn, toBrandLite, toCardProduct } from '@/static/catalogue-helpers';
 import type { BrandLite, CardProduct, CategoryLite, Group, NavData } from '@/types/catalogue';
 
-/* ---------- The design's sample catalogue (src/data/catalogue.ts) ---------- */
+/* ---------- The design's sample catalogue (src/static/data/catalogue.ts) ---------- */
 // Still used by the navbar menus, the search panel and the search page until they move to
 // the CMS (GET /v1/categories, /v1/brands, /v1/products). Product, listing, category and
-// brand pages already read the CMS (src/lib/content/catalogue.ts).
+// brand pages already read the CMS (src/lib/api/).
 
 /* ---------- Navigation (layouts) ---------- */
 

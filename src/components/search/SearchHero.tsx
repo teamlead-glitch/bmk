@@ -8,7 +8,7 @@ import { BrandLink } from '@/components/common/SmartLink';
 import type { ListingState } from '@/components/search/search-state';
 import type { ListingData } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
-import { searchBrands, searchCategories } from '@/lib/search';
+import { searchBrands, searchCategories } from '@/static/search-helpers';
 
 
 /** Hero for Search. (All products and category pages: CmsListing.tsx.) */

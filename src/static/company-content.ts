@@ -1,8 +1,8 @@
 import { cache } from 'react';
-import { brands, groups } from '@/data/catalogue';
-import * as company from '@/data/company';
-import { countryVisual, DEFAULT_LOCATION } from '@/data/visuals';
-import { categoriesIn, toBrandLite } from '@/lib/catalogue';
+import { brands, groups } from '@/static/data/catalogue';
+import * as company from '@/static/data/company';
+import { countryVisual, DEFAULT_LOCATION } from '@/static/data/visuals';
+import { categoriesIn, toBrandLite } from '@/static/catalogue-helpers';
 import { href } from '@/lib/routes';
 import type { Location } from '@/types/company';
 

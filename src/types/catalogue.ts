@@ -1,6 +1,6 @@
 // Catalogue model: group (6) → category (20) → spec template → product.
 // Mirrors the back-end model in the developer handoff document; the CMS will
-// return these shapes (see src/lib/content/).
+// return these shapes (see src/lib/api/).
 
 export type TemplateId = 'camera' | 'lens' | 'instantCamera' | 'film' | 'printer' | 'phone' | 'watch' | 'generic';
 

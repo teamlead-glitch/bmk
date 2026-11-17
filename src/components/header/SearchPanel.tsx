@@ -7,9 +7,9 @@ import { Arrow } from '@/components/common/Arrow';
 import { CloseIcon, SearchIcon } from '@/components/common/Icons';
 import { BrandLink } from '@/components/common/SmartLink';
 import { Stage } from '@/components/common/Stage';
-import { POPULAR_SEARCHES } from '@/data/visuals';
+import { POPULAR_SEARCHES } from '@/static/data/visuals';
 import { href } from '@/lib/routes';
-import type { SearchSuggestions } from '@/lib/search';
+import type { SearchSuggestions } from '@/static/search-helpers';
 import type { Group } from '@/types/catalogue';
 
 const Label = ({ children }: { children: string }) => <p className="mb-3 text-xs tracking-[0.14em] text-muted uppercase">{children}</p>;

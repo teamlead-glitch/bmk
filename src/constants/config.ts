@@ -1,7 +1,7 @@
 // Environment access lives here and in src/lib/* only, always with a safe fallback.
 
-// CMS API (server and browser): products, listings, contact, FAQ and the home banner read it; other content still comes from src/data via
-// src/lib/content/ until each function is moved to the CMS.
+// CMS API: read by src/lib/api/ (products, listings, contact, FAQ, home banner). Content without an
+// endpoint yet still comes from the designer's static content in src/static/.
 export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_URI || '',
 };

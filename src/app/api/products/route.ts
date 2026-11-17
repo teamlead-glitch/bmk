@@ -6,7 +6,7 @@ import type { ProductSort } from '@/types/listing';
 /* ---------- PRODUCT PAGES FOR THE LISTINGS (All products, category pages) ---------- */
 // GET /api/products/?category=a,b&brand=c,d&sort=latest|name_asc|name_desc&page=2
 // The browser calls this when filters, sort or the next page change; it reads the CMS
-// (GET /v1/products) through the shared cache in src/lib/content/catalogue.ts.
+// (GET /v1/products) through the shared cache in src/lib/api/products.ts.
 const SORTS: ProductSort[] = ['latest', 'name_asc', 'name_desc'];
 const MAX_SLUGS = 20;
 

@@ -6,7 +6,7 @@ export interface ProductDetail {
   name: string;
   modelNo: string | null;
   short: string;
-  /** Description markup, cleaned on the server (src/lib/html.ts) */
+  /** Description markup, cleaned on the server (src/lib/sanitize-html.ts) */
   descriptionHtml: string;
   /** Main image first, then the gallery */
   images: { src: string; alt: string }[];

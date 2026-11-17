@@ -5,7 +5,7 @@
 import { SEARCH_PAGE_SIZE } from '@/constants/listing';
 import type { ListingData } from '@/lib/content';
 import { href, queryList as list, type Query } from '@/lib/routes';
-import { searchProducts } from '@/lib/search';
+import { searchProducts } from '@/static/search-helpers';
 
 export function listingState({ ctx, base: all, brands, categories, groups }: ListingData, params: Query) {
   const q = (params.get('q') || '').trim();

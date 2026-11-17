@@ -1,4 +1,4 @@
-/** About the product: the CMS description (rich text, cleaned on the server in src/lib/html.ts). */
+/** About the product: the CMS description (rich text, cleaned on the server in src/lib/sanitize-html.ts). */
 export function ProductOverview({ name, html }: { name: string; html: string }) {
   return (
     <section id="overview" className="shell section-y scroll-mt-24" data-section>

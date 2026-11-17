@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
   // Every page URL ends with "/" (/about/, /brand/nikon/), as in the design reference
   trailingSlash: true,
   // Cache Components is off on purpose: the site uses the ISR model (cached pages,
-  // unstable_cache in src/lib/cms-fetch.ts, revalidateTag from /api/revalidate),
+  // unstable_cache in src/lib/api/cms-fetch.ts, revalidateTag from /api/revalidate),
   // and the homepage's GSAP pins / Lenis must unmount on navigation (Cache
   // Components keeps hidden routes mounted with <Activity>).
   cacheComponents: false,

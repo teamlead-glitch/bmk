@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { CMS_TAG } from '@/lib/cms-fetch';
+import { CMS_TAG } from '@/lib/api/cms-fetch';
 
 /* ---------- CLEAR THE CMS CACHE AFTER A SAVE ---------- */
 //   POST /api/revalidate   Header: x-revalidate-secret: <REVALIDATE_SECRET>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSearchIndex } from '@/lib/content';
-import { searchBrands, searchCategories, searchProducts, type SearchSuggestions } from '@/lib/search';
+import { searchBrands, searchCategories, searchProducts, type SearchSuggestions } from '@/static/search-helpers';
 
 /* ---------- SEARCH SUGGESTIONS (navbar search panel) ---------- */
 // GET /api/search?q=x-t5 → top 5 products (card fields only) + total, matching

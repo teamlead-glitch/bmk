@@ -2,7 +2,7 @@
 
 Production front end of the BMK Group website, built from the approved design reference (the Vite repo `bmk`, live preview https://bmkbyphitany.vercel.app). Markup, styles, motion and copy follow that reference; this repo adds routing, SEO, caching and the CMS-ready data layer.
 
-Content currently comes from the design's sample data (`src/data/`). The CMS API is wired in later through one file: `src/lib/content.ts`.
+Pages get their data through one entry point, `src/lib/content.ts`. CMS API code lives in `src/lib/api/` (products, listings, contact, FAQ, home banner); the designer's static content that has no endpoint yet lives in `src/static/` (sample data in `src/static/data/`).
 
 ## Run it
 
@@ -31,7 +31,7 @@ Copy `.env.example` to `.env.local` for local settings (all optional today).
 | `/product/{slug}/` | Product detail | `src/app/(site)/product/[slug]`, `src/components/product/*` |
 | `/search/?q=` | Search results (noindex) | `src/app/(site)/search` |
 | `/faq/`, `/contact/` | FAQ, Contact Us | `src/components/faq/*`, `src/components/contact/*` |
-| `/privacy/`, `/cookies/`, `/terms/` | Legal pages (placeholder wording) | `src/components/legal/*`, `src/data/legal.ts` |
+| `/privacy/`, `/cookies/`, `/terms/` | Legal pages (placeholder wording) | `src/components/legal/*`, `src/static/data/legal.ts` |
 | anything else | 404 (the 4/0 wall) | `src/app/not-found.tsx` |
 
 Listing filters, sort and paging live in the URL (`?brand=nikon&cat=lenses-optics&sort=az&page=2`). The unfiltered first page is in the static HTML; the browser applies the URL's filters.

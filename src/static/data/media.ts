@@ -34,7 +34,6 @@ export const brandStyle: Record<string, BrandColor> = {
   lg: { color: '#a50034', on: '#ffffff' },
   sujata: { color: '#6d6e71', on: '#ffffff' },
 };
-export const DEFAULT_BRAND_COLOR: BrandColor = { color: '#1f487d', on: '#ffffff' };
 
 /** Mega menu (brands view) picture per partner brand, 4:3 (admin field "Menu image"). */
 export const brandMenuImage: Record<string, string> = {

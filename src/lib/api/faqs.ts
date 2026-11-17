@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import { API_CONFIG } from '@/constants/config';
-import { cmsGet } from '@/lib/cms-fetch';
-import { cleanHtml, htmlToText } from '@/lib/html';
+import { cmsGet } from '@/lib/api/cms-fetch';
+import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { Faq, FaqTopic } from '@/types/faq';
 
 /* ---------- FAQ (CMS: GET /v1/faqs) ---------- */

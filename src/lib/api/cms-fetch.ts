@@ -1,9 +1,9 @@
 import { unstable_cache } from 'next/cache';
-import { withPreviewToken } from '@/lib/preview';
-import { cmsHeaders } from '@/lib/cms-headers';
+import { withPreviewToken } from '@/lib/api/cms-preview';
+import { cmsHeaders } from '@/lib/api/cms-headers';
 
 /* ---------- CMS API FETCH (shared cache + retry + last good copy) ---------- */
-// Used by src/lib/content/ for every CMS read (products, listings, contact, FAQ, home banner).
+// Used by src/lib/api/ for every CMS read (products, listings, contact, FAQ, home banner).
 //  - Answers are kept in the shared data cache for CMS_REVALIDATE_SECONDS; after that the
 //    old copy is served while a fresh one is fetched in the background.
 //  - Only 404 / 410 mean "not found". Any other 4xx/5xx is the CMS failing.

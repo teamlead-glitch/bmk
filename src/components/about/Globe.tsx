@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- pin icon (SVG) */
 import { useEffect, useRef } from 'react';
-import { globePlaces } from '@/data/visuals';
+import { globePlaces } from '@/static/data/visuals';
 
 /**
  * About › Who we are: a dotted globe that tours BMK's locations and can be

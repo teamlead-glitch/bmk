@@ -1,7 +1,7 @@
 import type { Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types/company';
 
 // Company content (from the design reference; the CMS replaces it).
-// Read it through @/lib/content (src/lib/content/), never directly from pages.
+// Read it through @/lib/content (src/static/company-content.ts), never directly from pages.
 // Source: the client's document "BMK_WEBSITE_INFO_21.10.2026" (shared 22 Oct 2026),
 // with the agency's decisions of 22 Oct (24 years, latest phone number, PIN 682021,
 // "-Dr" dropped from the Malaysian entity name). Anything the document doesn't

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- art-directed photos */
 import { Arrow } from '@/components/common/Arrow';
-import { enquiryImages } from '@/data/visuals';
+import { enquiryImages } from '@/static/data/visuals';
 import type { EnquiryType } from '@/types/company';
 
 const ALT: Record<string, string> = {

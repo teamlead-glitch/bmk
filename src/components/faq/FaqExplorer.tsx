@@ -46,7 +46,7 @@ function FaqItem({ f, forceOpen }: { f: Faq; forceOpen: boolean }) {
           <PlusIcon />
         </span>
       </summary>
-      {/* CMS rich text, cleaned on the server (src/lib/html.ts) */}
+      {/* CMS rich text, cleaned on the server (src/lib/sanitize-html.ts) */}
       <div className="faq-a" dangerouslySetInnerHTML={{ __html: f.html }} />
     </details>
   );

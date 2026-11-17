@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
 import { LegalToc } from '@/components/legal/LegalToc';
-import { LEGAL, LEGAL_ORDER, type LegalId } from '@/data/legal';
+import { LEGAL, LEGAL_ORDER, type LegalId } from '@/static/data/legal';
 import { getContact } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
