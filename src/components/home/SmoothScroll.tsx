@@ -4,7 +4,7 @@ import Lenis from 'lenis';
 import { useEffect } from 'react';
 import { gsap, ScrollTrigger, setLenis } from '@/lib/gsap';
 
-/** Homepage only: Lenis smoothing makes the scrubbed hero video feel continuous.
+/** Homepage only: Lenis smoothing makes the pinned, scrubbed sections feel continuous.
  *  Driven by GSAP's ticker so Lenis and ScrollTrigger read the same position.
  *  Pauses while a popup (body.no-scroll) is open. Render it FIRST on the page:
  *  effects run in tree order, and the pinned sections below rely on it. */

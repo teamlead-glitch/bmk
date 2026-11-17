@@ -3,16 +3,25 @@ import { LEGACY_REDIRECTS } from './src/constants/legacy-redirects';
 
 // Content-Security-Policy: one entry per directive, every third party listed with a reason.
 // 'unsafe-inline' scripts: Next.js bootstrap, the js-motion flag in the root layout and GTM.
-// blob: media: the hero video is fetched into memory and played from a blob URL.
+// media-src CMS: the homepage hero video uploaded in the CMS (home-banner "video").
+// frame-src youtube-nocookie: the homepage hero YouTube background (home-banner "video_url").
+const CMS_ORIGIN = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URI || '').origin;
+  } catch {
+    return '';
+  }
+})();
+
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com",
   "connect-src 'self' https://*.google-analytics.com https://*.googletagmanager.com https://*.analytics.google.com",
   "img-src 'self' data: blob: https:",
-  "media-src 'self' blob:",
+  `media-src 'self'${CMS_ORIGIN ? ` ${CMS_ORIGIN}` : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  "frame-src 'self' https://www.googletagmanager.com https://www.google.com",
+  "frame-src 'self' https://www.googletagmanager.com https://www.google.com https://www.youtube-nocookie.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -44,8 +53,8 @@ const nextConfig: NextConfig = {
     return [
       // Staging and previews stay out of search results (the live domain never matches)
       { source: '/:path*', has: [{ type: 'host', value: '.*\\.vercel\\.app' }], headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
-      // Design assets and video: a day in the browser, a week at the edge (rename files when they change)
-      ...['/assets/:path*', '/video/:path*', '/data/:path*'].map((source) => ({
+      // Design assets: a day in the browser, a week at the edge (rename files when they change)
+      ...['/assets/:path*', '/data/:path*'].map((source) => ({
         source,
         headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800' }],
       })),

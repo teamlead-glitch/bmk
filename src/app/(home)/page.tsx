@@ -8,9 +8,12 @@ import { HomeReveals } from '@/components/home/HomeReveals';
 import { PresenceSection } from '@/components/home/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
-import { getCompany, getHomeBrands } from '@/lib/content';
+import { getCompany, getHomeBanner, getHomeBrands } from '@/lib/content';
 import { jsonLd, pageMetadata } from '@/lib/seo';
 import { getSiteUrl } from '@/lib/site-url';
+
+// Hero background comes from the CMS: rebuilt at most every 5 minutes, or at once via POST /api/revalidate/
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   ...pageMetadata({ title: SEO_CONFIG.DEFAULT_TITLE, path: '/' }),
@@ -20,7 +23,7 @@ export const metadata: Metadata = {
 // Order matters: effects run top to bottom, and pinned sections (hero, history)
 // must be created before the triggers below them measure the pin spacing.
 export default async function HomePage() {
-  const [company, brands] = await Promise.all([getCompany(), getHomeBrands()]);
+  const [company, brands, banner] = await Promise.all([getCompany(), getHomeBrands(), getHomeBanner()]);
   const site = getSiteUrl();
   const organization = {
     '@context': 'https://schema.org',
@@ -38,7 +41,7 @@ export default async function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(organization) }} />
       <SmoothScroll />
-      <HeroSection years={company.YEARS} />
+      <HeroSection years={company.YEARS} banner={banner} />
       <AboutSection heading={company.intro.heading} paragraphs={company.intro.short} />
       <PresenceSection locations={company.locations} defaultLocation={company.defaultLocation} />
       <BrandsSection partner={brands.partner} own={brands.own} filters={brands.filters} />
