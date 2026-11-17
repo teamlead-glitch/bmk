@@ -8,7 +8,7 @@ import { HomeReveals } from '@/components/home/HomeReveals';
 import { PresenceSection } from '@/components/home/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
-import { getCompany, getHomeBanner, getHomeBrands } from '@/lib/content';
+import { getCompany, getContact, getHomeBanner, getHomeBrands } from '@/lib/content';
 import { jsonLd, pageMetadata } from '@/lib/seo';
 import { getSiteUrl } from '@/lib/site-url';
 
@@ -23,8 +23,9 @@ export const metadata: Metadata = {
 // Order matters: effects run top to bottom, and pinned sections (hero, history)
 // must be created before the triggers below them measure the pin spacing.
 export default async function HomePage() {
-  const [company, brands, banner] = await Promise.all([getCompany(), getHomeBrands(), getHomeBanner()]);
+  const [company, brands, banner, contact] = await Promise.all([getCompany(), getHomeBrands(), getHomeBanner(), getContact()]);
   const site = getSiteUrl();
+  // Contact details and social profiles from the CMS (settings/contact); empty ones are left out
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -32,9 +33,10 @@ export default async function HomePage() {
     url: site,
     logo: `${site}/assets/logo/bmk.svg`,
     foundingDate: String(company.FOUNDED),
-    email: company.contact.email,
-    telephone: company.contact.phone,
-    address: { '@type': 'PostalAddress', streetAddress: company.contact.address, addressLocality: 'Dubai', addressCountry: 'AE' },
+    ...(contact.email && { email: contact.email }),
+    ...(contact.phone && { telephone: contact.phone }),
+    ...(contact.address.length > 0 && { address: contact.address.join(', ') }),
+    ...(contact.social.length > 0 && { sameAs: contact.social.map((s) => s.href) }),
   };
 
   return (

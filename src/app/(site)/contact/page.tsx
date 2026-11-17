@@ -6,7 +6,7 @@ import { ContactOffices, ContactOfficesFromUrl } from '@/components/contact/Cont
 import { EnquiryBlock } from '@/components/common/EnquiryBlock';
 import { MailIcon, PhoneIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { getCompany } from '@/lib/content';
+import { getCompany, getContact, telHref } from '@/lib/content';
 import { HOME } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -18,8 +18,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function ContactPage() {
-  const company = await getCompany();
-  const { contact } = company;
+  const [company, contact] = await Promise.all([getCompany(), getContact()]);
+  const hasOffice = contact.address.length > 0 || contact.phone || contact.email;
   return (
     <>
       <PhotoHero trail={[['Home', HOME], ['Contact Us']]} title="Get in touch" sub="Reach the right BMK Group company, or send us a message." image="/assets/images/contact-hero.webp" />
@@ -34,27 +34,34 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
-      <section className="shell">
-        <div className="flex flex-col gap-6 rounded-3xl bg-navy p-6 text-white sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
-            <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white">
-              <img src="/assets/icons/loc-dubai.svg" alt="" width={32} height={32} />
-            </span>
-            <div>
-              <p className="text-xs tracking-[0.14em] text-white/60 uppercase">Head office</p>
-              <p className="mt-1 text-xl leading-7 font-semibold">{contact.company} · Jebel Ali Free Zone, Dubai</p>
+      {/* Head office: contact details from the CMS (settings/contact) */}
+      {hasOffice && (
+        <section className="shell">
+          <div className="flex flex-col gap-6 rounded-3xl bg-navy p-6 text-white sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-4">
+              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white">
+                <img src="/assets/icons/loc-dubai.svg" alt="" width={32} height={32} />
+              </span>
+              <div>
+                <p className="text-xs tracking-[0.14em] text-white/60 uppercase">Head office</p>
+                {contact.address.length > 0 && <p className="mt-1 text-xl leading-7 font-semibold">{contact.address.join(', ')}</p>}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {contact.phone && (
+                <a className="btn bg-white text-ink hover:bg-accent hover:text-white" href={telHref(contact.phone)}>
+                  <PhoneIcon /> {contact.phone}
+                </a>
+              )}
+              {contact.email && (
+                <a className="btn btn-outline-light" href={`mailto:${contact.email}`}>
+                  <MailIcon /> {contact.email}
+                </a>
+              )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <a className="btn bg-white text-ink hover:bg-accent hover:text-white" href={`tel:${contact.phone.replace(/\s/g, '')}`}>
-              <PhoneIcon /> {contact.phone}
-            </a>
-            <a className="btn btn-outline-light" href={`mailto:${contact.email}`}>
-              <MailIcon /> {contact.email}
-            </a>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
       <EnquiryBlock types={company.enquiryTypes} id="business-enquiries" title="Business enquiries" />
     </>
   );

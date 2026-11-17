@@ -4,6 +4,7 @@ import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
 import { LegalToc } from '@/components/legal/LegalToc';
 import { LEGAL, LEGAL_ORDER, type LegalId } from '@/data/legal';
+import { getContact } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -17,8 +18,9 @@ const slug = (s: string) =>
 export const legalMetadata = (id: LegalId): Metadata => pageMetadata({ title: LEGAL[id].title, description: LEGAL[id].sub, path: `/${id}/` });
 
 /** Privacy / Cookies / Terms: one template with a sticky table of contents. */
-export function LegalPage({ id }: { id: LegalId }) {
+export async function LegalPage({ id }: { id: LegalId }) {
   const doc = LEGAL[id];
+  const contact = await getContact(); // email from the CMS (settings/contact)
   const sections = doc.sections.map((t, i) => ({ id: slug(t), title: t, n: String(i + 1).padStart(2, '0') }));
   return (
     <>
@@ -57,8 +59,13 @@ export function LegalPage({ id }: { id: LegalId }) {
                 </h2>
                 {s.title === 'Contact us' ? (
                   <p>
-                    Questions about this {doc.title === 'Terms & Conditions' ? 'page' : 'policy'} can be sent to <a href="mailto:info@bmkintl.com">info@bmkintl.com</a>, or through our{' '}
-                    <Link href={href('/contact')}>contact page</Link>.
+                    Questions about this {doc.title === 'Terms & Conditions' ? 'page' : 'policy'} can be sent{' '}
+                    {contact.email && (
+                      <>
+                        to <a href={`mailto:${contact.email}`}>{contact.email}</a>, or{' '}
+                      </>
+                    )}
+                    through our <Link href={href('/contact')}>contact page</Link>.
                   </p>
                 ) : (
                   <>

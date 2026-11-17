@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- SVG logo and icons */
 import Link from 'next/link';
+import { Fragment } from 'react';
 import { FooterTagline } from '@/components/layout/FooterTagline';
-import { SOCIAL_LINKS } from '@/constants/site';
+import { telHref } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import type { Group } from '@/types/catalogue';
 import type { Contact } from '@/types/company';
@@ -64,33 +65,45 @@ export function Footer({ groups, contact }: { groups: Group[]; contact: Contact 
         </nav>
         <div className="flex flex-col gap-5 text-[15px]">
           <p className="leading-5 font-bold">CONTACT</p>
+          {/* Contact details from the CMS (settings/contact); empty fields are left out */}
           <address className="flex flex-col gap-1.5 leading-6 not-italic">
-            <p className="flex gap-2">
-              <img src="/assets/icons/location.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
-              <span>
-                {contact.company}
-                <br />
-                {contact.address}
-              </span>
-            </p>
-            <a className="footer-link flex gap-2" href={`tel:${contact.phone.replace(/\s/g, '')}`}>
-              <img src="/assets/icons/call.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
-              {contact.phone}
-            </a>
-            <a className="footer-link flex gap-2" href={`mailto:${contact.email}`}>
-              <img src="/assets/icons/email.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
-              {contact.email}
-            </a>
+            {contact.address.length > 0 && (
+              <p className="flex gap-2">
+                <img src="/assets/icons/location.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
+                <span>
+                  {contact.address.map((line, i) => (
+                    <Fragment key={i}>
+                      {i > 0 && <br />}
+                      {line}
+                    </Fragment>
+                  ))}
+                </span>
+              </p>
+            )}
+            {contact.phone && (
+              <a className="footer-link flex gap-2" href={telHref(contact.phone)}>
+                <img src="/assets/icons/call.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
+                {contact.phone}
+              </a>
+            )}
+            {contact.email && (
+              <a className="footer-link flex gap-2" href={`mailto:${contact.email}`}>
+                <img src="/assets/icons/email.svg" alt="" className="size-6 shrink-0" width={24} height={24} />
+                {contact.email}
+              </a>
+            )}
           </address>
-          <ul className="flex gap-6 pl-8">
-            {SOCIAL_LINKS.map((s) => (
-              <li key={s.id}>
-                <a href={s.href} className="social" aria-label={s.label}>
-                  <img src={`/assets/icons/${s.id}.svg`} alt="" width={20} height={20} />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {contact.social.length > 0 && (
+            <ul className="flex gap-6 pl-8">
+              {contact.social.map((s) => (
+                <li key={s.id}>
+                  <a href={s.href} className="social" aria-label={`${s.label} (opens in a new tab)`} target="_blank" rel="noopener">
+                    <img src={`/assets/icons/${s.id}.svg`} alt="" width={20} height={20} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 

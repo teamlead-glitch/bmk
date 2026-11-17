@@ -29,7 +29,7 @@ export interface EnquiryInput {
 
 export type EnquiryResult = { ok: true } | { ok: false; message: string; errors?: Record<string, string> };
 
-const GENERIC_ERROR = 'Sorry, we couldn’t send your message. Please try again, or email info@bmkintl.com.';
+const GENERIC_ERROR = 'Sorry, we couldn’t send your message. Please try again in a moment.';
 
 /** Browser side: send a form and get a result the form can show. Never throws. */
 export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {

@@ -1,4 +1,4 @@
-import type { Contact, Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types/company';
+import type { Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types/company';
 
 // Company content (from the design reference; the CMS replaces it).
 // Read it through src/lib/content.ts, never directly from pages.
@@ -10,14 +10,6 @@ import type { Contact, Country, CoreValue, Entity, EnquiryType, Milestone } from
 
 export const FOUNDED = 2002;
 export const YEARS = 24; // agreed figure for the homepage ("24 Years of Experience & Trust")
-
-export const contact: Contact = {
-  company: 'BMK GULF FZE',
-  address: 'Warehouse # RA08LB07, P.O. Box 261752, Jebel Ali Free Zone (JAFZA), Dubai, United Arab Emirates',
-  phone: '+971 4 232 4747', // from the client document's FAQ (replaces +971 4 887 0211)
-  email: 'info@bmkintl.com',
-  website: 'www.bmkintl.com',
-};
 
 export const intro = {
   heading: 'Built on trust. Driven by innovation.',
@@ -65,8 +57,8 @@ export const entities: Entity[] = [
     city: 'Jebel Ali Free Zone, Dubai',
     role: 'Master distribution hub, global supply chain logistics, and regional partner for tier-one electronics (Samsung, LG, Canon, Nikon, Fujifilm, Sony, SanDisk, etc.).',
     address: 'Warehouse # RA08LB07, P.O. Box 261752, Jebel Ali Free Zone (JAFZA), Dubai, United Arab Emirates',
-    phone: contact.phone,
-    email: contact.email,
+    phone: '+971 4 232 4747',
+    email: 'info@bmkintl.com',
   },
   {
     id: 'island-valley',
