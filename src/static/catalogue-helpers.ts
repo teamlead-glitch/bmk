@@ -9,7 +9,6 @@ const byId = <T extends { id: string }>(list: T[], id: string | undefined | null
 const brandOf = (p: Product) => byId(brands, p.brand)!;
 const categoryOf = (p: Product) => byId(categories, p.category)!;
 const groupOf = (c: Category) => byId(groups, c.group)!;
-export const categoriesIn = (groupId: string) => categories.filter((c) => c.group === groupId);
 export const countIn = (categoryId: string) => products.filter((p) => p.category === categoryId).length;
 
 /** Spec template and card highlights: the product's own, else its category's. */

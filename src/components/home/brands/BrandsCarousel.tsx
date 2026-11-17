@@ -6,15 +6,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { Flip, gsap } from '@/lib/gsap';
 import { href } from '@/lib/routes';
-import type { BrandLite } from '@/types/catalogue';
+import type { PartnerBrand } from '@/types/brand';
 
 /**
  * Associated brands (design: src/modules/brands.js): category chips filter the
  * cards in a sequenced swap (leaving cards sink out, staying cards glide with
  * Flip, new ones rise in); arrows page the native scroll-snap carousel.
  * Cards are shown/hidden with style.display (not React state) so GSAP owns the motion.
+ * Brands and chips come from the CMS (src/lib/api/brand-showcase.ts).
  */
-export function BrandsCarousel({ brands, filters }: { brands: BrandLite[]; filters: { id: string; label: string }[] }) {
+export function BrandsCarousel({ brands, filters }: { brands: PartnerBrand[]; filters: { id: string; label: string }[] }) {
   const track = useRef<HTMLUListElement>(null);
   const empty = useRef<HTMLParagraphElement>(null);
   const [filter, setFilter] = useState('all');
@@ -125,7 +126,7 @@ export function BrandsCarousel({ brands, filters }: { brands: BrandLite[]; filte
           data-lenis-prevent-wheel
         >
           {brands.map((b) => (
-            <li key={b.id} className="brand-card" data-categories={b.groups.join(' ')}>
+            <li key={b.slug} className="brand-card" data-categories={b.categories.join(' ')}>
               <div className="brand-inner">
                 {b.logo ? (
                   <img className="brand-logo" src={b.logo} alt={`${b.name} logo`} width={120} height={44} loading="lazy" />
@@ -136,8 +137,8 @@ export function BrandsCarousel({ brands, filters }: { brands: BrandLite[]; filte
                 )}
                 <div className="flex w-full flex-col gap-3">
                   <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
-                  <p className="t-body text-black/50">{b.intro}</p>
-                  <Link href={href(`/brand/${b.id}`)} className="brand-cta mt-3">
+                  {b.intro && <p className="t-body line-clamp-5 text-black/50">{b.intro}</p>}
+                  <Link href={href(`/brand/${b.slug}`)} className="brand-cta mt-3">
                     {b.name} Products
                     <Arrow />
                   </Link>

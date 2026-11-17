@@ -8,7 +8,6 @@ import type { Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types
 // cover is `null` and renders as "to be confirmed" — nothing is carried over from
 // the earlier placeholder copy.
 
-export const FOUNDED = 2002;
 export const YEARS = 24; // agreed figure for the homepage ("24 Years of Experience & Trust")
 
 export const intro = {

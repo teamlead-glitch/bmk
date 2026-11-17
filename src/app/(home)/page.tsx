@@ -8,7 +8,7 @@ import { HomeReveals } from '@/components/home/HomeReveals';
 import { PresenceSection } from '@/components/home/presence/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
-import { getCompany, getHomeBanner, getHomeBrands } from '@/lib/content';
+import { getBrandShowcase, getCompany, getHomeBanner } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 
 // Hero background comes from the CMS: rebuilt at most every 5 minutes, or at once via POST /api/revalidate/
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 // Order matters: effects run top to bottom, and pinned sections (hero, history)
 // must be created before the triggers below them measure the pin spacing.
 export default async function HomePage() {
-  const [company, brands, banner] = await Promise.all([getCompany(), getHomeBrands(), getHomeBanner()]);
+  const [company, brands, banner] = await Promise.all([getCompany(), getBrandShowcase(), getHomeBanner()]);
 
   return (
     <>

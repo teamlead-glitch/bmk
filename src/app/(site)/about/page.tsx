@@ -3,7 +3,7 @@ import { Companies, Journey, MissionValues, OurBrands, WhoWeAre } from '@/compon
 import { SectionPills } from '@/components/about/SectionPills';
 import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { getCompany, getHomeBrands } from '@/lib/content';
+import { getBrandShowcase, getCompany } from '@/lib/content';
 import { HOME } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -24,7 +24,7 @@ const SECTIONS: [string, string][] = [
 ];
 
 export default async function AboutPage() {
-  const [company, brands] = await Promise.all([getCompany(), getHomeBrands()]);
+  const [company, brands] = await Promise.all([getCompany(), getBrandShowcase()]);
   return (
     <>
       <PhotoHero

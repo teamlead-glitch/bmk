@@ -7,7 +7,7 @@ import { BrandMark } from '@/components/common/BrandMark';
 import { MilestoneCard } from '@/components/common/MilestoneCard';
 import { KindTag, MapPlaceholder } from '@/components/company/CompanyBits';
 import { href } from '@/lib/routes';
-import type { BrandLite } from '@/types/catalogue';
+import type { OwnBrand, PartnerBrand } from '@/types/brand';
 import type { CoreValue, Entity, Location, Milestone } from '@/types/company';
 
 /* ---------- Who we are: intro + globe + counts ---------- */
@@ -176,8 +176,17 @@ export function Companies({ locations }: { locations: Location[] }) {
   );
 }
 
-/* ---------- Our brands: BMK's own brands + partner logos ---------- */
-export function OurBrands({ own, partners }: { own: BrandLite[]; partners: BrandLite[] }) {
+/** "https://www.seeken.com/" -> "seeken.com" (the design's "Visit seeken.com" label) */
+const domainOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www./, '');
+  } catch {
+    return url;
+  }
+};
+
+/* ---------- Our brands: BMK's own brands + partner logos (CMS: own-brands, brands) ---------- */
+export function OurBrands({ own, partners }: { own: OwnBrand[]; partners: PartnerBrand[] }) {
   return (
     <section id="our-brands" className="section-y scroll-mt-24 bg-white" data-section>
       <div className="shell">
@@ -197,14 +206,16 @@ export function OurBrands({ own, partners }: { own: BrandLite[]; partners: Brand
               </div>
               <div className="mt-auto flex flex-col items-start gap-3 pt-16">
                 <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
-                <p className="t-body text-black/50">{b.intro}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-                  {b.sites.map(([d]) => (
-                    <a key={d} className="brand-cta" href={`https://${d}`} target="_blank" rel="noopener">
-                      Visit {d} <Arrow className="btn-icon -rotate-45" />
-                    </a>
-                  ))}
-                </div>
+                {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
+                {b.links.length > 0 && (
+                  <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
+                    {b.links.map((l) => (
+                      <a key={l.url} className="brand-cta" href={l.url} target="_blank" rel="noopener">
+                        Visit {domainOf(l.url)} <Arrow className="btn-icon -rotate-45" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -212,8 +223,8 @@ export function OurBrands({ own, partners }: { own: BrandLite[]; partners: Brand
         <p className="mt-16 mb-5 text-xs tracking-[0.14em] text-muted uppercase">Partner brands</p>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           {partners.map((b) => (
-            <li key={b.id}>
-              <Link className="partner-tile" href={href(`/brand/${b.id}`)} title={b.name}>
+            <li key={b.slug}>
+              <Link className="partner-tile" href={href(`/brand/${b.slug}`)} title={b.name}>
                 <BrandMark brand={b} className="h-11 !text-[17px]" />
               </Link>
             </li>
