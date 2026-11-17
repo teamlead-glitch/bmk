@@ -90,7 +90,8 @@ export function FaqExplorer({ faqs, topics }: { faqs: Faq[]; topics: FaqTopic[] 
           ))}
         </div>
         <div className="grid gap-12 lg:grid-cols-[1fr_360px] lg:gap-16">
-          <div className="grid gap-12">
+          {/* content-start: a short list stacks at the top instead of spreading to the help card's height */}
+          <div className="grid content-start gap-12">
             {topics.map((t) => {
               const items = faqs.filter((f) => f.topic === t.id && visible.has(f));
               if (!items.length) return null;
