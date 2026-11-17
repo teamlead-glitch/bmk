@@ -16,78 +16,34 @@ import { searchBrands, searchCategories } from '@/lib/search';
 
 const PRODUCTS: [string, string] = ['Brands & Products', href('/products')];
 
-/** Hero for All products, Search, category groups and categories. */
+/** Hero for All products and Search. (Category pages: CategoryHero in CategoryListing.tsx.) */
 export function PageHero({ data, s }: { data: ListingData; s: ListingState }) {
-  const { ctx, brands, groups, categories } = data;
-
-  if (ctx.kind === 'all' || ctx.kind === 'search') {
-    const search = ctx.kind === 'search';
-    return (
-      <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
-        <div className="shell">
-          <Crumbs items={[['Home', HOME], search ? ['Search'] : ['Brands & Products']]} />
-          <span className="chip mt-8 border-line bg-white text-ink">{search ? 'Search results' : 'Catalogue'}</span>
-          <h1 className="t-display mt-5 max-w-4xl">{search ? (s.q ? `“${s.q}”` : 'Search') : 'All products'}</h1>
-          <p className="t-body mt-3 max-w-2xl text-ink/80">
-            {search
-              ? `${s.base.length} product${s.base.length === 1 ? '' : 's'} found.`
-              : `The full BMK Group catalogue across ${brands.length} brands and ${groups.length} categories.`}
-          </p>
-          {search ? (
-            <SearchExtra data={data} q={s.q} />
-          ) : (
-            <div className="mt-8 flex flex-wrap gap-2">
-              {groups.map((g) => (
-                <Link key={g.id} className="pill" href={href(`/category/${g.id}`)}>
-                  {g.name}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    );
-  }
-
-  // Group or category: photo hero with sibling-category pills
-  const g = ctx.group!;
-  const cat = ctx.category;
-  const isGroup = ctx.kind === 'group';
-  const trail: [string, string?][] = isGroup ? [['Home', HOME], PRODUCTS, [g.name]] : [['Home', HOME], PRODUCTS, [g.name, href(`/category/${g.id}`)], [cat!.name]];
-  // Empty categories are left out of the pills (the current one always shows)
-  const sibs = categories.filter((c) => c.group === g.id && (c.count || cat?.id === c.id));
-  const sub = isGroup ? `Every ${g.name.toLowerCase()} product BMK Group handles, across ${categories.filter((c) => c.group === g.id).length} categories.` : cat!.desc;
-
+  const { ctx, brands, groups } = data;
+  const search = ctx.kind === 'search';
   return (
-    <>
-      <section
-        className={`photo-hero pt-[clamp(128px,11vw,176px)] ${sibs.length ? 'pb-[138px]' : 'pb-[clamp(40px,4.5vw,64px)]'}`}
-        style={{ '--hero-overlay': 'linear-gradient(180deg,rgb(0 0 0/.5) 0%,rgb(0 0 0/.85) 100%)' } as React.CSSProperties}
-      >
-        {ctx.heroImage && <img className="photo-hero-img" src={ctx.heroImage} alt="" fetchPriority="high" />}
-        <div className="shell">
-          <Crumbs items={trail} light />
-          <h1 className="t-display mt-6 max-w-4xl">{ctx.title}</h1>
-          <p className="t-body mt-2 max-w-2xl text-mist">{sub}</p>
-        </div>
-      </section>
-      {sibs.length > 0 && (
-        <Pillbar label={`${g.name} categories`}>
-          <li>
-            <Link className={`pill-dark ${isGroup ? 'is-on' : ''}`} href={href(`/category/${g.id}`)}>
-              All {g.name}
-            </Link>
-          </li>
-          {sibs.map((c) => (
-            <li key={c.id}>
-              <Link className={`pill-dark ${cat?.id === c.id ? 'is-on' : ''}`} href={href(`/category/${c.id}`)}>
-                {c.name} <span className="n">{c.count}</span>
+    <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
+      <div className="shell">
+        <Crumbs items={[['Home', HOME], search ? ['Search'] : ['Brands & Products']]} />
+        <span className="chip mt-8 border-line bg-white text-ink">{search ? 'Search results' : 'Catalogue'}</span>
+        <h1 className="t-display mt-5 max-w-4xl">{search ? (s.q ? `“${s.q}”` : 'Search') : 'All products'}</h1>
+        <p className="t-body mt-3 max-w-2xl text-ink/80">
+          {search
+            ? `${s.base.length} product${s.base.length === 1 ? '' : 's'} found.`
+            : `The full BMK Group catalogue across ${brands.length} brands and ${groups.length} categories.`}
+        </p>
+        {search ? (
+          <SearchExtra data={data} q={s.q} />
+        ) : (
+          <div className="mt-8 flex flex-wrap gap-2">
+            {groups.map((g) => (
+              <Link key={g.id} className="pill" href={href(`/category/${g.id}`)}>
+                {g.name}
               </Link>
-            </li>
-          ))}
-        </Pillbar>
-      )}
-    </>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

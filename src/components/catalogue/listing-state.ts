@@ -18,7 +18,7 @@ export function listingState({ ctx, base: all, brands, categories, groups }: Lis
   const q = ctx.kind === 'search' ? (params.get('q') || '').trim() : '';
   const base = ctx.kind === 'search' ? searchProducts(all, q) : all;
   const selB = ctx.kind === 'brand' ? [] : list(params.get('brand'));
-  const selC = ctx.kind === 'category' ? [] : list(params.get('cat'));
+  const selC = list(params.get('cat'));
   const sort = params.get('sort') === 'az' ? 'az' : 'latest';
   const pages = Math.max(1, parseInt(params.get('page') || '1', 10) || 1);
   const keep = { q: q || undefined, brand: selB, cat: selC, sort: sort === 'latest' ? '' : sort };
@@ -34,11 +34,10 @@ export function listingState({ ctx, base: all, brands, categories, groups }: Lis
   const brandOpts = brands
     .map((b) => ({ id: b.id, name: b.name, n: base.filter((p) => p.brandId === b.id && byC(p)).length }))
     .filter((o) => o.n || selB.includes(o.id));
-  const catScope = ctx.kind === 'group' ? categories.filter((c) => c.group === ctx.group!.id) : categories;
-  const catOpts = catScope.map((c) => ({ ...c, n: base.filter((p) => p.categoryId === c.id && byB(p)).length })).filter((o) => o.n || selC.includes(o.id));
+  const catOpts = categories.map((c) => ({ ...c, n: base.filter((p) => p.categoryId === c.id && byB(p)).length })).filter((o) => o.n || selC.includes(o.id));
 
   const isEmpty = base.length === 0;
-  const showCat = ctx.kind !== 'category' && ctx.kind !== 'brand';
+  const showCat = ctx.kind !== 'brand';
   const showBrand = ctx.kind !== 'brand';
   const sidebar = !isEmpty && (showCat || showBrand);
   const active = selB.length + (ctx.kind === 'brand' ? 0 : selC.length);
@@ -56,11 +55,8 @@ export function listingState({ ctx, base: all, brands, categories, groups }: Lis
           ...selB.map((id) => ({ label: brands.find((b) => b.id === id)?.name ?? id, to: toggle('brand', id) })),
         ];
 
-  // Category facet: grouped by product group, except on a group page
-  const catSections =
-    ctx.kind === 'group'
-      ? [{ group: null as null | { id: string; name: string }, opts: catOpts }]
-      : groups.map((g) => ({ group: g, opts: catOpts.filter((o) => o.group === g.id) })).filter((x) => x.opts.length);
+  // Category facet: grouped by product group
+  const catSections = groups.map((g) => ({ group: g as null | { id: string; name: string }, opts: catOpts.filter((o) => o.group === g.id) })).filter((x) => x.opts.length);
 
   return { q, base, selB, selC, sort, pages, url, results, shown, brandOpts, catSections, isEmpty, showCat, showBrand, sidebar, active, toggle, clearUrl, chips };
 }

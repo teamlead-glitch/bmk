@@ -214,12 +214,8 @@ function Empty({ data, s }: { data: ListingData; s: ListingState }) {
       </Box>
     );
   if (s.isEmpty) {
-    const name = ctx.category?.name || ctx.group?.name || ctx.brand?.name || '';
-    const alt = ctx.brand
-      ? data.groups.filter((g) => ctx.brand!.groups.includes(g.id))
-      : ctx.group && ctx.kind === 'group'
-        ? data.categories.filter((c) => c.group === ctx.group!.id && c.count)
-        : [];
+    const name = ctx.brand?.name || '';
+    const alt = ctx.brand ? data.groups.filter((g) => ctx.brand!.groups.includes(g.id)) : [];
     return (
       <Box
         title={ctx.brand ? `${name} products are coming soon` : `${name}: products coming soon`}

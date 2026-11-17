@@ -133,3 +133,43 @@ export interface NavData {
   inHouseBrands: BrandLite[];
   partnerBrands: BrandLite[];
 }
+
+/* ---------- CMS catalogue (GET /v1/categories, /v1/products) ---------- */
+
+/** Product sort the CMS understands */
+export type ProductSort = 'latest' | 'name_asc' | 'name_desc';
+
+/** One page of products from GET /v1/products */
+export interface ProductPage {
+  items: CardProduct[];
+  total: number;
+  page: number;
+  lastPage: number;
+}
+
+/** A category page (/category/{slug}) from GET /v1/categories/{slug} */
+export interface CategoryInfo {
+  slug: string;
+  title: string;
+  short: string | null;
+  /** Hero photo: the category banner, else its image */
+  banner: string | null;
+  count: number;
+}
+
+/** A pill or filter option with its product count */
+export interface CountedOption {
+  id: string;
+  name: string;
+  n: number;
+}
+
+export interface CategoryPageData {
+  category: CategoryInfo;
+  /** Every category with products (pill bar under the hero); the current one always included */
+  categories: CountedOption[];
+  /** Brands with products in this category (Brand filter) */
+  brands: CountedOption[];
+  /** First page, unfiltered, latest first: in the server HTML */
+  first: ProductPage;
+}

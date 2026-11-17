@@ -1,34 +1,62 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { ListingPage } from '@/components/catalogue/ListingPage';
-import { getListing, getListingParams } from '@/lib/content';
-import { pageMetadata } from '@/lib/seo';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { CategoryListing, CategoryListingFromUrl } from '@/components/catalogue/CategoryListing';
+import { EMPTY_QUERY } from '@/components/catalogue/Listing';
+import { getCategoryPage, getCategorySlugs } from '@/lib/content';
+import { href } from '@/lib/routes';
+import { jsonLd, pageMetadata } from '@/lib/seo';
+import { siteUrl } from '@/lib/site-url';
 
 type Props = { params: Promise<{ id: string }> };
 
-// /category/{id} is a product group (imaging) or a category (lenses-optics)
+// /category/{slug}: a CMS category (GET /v1/categories/{slug}) and its products (GET /v1/products)
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const data = await getListing('category', id);
-  if (!data) return {};
-  const { ctx } = data;
+  const data = await getCategoryPage(id);
+  if (!data || 'redirect' in data) return {};
+  const { category } = data;
   return pageMetadata({
-    title: ctx.title,
-    description: ctx.category?.desc ?? `${ctx.title} from the brands BMK Group distributes.`,
-    path: `${ctx.path}/`,
-    image: ctx.heroImage,
+    title: category.title,
+    description: category.short ?? `${category.title} from the brands BMK Group distributes.`,
+    path: `/category/${category.slug}/`,
+    image: category.banner,
   });
 }
 
 export default async function CategoryPage({ params }: Props) {
   const { id } = await params;
-  const data = await getListing('category', id);
+  const data = await getCategoryPage(id);
   if (!data) notFound();
-  return <ListingPage data={data} />;
+  if ('redirect' in data) permanentRedirect(href(`/category/${data.redirect}`)); // slug renamed in the CMS
+
+  const { category, first } = data;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: category.title,
+    url: siteUrl(`/category/${category.slug}/`),
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: first.total,
+      itemListElement: first.items.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: siteUrl(`/product/${p.slug}/`), name: p.name })),
+    },
+  };
+
+  // The unfiltered first page is in the static HTML (crawlable product links); in the
+  // browser the listing follows the URL's filters and loads more pages as you scroll.
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
+      <Suspense fallback={<CategoryListing data={data} query={EMPTY_QUERY} />}>
+        <CategoryListingFromUrl data={data} />
+      </Suspense>
+    </>
+  );
 }
 
-// Known categories are built at deploy time; new CMS ones on first visit, then cached
+// CMS categories are built at deploy time; new ones on first visit, then cached (ISR)
 export async function generateStaticParams() {
-  const { groups, categories } = await getListingParams();
-  return [...groups, ...categories].map((id) => ({ id }));
+  return (await getCategorySlugs()).map((id) => ({ id }));
 }

@@ -42,12 +42,6 @@ export const brandMenuImage: Record<string, string> = {
   fujifilm: `${P}fujifilm-x-t5.webp`,
 };
 
-/** Hero photography per category (falls back to its group, then to no image). */
-export const categoryHero: Record<string, string> = {
-  'mirrorless-dslr-cameras': `${M}heroes/category-mirrorless-cameras.webp`,
-  imaging: `${M}heroes/category-mirrorless-cameras.webp`,
-};
-
 /** card – listing photo; brand – brand-colour shot; shots – gallery by shot name;
  *  features – one image per overview feature, in order */
 export const productMedia: Record<string, ProductMedia> = {
