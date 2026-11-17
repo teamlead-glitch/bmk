@@ -31,7 +31,7 @@ import { API_CONFIG } from '@/constants/config';
 import { cmsGet } from '@/lib/cms-fetch';
 import { cleanHtml, htmlToText } from '@/lib/html';
 import { href } from '@/lib/routes';
-import type { BrandLite, CardProduct, CategoryLite, CategoryPageData, Group, NavData, ProductPage, ProductSort } from '@/types/catalogue';
+import type { BrandLite, CardProduct, CountedOption, CategoryLite, CmsListingData, Group, NavData, ProductPage, ProductSort } from '@/types/catalogue';
 import type { Contact, Faq, FaqTopic, Location, SocialId } from '@/types/company';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
@@ -109,8 +109,9 @@ export const getSearchIndex = cache(async () => ({
 
 /* ---------- Listing pages ---------- */
 
-// Category pages (/category/{slug}) come from the CMS: getCategoryPage below.
-export type ListingKind = 'all' | 'search' | 'brand';
+// All products (/products) and category pages (/category/{slug}) come from the CMS:
+// getAllProductsPage and getCategoryPage below.
+export type ListingKind = 'search' | 'brand';
 
 export interface ListingContext {
   kind: ListingKind;
@@ -135,7 +136,6 @@ export const getListing = cache(async (kind: ListingKind, id?: string): Promise<
   const shared = { brands: brands.map(toBrandLite), categories: categoryLites(), groups };
   const cards = (list: typeof products) => list.map(toCardProduct);
 
-  if (kind === 'all') return { ctx: { kind, path: '/products', title: 'All products' }, base: cards(products), ...shared };
   if (kind === 'search') return { ctx: { kind, path: '/search', title: 'Search' }, base: cards(products), ...shared };
 
   // brand
@@ -148,13 +148,14 @@ export const getListing = cache(async (kind: ListingKind, id?: string): Promise<
   };
 });
 
-/* ---------- CMS catalogue: category pages (GET /v1/categories, /v1/products) ---------- */
-// Categories are flat in the CMS (subcategories are switched off). A product page of the
-// category listing is one GET /v1/products call; the browser loads more pages, filters
-// and sorts through /api/products/ (src/app/api/products/route.ts), which calls getProducts.
+/* ---------- CMS catalogue: All products and category pages ---------- */
+// GET /v1/products (one page of the listing), /v1/categories and /v1/brands (filters).
+// Categories are flat in the CMS (subcategories are switched off). The browser loads more
+// pages, filters and sorts through /api/products/ (src/app/api/products/route.ts), which
+// calls getProducts.
 
-/** Products per page, as in the design's listing (3 columns × 3 rows) */
-export const CATEGORY_PAGE_SIZE = 9;
+/** Products per page */
+export const LISTING_PAGE_SIZE = 12;
 const SLUG = /^[a-z0-9][a-z0-9-]{0,190}$/i;
 export const isSlug = (v: string) => SLUG.test(v);
 
@@ -215,7 +216,7 @@ export async function getProducts(q: { category?: string; brands?: string[]; sor
   if (q.category) params.set('category', q.category);
   if (q.brands?.length) params.set('brand', [...q.brands].sort().join(',')); // sorted: one cache entry per filter set
   params.set('sort', q.sort ?? 'latest');
-  params.set('per_page', String(q.perPage ?? CATEGORY_PAGE_SIZE));
+  params.set('per_page', String(q.perPage ?? LISTING_PAGE_SIZE));
   params.set('page', String(q.page ?? 1));
   const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/products?${params}`);
   if (!found) return EMPTY_PAGE;
@@ -234,6 +235,32 @@ const getCmsCategories = cache(async (): Promise<CmsCategory[]> => {
   return found ? ((json as { data?: CmsCategory[] })?.data ?? []) : [];
 });
 
+const getCmsBrands = cache(async (): Promise<CmsBrand[]> => {
+  if (!API_CONFIG.BASE_URL) return [];
+  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/brands`);
+  return found ? ((json as { data?: CmsBrand[] })?.data ?? []) : [];
+});
+
+/** Brand filter: brands with products (in one category, or anywhere), with their count */
+async function brandOptions(category?: string): Promise<CountedOption[]> {
+  const list = (await getCmsBrands()).filter((b) => isSlug(text(b.slug)) && (!category || (b.categories ?? []).some((x) => text(x.slug) === category)));
+  const counts = await Promise.all(list.map((b) => getProducts({ category, brands: [text(b.slug)], perPage: 1 }).then((r) => r.total)));
+  return list.map((b, i) => ({ id: text(b.slug), name: text(b.name) || text(b.slug), n: counts[i] })).filter((o) => o.n > 0);
+}
+
+/** Categories with products, in CMS order (`keep`: always listed, e.g. the current one) */
+async function categoryOptions(keep?: string): Promise<CountedOption[]> {
+  return (await getCmsCategories())
+    .map((x) => ({ id: text(x.slug), name: text(x.title), n: Number(x.products_count) || 0 }))
+    .filter((x) => isSlug(x.id) && x.name && (x.n > 0 || x.id === keep));
+}
+
+/** /products: every product, with Category and Brand filters. CMS down -> error.tsx. */
+export const getAllProductsPage = cache(async (): Promise<CmsListingData> => {
+  const [categories, brandsList, first] = await Promise.all([categoryOptions(), brandOptions(), getProducts({ page: 1 })]);
+  return { kind: 'all', category: null, categories, brands: brandsList, first };
+});
+
 /** Slugs of the CMS categories (built at deploy time, sitemap) */
 export const getCategorySlugs = cache(async (): Promise<string[]> => (await getCmsCategories()).map((c) => text(c.slug)).filter(isSlug));
 
@@ -241,7 +268,7 @@ export const getCategorySlugs = cache(async (): Promise<string[]> => (await getC
  * /category/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current category). CMS down -> error.tsx.
  */
-export const getCategoryPage = cache(async (slug: string): Promise<CategoryPageData | { redirect: string } | null> => {
+export const getCategoryPage = cache(async (slug: string): Promise<CmsListingData | { redirect: string } | null> => {
   if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
   const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/categories/${encodeURIComponent(slug)}`);
   const c = found ? (json as { data?: CmsCategory })?.data : undefined;
@@ -249,21 +276,10 @@ export const getCategoryPage = cache(async (slug: string): Promise<CategoryPageD
   if (!c || !current) return null;
   if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
 
-  const [all, brandList, first] = await Promise.all([
-    getCmsCategories(),
-    (async () => {
-      const { found: ok, json: b } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/brands`);
-      return ok ? ((b as { data?: CmsBrand[] })?.data ?? []) : [];
-    })(),
-    getProducts({ category: current, page: 1 }),
-  ]);
-
-  // Brand filter: brands linked to this category, with their product count in it
-  const linked = brandList.filter((b) => isSlug(text(b.slug)) && (b.categories ?? []).some((x) => text(x.slug) === current));
-  const counts = await Promise.all(linked.map((b) => getProducts({ category: current, brands: [text(b.slug)], perPage: 1 }).then((r) => r.total)));
-  const brandOptions = linked.map((b, i) => ({ id: text(b.slug), name: text(b.name) || text(b.slug), n: counts[i] })).filter((o) => o.n > 0);
+  const [categories, brandsList, first] = await Promise.all([categoryOptions(current), brandOptions(current), getProducts({ category: current, page: 1 })]);
 
   return {
+    kind: 'category',
     category: {
       slug: current,
       title: text(c.title) || current,
@@ -271,10 +287,8 @@ export const getCategoryPage = cache(async (slug: string): Promise<CategoryPageD
       banner: mediaUrl(c.banner?.url) ?? mediaUrl(c.image?.url),
       count: Number(c.products_count) || first.total,
     },
-    categories: all
-      .map((x) => ({ id: text(x.slug), name: text(x.title), n: Number(x.products_count) || 0 }))
-      .filter((x) => isSlug(x.id) && x.name && (x.n > 0 || x.id === current)),
-    brands: brandOptions,
+    categories,
+    brands: brandsList,
     first,
   };
 });

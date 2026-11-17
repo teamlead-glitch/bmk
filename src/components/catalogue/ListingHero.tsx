@@ -16,32 +16,16 @@ import { searchBrands, searchCategories } from '@/lib/search';
 
 const PRODUCTS: [string, string] = ['Brands & Products', href('/products')];
 
-/** Hero for All products and Search. (Category pages: CategoryHero in CategoryListing.tsx.) */
+/** Hero for Search. (All products and category pages: CmsListing.tsx.) */
 export function PageHero({ data, s }: { data: ListingData; s: ListingState }) {
-  const { ctx, brands, groups } = data;
-  const search = ctx.kind === 'search';
   return (
     <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
       <div className="shell">
-        <Crumbs items={[['Home', HOME], search ? ['Search'] : ['Brands & Products']]} />
-        <span className="chip mt-8 border-line bg-white text-ink">{search ? 'Search results' : 'Catalogue'}</span>
-        <h1 className="t-display mt-5 max-w-4xl">{search ? (s.q ? `“${s.q}”` : 'Search') : 'All products'}</h1>
-        <p className="t-body mt-3 max-w-2xl text-ink/80">
-          {search
-            ? `${s.base.length} product${s.base.length === 1 ? '' : 's'} found.`
-            : `The full BMK Group catalogue across ${brands.length} brands and ${groups.length} categories.`}
-        </p>
-        {search ? (
-          <SearchExtra data={data} q={s.q} />
-        ) : (
-          <div className="mt-8 flex flex-wrap gap-2">
-            {groups.map((g) => (
-              <Link key={g.id} className="pill" href={href(`/category/${g.id}`)}>
-                {g.name}
-              </Link>
-            ))}
-          </div>
-        )}
+        <Crumbs items={[['Home', HOME], ['Search']]} />
+        <span className="chip mt-8 border-line bg-white text-ink">Search results</span>
+        <h1 className="t-display mt-5 max-w-4xl">{s.q ? `“${s.q}”` : 'Search'}</h1>
+        <p className="t-body mt-3 max-w-2xl text-ink/80">{`${s.base.length} product${s.base.length === 1 ? '' : 's'} found.`}</p>
+        <SearchExtra data={data} q={s.q} />
       </div>
     </section>
   );

@@ -1,24 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CATEGORY_PAGE_SIZE, getProducts, isSlug } from '@/lib/content';
+import { LISTING_PAGE_SIZE, getProducts, isSlug } from '@/lib/content';
 import type { ProductSort } from '@/types/catalogue';
 
-/* ---------- PRODUCT PAGES FOR THE CATEGORY LISTING ---------- */
-// GET /api/products/?category=slug&brand=a,b&sort=latest|name_asc|name_desc&page=2
-// The browser calls this when filters, sort or "Load more" change; it reads the CMS
+/* ---------- PRODUCT PAGES FOR THE LISTINGS (All products, category pages) ---------- */
+// GET /api/products/?category=a,b&brand=c,d&sort=latest|name_asc|name_desc&page=2
+// The browser calls this when filters, sort or the next page change; it reads the CMS
 // (GET /v1/products) through the shared cache in src/lib/content.ts.
 const SORTS: ProductSort[] = ['latest', 'name_asc', 'name_desc'];
 const MAX_PAGE = 100;
-const MAX_BRANDS = 20;
+const MAX_SLUGS = 20;
+
+/** "a,b" -> ["a","b"]; null when there are too many or one isn't a slug */
+const slugs = (v: string | null) => {
+  const out = (v || '').split(',').map((s) => s.trim()).filter(Boolean);
+  return out.length <= MAX_SLUGS && out.every(isSlug) ? out : null;
+};
 
 const bad = (message: string) => NextResponse.json({ error: message }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
 
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams;
-  const category = (q.get('category') || '').trim();
-  if (!isSlug(category)) return bad('category is required');
-
-  const brands = (q.get('brand') || '').split(',').map((b) => b.trim()).filter(Boolean);
-  if (brands.length > MAX_BRANDS || !brands.every(isSlug)) return bad('invalid brand');
+  const categories = slugs(q.get('category'));
+  if (!categories) return bad('invalid category');
+  const brands = slugs(q.get('brand'));
+  if (!brands) return bad('invalid brand');
 
   const sort = (q.get('sort') || 'latest') as ProductSort;
   if (!SORTS.includes(sort)) return bad('invalid sort');
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
   if (!Number.isInteger(page) || page < 1 || page > MAX_PAGE) return bad('invalid page');
 
   try {
-    const body = await getProducts({ category, brands, sort, page, perPage: CATEGORY_PAGE_SIZE });
+    const body = await getProducts({ category: [...categories].sort().join(',') || undefined, brands, sort, page, perPage: LISTING_PAGE_SIZE });
     return NextResponse.json(body, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } });
   } catch (error) {
     if ((error as { digest?: string })?.digest === 'DYNAMIC_SERVER_USAGE') throw error;

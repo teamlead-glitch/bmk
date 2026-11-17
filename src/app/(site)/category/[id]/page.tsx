@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
-import { CategoryListing, CategoryListingFromUrl } from '@/components/catalogue/CategoryListing';
+import { CmsListing, CmsListingFromUrl } from '@/components/catalogue/CmsListing';
 import { EMPTY_QUERY } from '@/components/catalogue/Listing';
 import { getCategoryPage, getCategorySlugs } from '@/lib/content';
 import { href } from '@/lib/routes';
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const data = await getCategoryPage(id);
   if (!data || 'redirect' in data) return {};
-  const { category } = data;
+  const category = data.category!;
   return pageMetadata({
     title: category.title,
     description: category.short ?? `${category.title} from the brands BMK Group distributes.`,
@@ -31,7 +31,8 @@ export default async function CategoryPage({ params }: Props) {
   if (!data) notFound();
   if ('redirect' in data) permanentRedirect(href(`/category/${data.redirect}`)); // slug renamed in the CMS
 
-  const { category, first } = data;
+  const category = data.category!;
+  const { first } = data;
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -49,8 +50,8 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
-      <Suspense fallback={<CategoryListing data={data} query={EMPTY_QUERY} />}>
-        <CategoryListingFromUrl data={data} />
+      <Suspense fallback={<CmsListing data={data} query={EMPTY_QUERY} />}>
+        <CmsListingFromUrl data={data} />
       </Suspense>
     </>
   );

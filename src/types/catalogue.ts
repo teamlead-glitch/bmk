@@ -164,11 +164,14 @@ export interface CountedOption {
   n: number;
 }
 
-export interface CategoryPageData {
-  category: CategoryInfo;
-  /** Every category with products (pill bar under the hero); the current one always included */
+/** A product listing page from the CMS: All products (/products) or a category (/category/{slug}) */
+export interface CmsListingData {
+  kind: 'all' | 'category';
+  /** The category of a category page; null on All products */
+  category: CategoryInfo | null;
+  /** Categories with products: Category filter and hero pills (a category page always includes itself) */
   categories: CountedOption[];
-  /** Brands with products in this category (Brand filter) */
+  /** Brands with products on this page (Brand filter) */
   brands: CountedOption[];
   /** First page, unfiltered, latest first: in the server HTML */
   first: ProductPage;
