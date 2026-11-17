@@ -10,27 +10,14 @@
 import { cache } from 'react';
 import { brands, categories, groups, products } from '@/data/catalogue';
 import * as company from '@/data/company';
-import { DEFAULT_BRAND_COLOR, productMedia } from '@/data/media';
+import { DEFAULT_BRAND_COLOR } from '@/data/media';
 import { countryVisual, DEFAULT_LOCATION } from '@/data/visuals';
-import {
-  brandOf,
-  categoriesIn,
-  categoryOf,
-  countIn,
-  fieldLabel,
-  groupOf,
-  productBySlug,
-  shortValue,
-  specGroups,
-  templateOf,
-  toBrandLite,
-  toCardProduct,
-} from '@/lib/catalogue';
+import { categoriesIn, countIn, toBrandLite, toCardProduct } from '@/lib/catalogue';
 import { API_CONFIG } from '@/constants/config';
 import { cmsGet } from '@/lib/cms-fetch';
 import { cleanHtml, htmlToText } from '@/lib/html';
 import { href } from '@/lib/routes';
-import type { BrandColor, BrandLite, CardProduct, CountedOption, CategoryLite, CmsListingData, Group, NavData, ProductPage, ProductSort } from '@/types/catalogue';
+import type { BrandColor, BrandLite, CardProduct, CountedOption, CategoryLite, CmsListingData, Group, NavData, ProductDetail, ProductPage, ProductSort } from '@/types/catalogue';
 import type { Contact, Faq, FaqTopic, Location, SocialId } from '@/types/company';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
@@ -341,40 +328,111 @@ export const getBrandPage = cache(async (slug: string): Promise<CmsListingData |
   };
 });
 
-/* ---------- Product detail ---------- */
+/* ---------- Product detail (CMS: GET /v1/products/{slug}) ---------- */
 
-export const getProduct = cache(async (slug: string) => {
-  const p = productBySlug(slug);
-  if (!p) return null;
-  const b = brandOf(p);
-  const c = categoryOf(p);
-  const g = groupOf(c);
-  const m = productMedia[p.slug] || {};
-  const tpl = templateOf(p);
+type CmsSpec = { name?: string | null; value?: string | null };
+type CmsProductDetail = {
+  slug?: string | null;
+  name?: string | null;
+  short_description?: string | null;
+  description?: string | null;
+  model_no?: string | null;
+  image?: { url?: string | null; alt?: string | null } | null;
+  gallery?: { url?: string | null; alt?: string | null }[] | null;
+  brand?: { slug?: string | null; name?: string | null; logo?: { url?: string | null } | null } | null;
+  categories?: CmsRef[] | null;
+  attributes?: { name?: string | null; values?: string[] | null }[] | null;
+  highlights?: CmsSpec[] | null;
+  specification_groups?: { name?: string | null; specifications?: CmsSpec[] | null }[] | null;
+  seo?: {
+    meta_title?: string | null;
+    meta_description?: string | null;
+    robots?: { index?: boolean } | null;
+    open_graph?: { image?: { url?: string | null } | null } | null;
+  } | null;
+};
+
+/**
+ * /product/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
+ * answers 301 and fetch follows it to the current product). CMS down -> error.tsx.
+ */
+export const getProduct = cache(async (slug: string): Promise<ProductDetail | { redirect: string } | null> => {
+  if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
+  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/products/${encodeURIComponent(slug)}`);
+  const p = found ? (json as { data?: CmsProductDetail })?.data : undefined;
+  const current = text(p?.slug);
+  if (!p || !current) return null;
+  if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
+
+  const name = text(p.name) || current;
+  const brandSlug = text(p.brand?.slug);
+  const cat = (p.categories ?? []).find((c) => isSlug(text(c.slug)) && text(c.title));
+  const catSlug = cat ? text(cat.slug) : '';
+
+  // Images: main image first, then the gallery (duplicates and broken links dropped)
+  const images: ProductDetail['images'] = [];
+  for (const im of [p.image, ...(p.gallery ?? [])]) {
+    const src = mediaUrl(im?.url);
+    if (src && !images.some((x) => x.src === src)) images.push({ src, alt: text(im?.alt) });
+  }
+
+  const specRows = (list: CmsSpec[] | null | undefined, prefix: string) =>
+    (list ?? []).flatMap((x, i) => (text(x.name) && text(x.value) ? [{ key: `${prefix}-${i}`, label: text(x.name), value: text(x.value) }] : []));
+  const specGroups: ProductDetail['specGroups'] = (p.specification_groups ?? [])
+    .map((g, i) => ({ group: text(g.name) || 'Specifications', rows: specRows(g.specifications, `g${i}`) }))
+    .filter((g) => g.rows.length);
+  // Variable products: the options they come in (e.g. Colour: Red, Blue)
+  const options = (p.attributes ?? []).flatMap((a, i) => {
+    const values = (a.values ?? []).map(text).filter(Boolean);
+    return text(a.name) && values.length ? [{ key: `opt-${i}`, label: text(a.name), value: values }] : [];
+  });
+  if (options.length) specGroups.unshift({ group: 'Available options', rows: options });
+
+  const [cmsBrands, byBrand, byCategory] = await Promise.all([
+    getCmsBrands(),
+    isSlug(brandSlug) ? getProducts({ brands: [brandSlug], perPage: 5 }) : null,
+    catSlug ? getProducts({ category: catSlug, perPage: 5 }) : null,
+  ]);
+  const others = (page: ProductPage | null) => (page?.items ?? []).filter((x) => x.slug !== current).slice(0, 4);
+
   return {
-    slug: p.slug,
-    name: p.name,
-    model: p.model,
-    modelNo: p.modelNo,
-    short: p.short,
-    overview: p.overview,
-    features: p.features ?? [],
-    images: p.images,
-    /** Stage glyph follows the category template, as in the design */
-    glyph: c.template,
-    brand: toBrandLite(b),
-    category: { id: c.id, name: c.name },
-    group: { id: g.id, name: g.name },
-    highlights: c.card.filter((k) => p.specs[k] != null).map((k) => ({ key: k, label: fieldLabel(tpl, k), value: shortValue(p.specs[k]) })),
-    specGroups: specGroups(p),
-    media: m,
-    fromBrand: products.filter((x) => x.brand === p.brand && x.slug !== p.slug).slice(0, 4).map(toCardProduct),
-    inCategory: products.filter((x) => x.category === p.category && x.slug !== p.slug).slice(0, 4).map(toCardProduct),
+    slug: current,
+    name,
+    modelNo: text(p.model_no) || null,
+    short: text(p.short_description),
+    descriptionHtml: cleanHtml(text(p.description)),
+    images,
+    brand: {
+      slug: brandSlug,
+      name: text(p.brand?.name),
+      logo: mediaUrl(p.brand?.logo?.url),
+      color: brandColor(cmsBrands.find((b) => text(b.slug) === brandSlug)?.color),
+    },
+    category: cat ? { slug: catSlug, name: text(cat.title) } : null,
+    highlights: specRows(p.highlights, 'h').slice(0, 3).map(({ label, value }) => ({ label, value })),
+    specGroups,
+    seo: {
+      title: text(p.seo?.meta_title) || name,
+      description: text(p.seo?.meta_description) || text(p.short_description),
+      index: p.seo?.robots?.index !== false,
+      image: mediaUrl(p.seo?.open_graph?.image?.url) ?? images[0]?.src ?? null,
+    },
+    fromBrand: others(byBrand),
+    inCategory: others(byCategory),
   };
 });
-export type ProductPageData = NonNullable<Awaited<ReturnType<typeof getProduct>>>;
 
-export const getProductSlugs = cache(async () => products.map((p) => p.slug));
+/** Every product slug (sitemap, build): all pages of GET /v1/products, 48 at a time */
+export const getProductSlugs = cache(async (): Promise<string[]> => {
+  if (!API_CONFIG.BASE_URL) return [];
+  const slugs: string[] = [];
+  for (let page = 1, last = 1; page <= last && page <= 50; page++) {
+    const res = await getProducts({ page, perPage: 48 });
+    slugs.push(...res.items.map((x) => x.slug));
+    last = res.lastPage;
+  }
+  return slugs;
+});
 
 /* ---------- Company (homepage, About, FAQ, Contact) ---------- */
 

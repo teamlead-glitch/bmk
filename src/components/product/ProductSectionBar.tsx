@@ -11,9 +11,10 @@ const SECTIONS = [
   ['more', 'Related'],
 ] as const;
 
-/** Sticky bar under the navbar: section links (current one highlighted) and
+/** Sticky bar under the navbar: links to the sections the product has (current one highlighted) and
  *  Enquire; plus the phone-only bottom CTA once the main CTA scrolls away. */
-export function ProductSectionBar({ product }: { product: EnquiryProduct }) {
+export function ProductSectionBar({ product, sections }: { product: EnquiryProduct; sections: string[] }) {
+  const links = SECTIONS.filter(([id]) => sections.includes(id));
   const bar = useRef<HTMLDivElement>(null);
   const cta = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState<string>('');
@@ -30,7 +31,7 @@ export function ProductSectionBar({ product }: { product: EnquiryProduct }) {
     sync();
 
     const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setCurrent(e.target.id)), { rootMargin: '-45% 0px -50% 0px' });
-    SECTIONS.forEach(([id]) => {
+    links.forEach(([id]) => {
       const s = document.getElementById(id);
       if (s) io.observe(s);
     });
@@ -40,6 +41,7 @@ export function ProductSectionBar({ product }: { product: EnquiryProduct }) {
     const io2 = new IntersectionObserver(([e]) => mobile.classList.toggle('translate-y-full', e.isIntersecting || e.boundingClientRect.top > 0));
     if (main) io2.observe(main);
     return () => (mo.disconnect(), io.disconnect(), io2.disconnect());
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sections are fixed for the page
   }, []);
 
   return (
@@ -48,7 +50,7 @@ export function ProductSectionBar({ product }: { product: EnquiryProduct }) {
         <div className="shell flex h-16 items-center gap-6">
           <p className="hidden max-w-[30ch] truncate font-semibold md:block">{product.name}</p>
           <nav className="-mx-1 flex flex-1 gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Product sections">
-            {SECTIONS.map(([id, label]) => (
+            {links.map(([id, label]) => (
               <a key={id} href={`#${id}`} data-anchor className={`sec-link ${current === id ? 'is-on' : ''}`} aria-current={current === id ? 'true' : undefined}>
                 {label}
               </a>

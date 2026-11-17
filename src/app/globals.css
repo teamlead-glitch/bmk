@@ -1296,3 +1296,18 @@ input[type='search']::-webkit-search-cancel-button {
     transition: none;
   }
 }
+
+/* Product description from the CMS (rich text): lists and links */
+.rich-text ul,
+.rich-text ol {
+  @apply grid gap-2 pl-5;
+}
+.rich-text ul {
+  @apply list-disc;
+}
+.rich-text ol {
+  @apply list-decimal;
+}
+.rich-text a {
+  @apply text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy;
+}

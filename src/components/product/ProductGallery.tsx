@@ -37,11 +37,11 @@ export function ProductGallery({ name, glyph, images, sources }: { name: string;
       {many && (
         <ul className="mt-3 grid grid-cols-6 gap-2" aria-label="Images">
           {images.map((im, i) => (
-            <li key={im}>
+            <li key={i}>
               <button
                 type="button"
                 onClick={() => setImg(i)}
-                aria-label={`Show ${im}`}
+                aria-label={`Show image ${i + 1}${im ? `: ${im}` : ""}`}
                 aria-pressed={i === img}
                 className={`block w-full rounded-xl ring-2 ring-offset-2 transition ${i === img ? 'ring-navy' : 'ring-transparent hover:ring-line'}`}
               >
