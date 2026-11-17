@@ -1,19 +1,20 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element -- category banner from the CMS */
+/* eslint-disable @next/next/no-img-element -- category and brand banners from the CMS */
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Query } from '@/components/catalogue/listing-state';
 import { Arrow } from '@/components/common/Arrow';
+import { BrandMark } from '@/components/common/BrandMark';
 import { Crumbs } from '@/components/common/Crumbs';
 import { CheckIcon, ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
 import { Pillbar } from '@/components/common/Pillbar';
-import { ProductCard } from '@/components/common/ProductCard';
+import { brandVars, ProductCard } from '@/components/common/ProductCard';
 import { HOME, href } from '@/lib/routes';
 import type { CmsListingData, CountedOption, ProductPage } from '@/types/catalogue';
 
-/* ---------- PRODUCT LISTING FROM THE CMS (All products, category pages) ---------- */
+/* ---------- PRODUCT LISTING FROM THE CMS (All products, category and brand pages) ---------- */
 // Same look as the design's listing (src/components/catalogue/Listing.tsx), with the
 // products coming from the CMS a page at a time (GET /v1/products through /api/products/).
 // Filters, sort and paging live in the URL (?cat=a,b&brand=c&sort=az&page=2) so every
@@ -36,13 +37,15 @@ export function CmsListingFromUrl({ data }: { data: CmsListingData }) {
 
 export function CmsListing({ data, query }: { data: CmsListingData; query: Query }) {
   const router = useRouter();
-  const { category } = data;
+  const { category, brand } = data;
   const all = data.kind === 'all';
-  const path = category ? `/category/${category.slug}` : '/products';
+  const path = category ? `/category/${category.slug}` : brand ? `/brand/${brand.slug}` : '/products';
 
-  // URL state (unknown categories and brands are ignored). Category pages have no category filter.
-  const selC = all ? known(list(query.get('cat')), data.categories) : [];
-  const selB = known(list(query.get('brand')), data.brands);
+  // URL state (unknown categories and brands are ignored). Category pages have no category
+  // filter; brand pages have one category tab at a time and no brand filter.
+  const cats = known(list(query.get('cat')), data.categories);
+  const selC = all ? cats : brand ? cats.slice(0, 1) : [];
+  const selB = brand ? [] : known(list(query.get('brand')), data.brands);
   const sort: SortKey = query.get('sort') === 'az' ? 'az' : 'latest';
   const pages = Math.min(MAX_PAGES, Math.max(1, parseInt(query.get('page') || '1', 10) || 1));
   const keep = { cat: selC, brand: selB, sort: sort === 'latest' ? '' : sort };
@@ -55,8 +58,9 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
 
   // Loaded pages, by filter set and page number: "categories|brands|sort|page"
   const apiCategory = category ? category.slug : [...selC].sort().join(',');
-  const setKey = `${apiCategory}|${[...selB].sort().join(',')}|${SORT_API[sort]}`;
-  const [loaded, setLoaded] = useState<Record<string, ProductPage>>(() => ({ [`${category?.slug ?? ''}||latest|1`]: data.first }));
+  const apiBrand = brand ? brand.slug : [...selB].sort().join(',');
+  const setKey = `${apiCategory}|${apiBrand}|${SORT_API[sort]}`;
+  const [loaded, setLoaded] = useState<Record<string, ProductPage>>(() => ({ [`${category?.slug ?? ''}|${brand?.slug ?? ''}|latest|1`]: data.first }));
   const [failed, setFailed] = useState(false);
   const [retry, setRetry] = useState(0);
 
@@ -94,9 +98,9 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
   const total = firstPage?.total ?? 0;
   const isEmpty = data.first.total === 0; // nothing to list at all (before filters)
   const showCat = all && data.categories.length > 0;
-  const sidebar = !isEmpty && (showCat || data.brands.length > 0);
+  const sidebar = !isEmpty && !brand && (showCat || data.brands.length > 0); // brand pages filter with the hero tabs
   const active = selC.length + selB.length;
-  const chips = [
+  const chips = brand ? [] : [
     ...selC.map((id) => ({ label: data.categories.find((c) => c.id === id)?.name ?? id, to: toggle('cat', id) })),
     ...selB.map((id) => ({ label: data.brands.find((b) => b.id === id)?.name ?? id, to: toggle('brand', id) })),
   ];
@@ -137,7 +141,7 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
 
   return (
     <>
-      {category ? <CategoryHero data={data} /> : <AllProductsHero data={data} />}
+      {category ? <CategoryHero data={data} /> : brand ? <BrandHero data={data} selected={selC[0]} url={url} total={data.first.total} /> : <AllProductsHero data={data} />}
       <section className="shell section-y !pt-12">
         {sidebar && (
           <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
@@ -193,11 +197,13 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
               </Box>
             ) : isEmpty ? (
               <Box
-                title={category ? `${category.title}: products coming soon` : 'Products coming soon'}
+                title={category ? `${category.title}: products coming soon` : brand ? `${brand.name} products are coming soon` : 'Products coming soon'}
                 body={
                   category
                     ? 'Products for this category are being added. Explore related categories, or ask our team what’s available.'
-                    : 'We’re adding products to the catalogue. Meanwhile, ask our team what’s available.'
+                    : brand
+                      ? `We’re adding the ${brand.name} range to the catalogue. Meanwhile, ask our team what’s available.`
+                      : 'We’re adding products to the catalogue. Meanwhile, ask our team what’s available.'
                 }
               >
                 {data.categories
@@ -216,7 +222,7 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
                 <ul className={`grid gap-5 sm:grid-cols-2 ${sidebar ? 'xl:grid-cols-3' : 'lg:grid-cols-3 xl:grid-cols-4'}`}>
                   {shown.map((p, i) => (
                     <li key={p.slug}>
-                      <ProductCard product={p} index={i} />
+                      <ProductCard product={p} index={i} brandColor={brand?.color} />
                     </li>
                   ))}
                 </ul>
@@ -275,7 +281,7 @@ export function CmsListing({ data, query }: { data: CmsListingData; query: Query
   );
 }
 
-/** All products hero (design: PageHero, catalogue variant) with the categories as pills */
+/** All products hero (design: PageHero, catalogue variant, without the category pills) */
 function AllProductsHero({ data }: { data: CmsListingData }) {
   return (
     <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
@@ -287,48 +293,83 @@ function AllProductsHero({ data }: { data: CmsListingData }) {
           The full BMK Group catalogue across {data.brands.length} brand{data.brands.length === 1 ? '' : 's'} and {data.categories.length} categor
           {data.categories.length === 1 ? 'y' : 'ies'}.
         </p>
-        {data.categories.length > 0 && (
-          <div className="mt-8 flex flex-wrap gap-2">
-            {data.categories.map((c) => (
-              <Link key={c.id} className="pill" href={href(`/category/${c.id}`)}>
-                {c.name}
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );
 }
 
-/** Category photo hero with the other categories as pills (design: PageHero, category variant) */
+/** Category photo hero (design: PageHero, category variant, without the sub-category pills) */
 function CategoryHero({ data }: { data: CmsListingData }) {
   const category = data.category!;
-  const { categories } = data;
-  const pills = categories.length > 1;
+  return (
+    <section
+      className="photo-hero pt-[clamp(128px,11vw,176px)] pb-[clamp(40px,4.5vw,64px)]"
+      style={{ '--hero-overlay': 'linear-gradient(180deg,rgb(0 0 0/.5) 0%,rgb(0 0 0/.85) 100%)' } as React.CSSProperties}
+    >
+      {category.banner && <img className="photo-hero-img" src={category.banner} alt="" fetchPriority="high" />}
+      <div className="shell">
+        <Crumbs items={[['Home', HOME], ['Brands & Products', href('/products')], [category.title]]} light />
+        <h1 className="t-display mt-6 max-w-4xl">{category.title}</h1>
+        {category.short && <p className="t-body mt-2 max-w-2xl text-mist">{category.short}</p>}
+      </div>
+    </section>
+  );
+}
+
+/** Brand hero (design: BrandHero): banner, logo, intro, counts and the category tabs in the brand colour */
+function BrandHero({ data, selected, url, total }: { data: CmsListingData; selected?: string; url: (o: Record<string, string | string[]>) => string; total: number }) {
+  const b = data.brand!;
+  const cats = data.categories;
   return (
     <>
       <section
-        className={`photo-hero pt-[clamp(128px,11vw,176px)] ${pills ? 'pb-[138px]' : 'pb-[clamp(40px,4.5vw,64px)]'}`}
-        style={{ '--hero-overlay': 'linear-gradient(180deg,rgb(0 0 0/.5) 0%,rgb(0 0 0/.85) 100%)' } as React.CSSProperties}
+        className={`photo-hero pt-[clamp(128px,11vw,176px)] ${total ? 'pb-[146px]' : 'pb-[clamp(56px,5vw,80px)]'}`}
+        style={{ '--hero-overlay': 'linear-gradient(90deg,rgb(0 0 0/.55) 0%,rgb(0 0 0/.15) 55%,rgb(0 0 0/0) 100%)' } as React.CSSProperties}
       >
-        {category.banner && <img className="photo-hero-img" src={category.banner} alt="" fetchPriority="high" />}
+        {b.banner && <img className="photo-hero-img object-[70%_top]" src={b.banner} alt="" fetchPriority="high" />}
         <div className="shell">
-          <Crumbs items={[['Home', HOME], ['Brands & Products', href('/products')], [category.title]]} light />
-          <h1 className="t-display mt-6 max-w-4xl">{category.title}</h1>
-          {category.short && <p className="t-body mt-2 max-w-2xl text-mist">{category.short}</p>}
+          <Crumbs items={[['Home', HOME], ['Brands & Products', href('/products')], [b.name]]} light />
+          <div className="mt-10 flex max-w-xl flex-col items-start gap-6">
+            <div className="rounded-xl bg-white px-4 py-4">
+              <BrandMark brand={b} className="h-[42px]" />
+            </div>
+            <h1 className="t-display">{b.name}</h1>
+            {b.intro && <p className="t-body text-white/75">{b.intro}</p>}
+            {total > 0 && (
+              <dl className="flex gap-12">
+                <div>
+                  <dt className="text-[11px] tracking-[0.14em] text-white/60 uppercase">Products</dt>
+                  <dd className="mt-1 text-[32px] leading-10 tracking-[-0.02em]">{total}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] tracking-[0.14em] text-white/60 uppercase">Categories</dt>
+                  <dd className="mt-1 text-[32px] leading-10 tracking-[-0.02em]">{cats.length}</dd>
+                </div>
+              </dl>
+            )}
+          </div>
         </div>
       </section>
-      {pills && (
-        <Pillbar label="Product categories">
-          {categories.map((c) => (
-            <li key={c.id}>
-              <Link className={`pill-dark ${c.id === category.slug ? 'is-on' : ''}`} href={href(`/category/${c.id}`)} aria-current={c.id === category.slug ? 'page' : undefined}>
-                {c.name} <span className="n">{c.n}</span>
-              </Link>
-            </li>
-          ))}
+      {total ? (
+        <Pillbar label={`${b.name} categories`} style={brandVars(b.color)}>
+          <li>
+            <Link scroll={false} className={`pill-dark is-brand ${selected ? '' : 'is-on'}`} href={url({ cat: [], page: '' })}>
+              All <span className="n">{total}</span>
+            </Link>
+          </li>
+          {cats.map((c) => {
+            const on = selected === c.id;
+            return (
+              <li key={c.id}>
+                <Link scroll={false} className={`pill-dark is-brand ${on ? 'is-on' : ''}`} href={url({ cat: on ? [] : [c.id], page: '' })}>
+                  {c.name} <span className="n">{c.n}</span>
+                </Link>
+              </li>
+            );
+          })}
         </Pillbar>
+      ) : (
+        <div className="h-0" />
       )}
     </>
   );

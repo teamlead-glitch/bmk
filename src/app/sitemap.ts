@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next';
-import { getCategorySlugs, getListingParams, getProductSlugs } from '@/lib/content';
+import { getBrandSlugs, getCategorySlugs, getProductSlugs } from '@/lib/content';
 import { siteUrl } from '@/lib/site-url';
 
 // Built from the content layer: every indexable page. Search results (noindex)
 // and BMK's own brands (no brand page) are left out. When the CMS is live it can
 // supply this list instead (skill template: sitemap.xml/route.ts proxy).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ brands }, categories, slugs] = await Promise.all([getListingParams(), getCategorySlugs(), getProductSlugs()]);
+  const [brands, categories, slugs] = await Promise.all([getBrandSlugs(), getCategorySlugs(), getProductSlugs()]);
   const fixed = ['/', '/about/', '/products/', '/faq/', '/contact/', '/privacy/', '/cookies/', '/terms/'];
   return [
     ...fixed.map((p) => ({ url: siteUrl(p), changeFrequency: 'monthly' as const, priority: p === '/' ? 1 : 0.7 })),

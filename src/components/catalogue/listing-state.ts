@@ -15,9 +15,9 @@ export interface Query {
 }
 
 export function listingState({ ctx, base: all, brands, categories, groups }: ListingData, params: Query) {
-  const q = ctx.kind === 'search' ? (params.get('q') || '').trim() : '';
-  const base = ctx.kind === 'search' ? searchProducts(all, q) : all;
-  const selB = ctx.kind === 'brand' ? [] : list(params.get('brand'));
+  const q = (params.get('q') || '').trim();
+  const base = searchProducts(all, q);
+  const selB = list(params.get('brand'));
   const selC = list(params.get('cat'));
   const sort = params.get('sort') === 'az' ? 'az' : 'latest';
   const pages = Math.max(1, parseInt(params.get('page') || '1', 10) || 1);
@@ -37,23 +37,20 @@ export function listingState({ ctx, base: all, brands, categories, groups }: Lis
   const catOpts = categories.map((c) => ({ ...c, n: base.filter((p) => p.categoryId === c.id && byB(p)).length })).filter((o) => o.n || selC.includes(o.id));
 
   const isEmpty = base.length === 0;
-  const showCat = ctx.kind !== 'brand';
-  const showBrand = ctx.kind !== 'brand';
+  const showCat = true;
+  const showBrand = true;
   const sidebar = !isEmpty && (showCat || showBrand);
-  const active = selB.length + (ctx.kind === 'brand' ? 0 : selC.length);
+  const active = selB.length + selC.length;
   const toggle = (key: 'brand' | 'cat', id: string) => {
     const cur = key === 'brand' ? selB : selC;
     return url({ [key]: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id], page: '' });
   };
   const clearUrl = url({ brand: [], cat: [], page: '' });
 
-  const chips =
-    ctx.kind === 'brand'
-      ? []
-      : [
-          ...selC.map((id) => ({ label: categories.find((c) => c.id === id)?.name ?? id, to: toggle('cat', id) })),
-          ...selB.map((id) => ({ label: brands.find((b) => b.id === id)?.name ?? id, to: toggle('brand', id) })),
-        ];
+  const chips = [
+    ...selC.map((id) => ({ label: categories.find((c) => c.id === id)?.name ?? id, to: toggle('cat', id) })),
+    ...selB.map((id) => ({ label: brands.find((b) => b.id === id)?.name ?? id, to: toggle('brand', id) })),
+  ];
 
   // Category facet: grouped by product group
   const catSections = groups.map((g) => ({ group: g as null | { id: string; name: string }, opts: catOpts.filter((o) => o.group === g.id) })).filter((x) => x.opts.length);

@@ -10,11 +10,10 @@
 import { cache } from 'react';
 import { brands, categories, groups, products } from '@/data/catalogue';
 import * as company from '@/data/company';
-import { brandStyle, productMedia } from '@/data/media';
+import { DEFAULT_BRAND_COLOR, productMedia } from '@/data/media';
 import { countryVisual, DEFAULT_LOCATION } from '@/data/visuals';
 import {
   brandOf,
-  byId,
   categoriesIn,
   categoryOf,
   countIn,
@@ -31,7 +30,7 @@ import { API_CONFIG } from '@/constants/config';
 import { cmsGet } from '@/lib/cms-fetch';
 import { cleanHtml, htmlToText } from '@/lib/html';
 import { href } from '@/lib/routes';
-import type { BrandLite, CardProduct, CountedOption, CategoryLite, CmsListingData, Group, NavData, ProductPage, ProductSort } from '@/types/catalogue';
+import type { BrandColor, BrandLite, CardProduct, CountedOption, CategoryLite, CmsListingData, Group, NavData, ProductPage, ProductSort } from '@/types/catalogue';
 import type { Contact, Faq, FaqTopic, Location, SocialId } from '@/types/company';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
@@ -109,17 +108,15 @@ export const getSearchIndex = cache(async () => ({
 
 /* ---------- Listing pages ---------- */
 
-// All products (/products) and category pages (/category/{slug}) come from the CMS:
-// getAllProductsPage and getCategoryPage below.
-export type ListingKind = 'search' | 'brand';
+// All products (/products), category pages (/category/{slug}) and brand pages
+// (/brand/{slug}) come from the CMS: getAllProductsPage, getCategoryPage, getBrandPage below.
+export type ListingKind = 'search';
 
 export interface ListingContext {
   kind: ListingKind;
   /** Page path without query, e.g. "/brand/nikon" */
   path: string;
   title: string;
-  brand?: BrandLite;
-  heroImage?: string | null;
 }
 
 export interface ListingData {
@@ -132,21 +129,15 @@ export interface ListingData {
 }
 
 /** null → the page answers 404. BMK's own brands have no brand page. */
-export const getListing = cache(async (kind: ListingKind, id?: string): Promise<ListingData | null> => {
-  const shared = { brands: brands.map(toBrandLite), categories: categoryLites(), groups };
-  const cards = (list: typeof products) => list.map(toCardProduct);
-
-  if (kind === 'search') return { ctx: { kind, path: '/search', title: 'Search' }, base: cards(products), ...shared };
-
-  // brand
-  const b = byId(brands, id);
-  if (!b || b.inHouse) return null;
-  return {
-    ctx: { kind, path: `/brand/${b.id}`, title: b.name, brand: toBrandLite(b), heroImage: brandStyle[b.id]?.hero ?? null },
-    base: cards(products.filter((p) => p.brand === b.id)),
-    ...shared,
-  };
-});
+export const getListing = cache(
+  async (kind: ListingKind): Promise<ListingData> => ({
+    ctx: { kind, path: '/search', title: 'Search' },
+    base: products.map(toCardProduct),
+    brands: brands.map(toBrandLite),
+    categories: categoryLites(),
+    groups,
+  }),
+);
 
 /* ---------- CMS catalogue: All products and category pages ---------- */
 // GET /v1/products (one page of the listing), /v1/categories and /v1/brands (filters).
@@ -178,7 +169,15 @@ type CmsCategory = {
   banner?: { url?: string | null } | null;
   products_count?: number | null;
 };
-type CmsBrand = { slug?: string | null; name?: string | null; categories?: CmsRef[] | null };
+type CmsBrand = {
+  slug?: string | null;
+  name?: string | null;
+  introduction?: string | null;
+  color?: string | null;
+  logo?: { url?: string | null } | null;
+  banner?: { url?: string | null } | null;
+  categories?: CmsRef[] | null;
+};
 
 const text = (v: unknown) => String(v ?? '').trim();
 
@@ -258,7 +257,7 @@ async function categoryOptions(keep?: string): Promise<CountedOption[]> {
 /** /products: every product, with Category and Brand filters. CMS down -> error.tsx. */
 export const getAllProductsPage = cache(async (): Promise<CmsListingData> => {
   const [categories, brandsList, first] = await Promise.all([categoryOptions(), brandOptions(), getProducts({ page: 1 })]);
-  return { kind: 'all', category: null, categories, brands: brandsList, first };
+  return { kind: 'all', category: null, brand: null, categories, brands: brandsList, first };
 });
 
 /** Slugs of the CMS categories (built at deploy time, sitemap) */
@@ -280,6 +279,7 @@ export const getCategoryPage = cache(async (slug: string): Promise<CmsListingDat
 
   return {
     kind: 'category',
+    brand: null,
     category: {
       slug: current,
       title: text(c.title) || current,
@@ -293,9 +293,53 @@ export const getCategoryPage = cache(async (slug: string): Promise<CmsListingDat
   };
 });
 
-export const getListingParams = cache(async () => ({
-  brands: brands.filter((b) => !b.inHouse).map((b) => b.id),
-}));
+/** Brand colour from the CMS ("#d12e2e"), with a black or white label colour that reads on it */
+function brandColor(hex: unknown): BrandColor {
+  const m = text(hex).match(/^#?([0-9a-f]{6})$/i);
+  if (!m) return DEFAULT_BRAND_COLOR;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return { color: `#${m[1].toLowerCase()}`, on: luminance > 0.4 ? '#121212' : '#ffffff' };
+}
+
+/** Slugs of the CMS brands (built at deploy time, sitemap) */
+export const getBrandSlugs = cache(async (): Promise<string[]> => (await getCmsBrands()).map((b) => text(b.slug)).filter(isSlug));
+
+/**
+ * /brand/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
+ * answers 301 and fetch follows it to the current brand). CMS down -> error.tsx.
+ */
+export const getBrandPage = cache(async (slug: string): Promise<CmsListingData | { redirect: string } | null> => {
+  if (!API_CONFIG.BASE_URL || !isSlug(slug)) return null;
+  const { found, json } = await cmsGet(`${API_CONFIG.BASE_URL}/v1/brands/${encodeURIComponent(slug)}`);
+  const b = found ? (json as { data?: CmsBrand })?.data : undefined;
+  const current = text(b?.slug);
+  if (!b || !current) return null;
+  if (current.toLowerCase() !== slug.toLowerCase()) return { redirect: current };
+
+  // Category tabs: the brand's categories, with its product count in each
+  const cats = (b.categories ?? []).filter((c) => isSlug(text(c.slug)) && text(c.title));
+  const [first, counts] = await Promise.all([
+    getProducts({ brands: [current], page: 1 }),
+    Promise.all(cats.map((c) => getProducts({ category: text(c.slug), brands: [current], perPage: 1 }).then((r) => r.total))),
+  ]);
+  const name = text(b.name) || current;
+  return {
+    kind: 'brand',
+    category: null,
+    brand: {
+      slug: current,
+      name,
+      intro: htmlToText(cleanHtml(text(b.introduction))),
+      logo: mediaUrl(b.logo?.url),
+      banner: mediaUrl(b.banner?.url),
+      color: brandColor(b.color),
+    },
+    categories: cats.map((c, i) => ({ id: text(c.slug), name: text(c.title), n: counts[i] })).filter((c) => c.n > 0),
+    brands: [],
+    first,
+  };
+});
 
 /* ---------- Product detail ---------- */
 

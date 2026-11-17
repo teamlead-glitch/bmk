@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
-import { BrandHero, PageHero } from '@/components/catalogue/ListingHero';
+import { PageHero } from '@/components/catalogue/ListingHero';
 import { listingState, type ListingState, type Query } from '@/components/catalogue/listing-state';
 import { Arrow } from '@/components/common/Arrow';
 import { CheckIcon, ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
@@ -21,11 +21,10 @@ export function ListingFromUrl({ data }: { data: ListingData }) {
 
 export const EMPTY_QUERY: Query = { get: () => null };
 
-/** Category, group, all products, search results and the brand page. */
+/** Search results. (All products, category and brand pages: CmsListing.tsx.) */
 export function Listing({ data, query }: { data: ListingData; query: Query }) {
   const router = useRouter();
   const s = listingState(data, query);
-  const { ctx } = data;
   const [sheet, setSheet] = useState(false);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export function Listing({ data, query }: { data: ListingData; query: Query }) {
 
   return (
     <>
-      {ctx.kind === 'brand' ? <BrandHero data={data} s={s} /> : <PageHero data={data} s={s} />}
+      <PageHero data={data} s={s} />
       <section className="shell section-y !pt-12">
         {s.sidebar && (
           <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
@@ -93,7 +92,7 @@ export function Listing({ data, query }: { data: ListingData; query: Query }) {
                 <ul className={`grid gap-5 sm:grid-cols-2 ${s.sidebar ? 'xl:grid-cols-3' : 'lg:grid-cols-3 xl:grid-cols-4'}`}>
                   {s.shown.map((p, i) => (
                     <li key={p.slug}>
-                      <ProductCard product={p} index={i} brandColor={ctx.kind === 'brand' ? ctx.brand!.color : undefined} />
+                      <ProductCard product={p} index={i} />
                     </li>
                   ))}
                 </ul>
@@ -112,7 +111,7 @@ export function Listing({ data, query }: { data: ListingData; query: Query }) {
                 )}
               </>
             ) : (
-              <Empty data={data} s={s} />
+              <Empty s={s} />
             )}
           </div>
         </div>
@@ -197,49 +196,17 @@ function Box({ title, body, children }: { title: string; body: string; children:
   );
 }
 
-/** Empty states: no search matches, nothing in this category/brand yet, or filters too narrow. */
-function Empty({ data, s }: { data: ListingData; s: ListingState }) {
-  const { ctx } = data;
-  if (ctx.kind === 'search')
-    return (
-      <Box title={s.q ? `No products match “${s.q}”` : 'Search the catalogue'} body={s.q ? 'Check the spelling, or search by model name or brand.' : 'Search by product, model name or brand.'}>
-        {POPULAR_SEARCHES.map((t) => (
-          <Link key={t} className="pill" href={href('/search', { q: t })}>
-            {t}
-          </Link>
-        ))}
-        <Link className="btn btn-navy" href={href('/products')}>
-          Browse all products <Arrow />
-        </Link>
-      </Box>
-    );
-  if (s.isEmpty) {
-    const name = ctx.brand?.name || '';
-    const alt = ctx.brand ? data.groups.filter((g) => ctx.brand!.groups.includes(g.id)) : [];
-    return (
-      <Box
-        title={ctx.brand ? `${name} products are coming soon` : `${name}: products coming soon`}
-        body={
-          ctx.brand
-            ? `We’re adding the ${name} range to the catalogue. Meanwhile, browse the categories it covers, or ask our team what’s available.`
-            : 'Products for this category are being added. Explore related categories, or ask our team what’s available.'
-        }
-      >
-        {alt.map((c) => (
-          <Link key={c.id} className="pill" href={href(`/category/${c.id}`)}>
-            {c.name}
-          </Link>
-        ))}
-        <button type="button" className="btn btn-navy" data-enquire="">
-          Make an enquiry <Arrow />
-        </button>
-      </Box>
-    );
-  }
+/** Empty state: no search matches yet. */
+function Empty({ s }: { s: ListingState }) {
   return (
-    <Box title="No products match these filters" body="Remove a filter to see more products.">
-      <Link scroll={false} className="btn btn-dark" href={s.clearUrl}>
-        Clear filters
+    <Box title={s.q ? `No products match “${s.q}”` : 'Search the catalogue'} body={s.q ? 'Check the spelling, or search by model name or brand.' : 'Search by product, model name or brand.'}>
+      {POPULAR_SEARCHES.map((t) => (
+        <Link key={t} className="pill" href={href('/search', { q: t })}>
+          {t}
+        </Link>
+      ))}
+      <Link className="btn btn-navy" href={href('/products')}>
+        Browse all products <Arrow />
       </Link>
     </Box>
   );
