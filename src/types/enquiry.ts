@@ -9,6 +9,8 @@ export interface EnquiryInput {
   country?: string;
   subject?: string;
   message: string;
+  /** Product slug: set by the product enquiry popup, sends to POST /v1/products/{slug}/enquiries */
+  product?: string;
   /** Honeypot: hidden from people, filled in by bots */
   website?: string;
 }

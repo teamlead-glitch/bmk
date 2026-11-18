@@ -34,7 +34,7 @@ export default async function ProductPage({ params }: Props) {
   // Gallery: labels (alt text) and photos; a product without photos shows the placeholder
   const labels = p.images.length ? p.images.map((im) => im.alt) : [''];
   const sources = p.images.length ? p.images.map((im) => im.src) : [''];
-  const enquiry: EnquiryProduct = { name: p.name, brandName: p.brand.name, categoryName: p.category?.name ?? '', thumb: p.images[0]?.src, glyph: 'generic' };
+  const enquiry: EnquiryProduct = { slug: p.slug, name: p.name, brandName: p.brand.name, categoryName: p.category?.name ?? '', thumb: p.images[0]?.src, glyph: 'generic' };
   const hasOverview = p.descriptionHtml.length > 0;
   const hasSpecs = p.specGroups.length > 0;
 

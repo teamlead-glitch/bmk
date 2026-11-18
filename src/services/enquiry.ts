@@ -4,7 +4,8 @@ import type { EnquiryInput, EnquiryResult } from '@/types/enquiry';
 
 /* ---------- ENQUIRIES (browser) ---------- */
 // The forms post to this site's POST /api/enquiry/ (src/app/api/enquiry/route.ts), which
-// checks the fields and forwards them to the CMS (POST /v1/enquiries) with the server-only key.
+// checks the fields and forwards them to the CMS (POST /v1/enquiries, or
+// POST /v1/products/{slug}/enquiries for a product) with the server-only key.
 
 /** Send a form and get a result the form can show. Never throws. */
 export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {

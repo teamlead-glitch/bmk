@@ -13,7 +13,8 @@ import type { TemplateId } from '@/types/catalogue';
 // Any element with data-enquire="Distribution Enquiry" (or an empty value) opens
 // the popup with that type preselected, so server components need no JS of their
 // own. Product pages call useEnquiry().open({ product }).
-// The form is posted to the CMS through /api/enquiry/ (src/services/enquiry.ts);
+// The form is posted to the CMS through /api/enquiry/ (src/services/enquiry.ts); a product
+// enquiry carries the product slug and is saved against that product;
 // trackLead runs only after the CMS saved it.
 
 const ENQUIRY_TYPES = ['Distribution Enquiry', 'Dealership Enquiry', 'Retail Sales Enquiry', 'General Enquiry'];
@@ -29,6 +30,7 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
       message: f.message,
       type: product ? 'Product Enquiry' : f.type,
       subject: product ? `Product enquiry: ${product.brandName} ${product.name}`.slice(0, 200) : f.type,
+      ...(product ? { product: product.slug } : {}),
     }),
     (input) => {
       onSent();
@@ -120,6 +122,8 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
 }
 
 export interface EnquiryProduct {
+  /** Product slug: the enquiry is saved against this product in the CMS */
+  slug: string;
   name: string;
   brandName: string;
   categoryName: string;
