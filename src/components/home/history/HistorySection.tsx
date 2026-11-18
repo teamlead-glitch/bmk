@@ -4,7 +4,7 @@ import { Arrow } from '@/components/common/Arrow';
 import { MilestoneCard } from '@/components/common/MilestoneCard';
 import { TimelineMotion } from '@/components/home/history/TimelineMotion';
 import { href } from '@/lib/routes';
-import type { Milestone } from '@/types/company';
+import type { Milestone } from '@/types/timeline';
 
 const MARKS = [
   { src: 'history-mark-1', cls: 'top-[-114px] left-[62%]' },
@@ -15,6 +15,7 @@ const MARKS = [
 
 /** Our Journey: pinned horizontal timeline on desktop, swipe on smaller screens. */
 export function HistorySection({ milestones }: { milestones: Milestone[] }) {
+  if (!milestones.length) return null;
   return (
     <section id="history" className="history relative overflow-hidden bg-mist" aria-labelledby="history-title">
       <div className="history-marks pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
@@ -54,7 +55,7 @@ export function HistorySection({ milestones }: { milestones: Milestone[] }) {
           <div className="history-viewport -mx-[clamp(20px,7.5vw,120px)] overflow-x-auto px-[clamp(20px,7.5vw,120px)] [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden">
             <ol className="history-track flex w-max gap-2 pb-6 will-change-transform">
               {milestones.map((m) => (
-                <MilestoneCard key={m.year} m={m} />
+                <MilestoneCard key={m.id} m={m} />
               ))}
             </ol>
           </div>

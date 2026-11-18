@@ -8,7 +8,8 @@ import { MilestoneCard } from '@/components/common/MilestoneCard';
 import { KindTag, MapPlaceholder } from '@/components/company/CompanyBits';
 import { href } from '@/lib/routes';
 import type { OwnBrand, PartnerBrand } from '@/types/brand';
-import type { CoreValue, Entity, Location, Milestone } from '@/types/company';
+import type { CoreValue, Entity, Location } from '@/types/company';
+import type { Milestone } from '@/types/timeline';
 
 /* ---------- Who we are: intro + globe + counts ---------- */
 export function WhoWeAre({ heading, paragraphs, companies, countries }: { heading: string; paragraphs: string[]; companies: number; countries: number }) {
@@ -237,12 +238,13 @@ export function OurBrands({ own, partners }: { own: OwnBrand[]; partners: Partne
 
 /* ---------- Our journey ---------- */
 export function Journey({ milestones }: { milestones: Milestone[] }) {
+  if (!milestones.length) return null;
   return (
     <section id="journey" className="section-y relative scroll-mt-24 overflow-hidden bg-mist" data-section>
       <div className="shell">
         <JourneyRail>
           {milestones.map((m) => (
-            <MilestoneCard key={m.year} m={m} />
+            <MilestoneCard key={m.id} m={m} />
           ))}
         </JourneyRail>
       </div>

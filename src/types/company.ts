@@ -23,12 +23,6 @@ export interface Entity {
   email: string | null;
 }
 
-export interface Milestone {
-  year: string;
-  title: string;
-  points: string[];
-}
-
 export interface EnquiryType {
   type: string;
   title: string;
@@ -54,10 +48,4 @@ export interface CountryVisual {
 export interface Location extends Country, CountryVisual {
   companies: Entity[];
   href: string;
-}
-
-export interface MilestoneVisual {
-  icon: string;
-  img: string;
-  short: string;
 }

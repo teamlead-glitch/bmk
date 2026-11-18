@@ -9,9 +9,10 @@
 //   contact-settings.ts    site contact details (settings/contact)
 //   faqs.ts                FAQ
 //   home-banner.ts         homepage hero (settings/home-banner)
+//   timeline.ts            homepage Our Journey, About › Our journey (timeline-events)
 //
 // Designer's static content (src/static/), until these get a CMS endpoint
-//   company-content.ts     company, offices, timeline (static/data/company.ts)
+//   company-content.ts     company and offices (static/data/company.ts)
 //   catalogue-content.ts   navbar menus and search (static/data/catalogue.ts)
 //
 // Functions are wrapped in React cache() so generateMetadata and the page share one call.
@@ -24,5 +25,6 @@ export * from '@/lib/api/faqs';
 export * from '@/lib/api/home-banner';
 export * from '@/lib/api/product-listings';
 export * from '@/lib/api/products';
+export * from '@/lib/api/timeline';
 export * from '@/static/catalogue-content';
 export * from '@/static/company-content';

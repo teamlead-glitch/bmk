@@ -3,7 +3,7 @@ import { Companies, Journey, MissionValues, OurBrands, WhoWeAre } from '@/compon
 import { SectionPills } from '@/components/about/SectionPills';
 import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { getBrandShowcase, getCompany } from '@/lib/content';
+import { getBrandShowcase, getCompany, getTimeline } from '@/lib/content';
 import { HOME } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -24,7 +24,7 @@ const SECTIONS: [string, string][] = [
 ];
 
 export default async function AboutPage() {
-  const [company, brands] = await Promise.all([getCompany(), getBrandShowcase()]);
+  const [company, brands, timeline] = await Promise.all([getCompany(), getBrandShowcase(), getTimeline()]);
   return (
     <>
       <PhotoHero
@@ -43,7 +43,7 @@ export default async function AboutPage() {
       <MissionValues mission={company.mission} vision={company.vision} values={company.values} />
       <Companies locations={company.locations} />
       <OurBrands own={brands.own} partners={brands.partner} />
-      <Journey milestones={company.milestones} />
+      <Journey milestones={timeline} />
       <EnquiryBlock types={company.enquiryTypes} title="Work with BMK" sub="Distribution, dealership, retail supply or something else." />
     </>
   );

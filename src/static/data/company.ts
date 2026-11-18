@@ -1,4 +1,4 @@
-import type { Country, CoreValue, Entity, EnquiryType, Milestone } from '@/types/company';
+import type { Country, CoreValue, Entity, EnquiryType } from '@/types/company';
 
 // Company content (from the design reference; the CMS replaces it).
 // Read it through @/lib/content (src/static/company-content.ts), never directly from pages.
@@ -143,43 +143,6 @@ export const entities: Entity[] = [
 ];
 
 export const entitiesIn = (countryId: string) => entities.filter((e) => e.country === countryId);
-
-// ── Timeline ─────────────────────────────────────────────────────────────────
-export const milestones: Milestone[] = [
-  { year: '2002', title: 'Origins & Early Success', points: ['BMK Group begins operations with the founding of Island Valley Electronics LLC in Dubai, UAE, specializing in consumer electronics import and export.'] },
-  { year: '2004', title: 'Portfolio Diversification', points: ['Expands wholesale and retail portfolios to include digital imaging and cameras, broadening market footprint across regional channels.'] },
-  {
-    year: '2010',
-    title: 'International Expansion & Distribution Hubs',
-    points: [
-      'Establishes BMK GULF FZE in Jebel Ali Free Zone (JAFZA), Dubai, to scale regional warehousing and logistics.',
-      'Incorporates BMK Electronics Pte Ltd in Singapore, securing BMK’s gateway into Southeast Asian markets.',
-      'Establishes long-term regional distribution relationships with global tech leaders including Samsung, LG, Canon, Fujifilm, Nikon, Sharp, Sony, and SanDisk.',
-    ],
-  },
-  { year: '2013', title: 'Launch of SEEKEN', points: ['Ventures into original consumer technology with the launch of flagship brand SEEKEN in Singapore.', 'Debuts its first proprietary device, the ST100 tablet.'] },
-  {
-    year: '2018',
-    title: 'Pan-African & Southeast Asian Expansion',
-    points: [
-      'Scales international distribution into Africa and Southeast Asia.',
-      'Secures official Fujifilm camera and accessories distribution in the Democratic Republic of the Congo.',
-      'Secures official Nikon camera and accessories distribution in Zambia via SEEKEN ELECTRONICS LIMITED.',
-      'Expands SEEKEN across the Middle East, Southeast Asia, and Africa.',
-    ],
-  },
-  { year: '2022', title: 'Wearables & Premium Segments', points: ['SEEKEN expands into premium smartwatches and advanced audio peripherals.'] },
-  { year: '2023', title: 'Acquisition of TEAM Appliances', points: ['BMK Group broadens its lifestyle portfolio into domestic living by acquiring home appliance brand TEAM Appliances.'] },
-  {
-    year: 'Present',
-    title: 'Global Distribution, Indian Expansion & Retail',
-    points: [
-      'Operates BMK International in Kerala, India, distributing premier brands (Samsung, Sujata, Prestige, Voltas, Symphony) and manufacturing the Made-in-India SEEKEN Home and Kitchen Appliances line.',
-      'Launches dedicated physical retail experience via Bhome Appliances in Kochi, Kerala.',
-      'Sustains direct corporate entities, authorized distributorships, and retail operations spanning the UAE, Singapore, Malaysia, Zambia, the DRC, and India.',
-    ],
-  },
-];
 
 export const enquiryTypes: EnquiryType[] = [
   { type: 'Distribution Enquiry', title: 'Good business starts with the right connection', text: 'Enquire about becoming a distribution partner for BMK Group brands.' },
