@@ -16,7 +16,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="main" tabIndex={-1}>
         {children}
       </main>
-      <Footer groups={nav.groups} contact={contact} />
+      <Footer categories={nav.categories} contact={contact} />
       <SectionReveal />
       <AnchorScroll />
     </>

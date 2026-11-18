@@ -10,14 +10,14 @@ import { Stage } from '@/components/common/Stage';
 import { POPULAR_SEARCHES } from '@/static/data/visuals';
 import { href } from '@/lib/routes';
 import type { SearchSuggestions } from '@/static/search-helpers';
-import type { Group } from '@/types/catalogue';
+import type { NavCategory } from '@/types/catalogue';
 
 const Label = ({ children }: { children: string }) => <p className="mb-3 text-xs tracking-[0.14em] text-muted uppercase">{children}</p>;
 
 /** Search panel under the navbar: popular searches and categories, then live
  *  product / brand / category matches. Enter opens the search page. */
-export const SearchPanel = forwardRef<HTMLDivElement, { groups: Group[]; open: boolean; className: string; onClose: () => void }>(function SearchPanel(
-  { groups, open, className, onClose },
+export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[]; open: boolean; className: string; onClose: () => void }>(function SearchPanel(
+  { categories, open, className, onClose },
   ref,
 ) {
   const router = useRouter();
@@ -90,9 +90,9 @@ export const SearchPanel = forwardRef<HTMLDivElement, { groups: Group[]; open: b
             <div>
               <Label>Browse categories</Label>
               <div className="flex flex-wrap gap-2">
-                {groups.map((g) => (
-                  <Link key={g.id} className="pill" href={href(`/category/${g.id}`)}>
-                    {g.name}
+                {categories.map((c) => (
+                  <Link key={c.slug} className="pill" href={href(`/category/${c.slug}`)}>
+                    {c.name}
                   </Link>
                 ))}
               </div>

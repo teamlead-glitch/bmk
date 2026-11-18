@@ -276,7 +276,7 @@ export function HomeHeader({ nav }: { nav: NavData }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && (timer.current = setTimeout(() => setMega(false), 250))}
         onNavigate={() => setMega(false)}
       />
-      <SearchPanel ref={searchRef} groups={nav.groups} open={search} onClose={() => setSearch(false)} className={`search-panel ${searchVisible ? '' : 'hidden'}`} />
+      <SearchPanel ref={searchRef} categories={nav.categories} open={search} onClose={() => setSearch(false)} className={`search-panel ${searchVisible ? '' : 'hidden'}`} />
     </>
   );
 }

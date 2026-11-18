@@ -10,12 +10,13 @@
 //   contact-settings.ts    site contact details (settings/contact)
 //   faqs.ts                FAQ
 //   home-banner.ts         homepage hero (settings/home-banner)
+//   navigation.ts          mega menu, mobile menu, footer and search panel links
 //   home-about.ts          homepage About BMK Group (settings/about/home)
 //   timeline.ts            homepage Our Journey, About › Our journey (timeline-events)
 //
 // Designer's static content (src/static/), until these get a CMS endpoint
 //   company-content.ts     company and offices (static/data/company.ts)
-//   catalogue-content.ts   navbar menus and search (static/data/catalogue.ts)
+//   catalogue-content.ts   search (static/data/catalogue.ts)
 //
 // Functions are wrapped in React cache() so generateMetadata and the page share one call.
 
@@ -27,6 +28,7 @@ export * from '@/lib/api/contact-settings';
 export * from '@/lib/api/faqs';
 export * from '@/lib/api/home-about';
 export * from '@/lib/api/home-banner';
+export * from '@/lib/api/navigation';
 export * from '@/lib/api/product-listings';
 export * from '@/lib/api/products';
 export * from '@/lib/api/timeline';

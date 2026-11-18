@@ -9,7 +9,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     <>
       <HomeHeader nav={nav} />
       <main id="main">{children}</main>
-      <Footer groups={nav.groups} contact={contact} />
+      <Footer categories={nav.categories} contact={contact} />
     </>
   );
 }

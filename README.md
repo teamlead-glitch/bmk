@@ -80,7 +80,6 @@ public/                      design assets, map/globe dot data
 
 ## Design notes carried over
 
-- **Mega menu:** two designs exist and the client has not chosen. Default is "categories"; set `NEXT_PUBLIC_MEGA_MENU=brands` for the brands-only design (`src/constants/site.ts`).
 - **Forms** (enquiry popup, contact form) post to the CMS through `/api/enquiry/`. Retail Sales and General types still need the CMS values confirmed (`src/constants/enquiry.ts`).
 - **Office maps** are placeholders until BMK supplies Google Maps embeds. Social links come from the CMS contact settings.
 - **Motion:** GSAP (ScrollTrigger, SplitText, Flip, Draggable, Inertia) and Lenis on the homepage; everything respects `prefers-reduced-motion`. Don't put a CSS `transition` on `transform` for elements GSAP animates.

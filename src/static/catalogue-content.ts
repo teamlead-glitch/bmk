@@ -1,26 +1,14 @@
 import { cache } from 'react';
 import { brands, categories, groups, products } from '@/static/data/catalogue';
 import { countIn, toBrandLite, toCardProduct } from '@/static/catalogue-helpers';
-import type { BrandLite, CardProduct, CategoryLite, Group, NavData } from '@/types/catalogue';
+import type { BrandLite, CardProduct, CategoryLite, Group } from '@/types/catalogue';
 
 /* ---------- The design's sample catalogue (src/static/data/catalogue.ts) ---------- */
-// Still used by the navbar menus, the search panel and the search page until they move to
+// Still used by search (search panel results, /api/search/, the search page) until it moves to
 // the CMS (GET /v1/categories, /v1/brands, /v1/products). Product, listing, category and
 // brand pages already read the CMS (src/lib/api/).
 
-/* ---------- Navigation (layouts) ---------- */
-
 const categoryLites = (): CategoryLite[] => categories.map((c) => ({ id: c.id, name: c.name, group: c.group, count: countIn(c.id) }));
-
-export const getNavData = cache(async (): Promise<NavData> => {
-  const all = brands.map(toBrandLite);
-  return {
-    groups,
-    categories: categoryLites(),
-    inHouseBrands: all.filter((b) => b.inHouse),
-    partnerBrands: all.filter((b) => !b.inHouse),
-  };
-});
 
 /* ---------- Search index (search panel API, search page) ---------- */
 

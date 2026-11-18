@@ -162,7 +162,7 @@ export function SiteHeader({ nav }: { nav: NavData }) {
 
       <SearchPanel
         ref={searchRef}
-        groups={nav.groups}
+        categories={nav.categories}
         open={search}
         onClose={() => setSearch(false)}
         className={`fixed top-[96px] left-1/2 z-40 w-[min(1040px,calc(100%-32px))] -translate-x-1/2 rounded-2xl bg-white p-6 shadow-[0_40px_80px_-30px_rgba(18,18,18,0.45)] md:top-[104px] md:p-8 ${searchVisible ? '' : 'hidden'}`}

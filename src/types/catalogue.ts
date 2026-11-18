@@ -126,10 +126,31 @@ export interface CategoryLite {
   count: number;
 }
 
-/** Navigation data loaded once in the layouts (mega menu, mobile menu, footer) */
+/** A main product category in the menus (CMS: GET /v1/categories) */
+export interface NavCategory {
+  slug: string;
+  name: string;
+  count: number;
+}
+
+/** One of BMK's own brands in the menus: its logo and website (CMS: settings/own-brands) */
+export interface NavOwnBrand {
+  id: string;
+  name: string;
+  logo: string | null;
+  site: { url: string; label: string } | null;
+}
+
+/** A partner brand in the menus, linking to its brand page (CMS: GET /v1/brands) */
+export interface NavPartnerBrand {
+  slug: string;
+  name: string;
+  logo: string | null;
+}
+
+/** Navigation data loaded once in the layouts (mega menu, mobile menu, footer, search panel) */
 export interface NavData {
-  groups: Group[];
-  categories: CategoryLite[];
-  inHouseBrands: BrandLite[];
-  partnerBrands: BrandLite[];
+  categories: NavCategory[];
+  ownBrands: NavOwnBrand[];
+  partnerBrands: NavPartnerBrand[];
 }

@@ -35,7 +35,7 @@ export default async function NotFound() {
           </div>
         </section>
       </main>
-      <Footer groups={nav.groups} contact={contact} />
+      <Footer categories={nav.categories} contact={contact} />
       <AnchorScroll />
     </>
   );

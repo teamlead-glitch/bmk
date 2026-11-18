@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import { FooterTagline } from '@/components/footer/FooterTagline';
 import { telHref } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
-import type { Group } from '@/types/catalogue';
+import type { NavCategory } from '@/types/catalogue';
 import type { Contact } from '@/types/contact';
 
 const LEGAL_LINKS: [string, string][] = [
@@ -13,7 +13,7 @@ const LEGAL_LINKS: [string, string][] = [
   ['/terms', 'Terms & Conditions'],
 ];
 
-export function Footer({ groups, contact }: { groups: Group[]; contact: Contact }) {
+export function Footer({ categories, contact }: { categories: NavCategory[]; contact: Contact }) {
   return (
     <footer className="bg-black text-white">
       <div className="shell grid gap-10 py-20 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
@@ -54,10 +54,10 @@ export function Footer({ groups, contact }: { groups: Group[]; contact: Contact 
         <nav className="flex flex-col gap-5 text-[15px]" aria-label="Categories">
           <p className="leading-5 font-bold">Categories</p>
           <ul className="flex flex-col gap-1.5 leading-6">
-            {groups.map((g) => (
-              <li key={g.id}>
-                <Link className="footer-link" href={href(`/category/${g.id}`)}>
-                  {g.name}
+            {categories.map((c) => (
+              <li key={c.slug}>
+                <Link className="footer-link" href={href(`/category/${c.slug}`)}>
+                  {c.name}
                 </Link>
               </li>
             ))}
