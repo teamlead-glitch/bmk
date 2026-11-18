@@ -10,7 +10,7 @@ import type { NavData } from '@/types/catalogue';
 const Label = ({ children, className = '' }: { children: string; className?: string }) => <p className={`mb-4 text-xs tracking-[0.14em] text-muted uppercase ${className}`}>{children}</p>;
 
 /** Brands & Products dropdown (desktop), shared by the homepage and every other page.
- *  Brands on the left (60%), main product categories on the right (40%), all from the CMS. */
+ *  Brands on the left (55%), main product categories on the right (45%), all from the CMS. */
 export const MegaMenu = forwardRef<
   HTMLDivElement,
   { nav: NavData; className: string; style?: CSSProperties; onPointerEnter?: () => void; onPointerLeave?: (e: React.PointerEvent) => void; onNavigate: () => void }
@@ -28,8 +28,8 @@ export const MegaMenu = forwardRef<
       onPointerLeave={onPointerLeave}
       onClick={(e) => (e.target as Element).closest('a') && onNavigate()}
     >
-      <div className="grid grid-cols-5 gap-10 p-10">
-        <div className="col-span-3">
+      <div className="grid grid-cols-[minmax(0,11fr)_minmax(0,9fr)] gap-10 p-10">
+        <div>
           {nav.ownBrands.length > 0 && (
             <>
               <Label>Our brands</Label>
@@ -74,7 +74,7 @@ export const MegaMenu = forwardRef<
             </>
           )}
         </div>
-        <div className="col-span-2 border-l border-line pl-10">
+        <div className="border-l border-line pl-10">
           <Label>Product categories</Label>
           <ul className="grid">
             {nav.categories.map((c) => (
