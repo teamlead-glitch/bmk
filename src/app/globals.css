@@ -275,6 +275,14 @@
   .btn-outline-light {
     @apply border border-white text-white hover:bg-white hover:text-ink;
   }
+  /* Hero "Partner With Us": the scroll timeline sets color/filter inline, which beats
+     the hover classes above, so the hover state has to win with !important. */
+  .hero-partner:hover {
+    color: var(--color-ink) !important;
+  }
+  .hero-partner:hover img {
+    filter: brightness(0.07) !important;
+  }
 
   .icon-btn {
     @apply grid size-10 place-items-center rounded-full transition-colors duration-300 disabled:opacity-30;
