@@ -202,7 +202,7 @@ export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; pa
                   <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
                     {b.links.map((l, i) => (
                       <a key={`${l.url}-${i}`} className="brand-cta" href={l.url} target="_blank" rel="noopener">
-                        Visit {hostLabel(l.url)} <Arrow className="btn-icon -rotate-45" />
+                        {l.title || `Visit ${hostLabel(l.url)}`} <Arrow className="btn-icon -rotate-45" />
                       </a>
                     ))}
                   </div>

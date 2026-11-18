@@ -39,7 +39,7 @@ export function BrandsSection({ partner, own, filters }: BrandShowcase) {
                       <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
                         {b.links.map((l, i) => (
                           <a key={`${l.url}-${i}`} href={l.url} target="_blank" rel="noopener" className="brand-cta w-auto gap-8">
-                            Visit {hostLabel(l.url)}
+                            {l.title || `Visit ${hostLabel(l.url)}`}
                             <Arrow className="btn-icon -rotate-45" />
                           </a>
                         ))}
