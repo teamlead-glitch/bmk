@@ -12,8 +12,10 @@ export interface ProductDetail {
   /** Main image first, then the gallery */
   images: { src: string; alt: string }[];
   brand: { slug: string; name: string; logo: string | null; color: BrandColor };
-  /** First category, null when the product has none */
+  /** First category, null when the product has none (breadcrumb, "More in" strip, enquiry) */
   category: { slug: string; name: string } | null;
+  /** Every category assigned to the product, in CMS order (chips in the summary) */
+  categories: { slug: string; name: string }[];
   highlights: Highlight[];
   /** Specification groups ("Specifications" when the CMS group has no name); variable products add their options */
   specGroups: { group: string; rows: { key: string; label: string; value: SpecValue }[] }[];

@@ -103,8 +103,13 @@ export const getProduct = cache(async (slug: string): Promise<DetailsResult<Prod
 
   const name = text(p.name) || current;
   const brandSlug = text(p.brand?.slug);
-  const cat = (p.categories ?? []).find((c) => isSlug(text(c.slug)) && text(c.title));
-  const catSlug = cat ? text(cat.slug) : '';
+  const categories: ProductDetail['categories'] = [];
+  for (const c of p.categories ?? []) {
+    const slug = text(c.slug);
+    if (isSlug(slug) && text(c.title) && !categories.some((x) => x.slug === slug)) categories.push({ slug, name: text(c.title) });
+  }
+  const cat = categories[0] ?? null;
+  const catSlug = cat?.slug ?? '';
 
   // Images: main image first, then the gallery (duplicates and broken links dropped)
   const images: ProductDetail['images'] = [];
@@ -145,7 +150,8 @@ export const getProduct = cache(async (slug: string): Promise<DetailsResult<Prod
       logo: mediaUrl(p.brand?.logo?.url),
       color: brandColor(cmsBrands.find((b) => text(b.slug) === brandSlug)?.color),
     },
-    category: cat ? { slug: catSlug, name: text(cat.title) } : null,
+    category: cat,
+    categories,
     highlights: specRows(p.highlights, 'h').slice(0, 3).map(({ label, value }) => ({ label, value })),
     specGroups,
     seo: p.seo ?? null,

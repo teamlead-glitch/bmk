@@ -16,11 +16,11 @@ export function ProductSummary({ p, enquiry, hasSpecs }: { p: ProductDetail; enq
             <BrandMark brand={p.brand} className="h-7" />
           </Link>
         )}
-        {p.category && (
-          <Link href={href(`/category/${p.category.slug}`)} className="chip border-line text-ink transition-colors hover:border-ink">
-            {p.category.name}
+        {p.categories.map((c) => (
+          <Link key={c.slug} href={href(`/category/${c.slug}`)} className="chip border-line text-ink transition-colors hover:border-ink">
+            {c.name}
           </Link>
-        )}
+        ))}
       </div>
       <div>
         <h1 className="text-[clamp(2.25rem,1.5rem+2vw,3.25rem)] leading-[1.08] font-semibold tracking-[-0.035em]">{p.name}</h1>
