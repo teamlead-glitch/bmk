@@ -38,7 +38,8 @@ export function ProductCard({ product: p, index = 0, brandColor }: { product: Ca
         ) : (
           <p className="line-clamp-2 text-sm text-muted">{p.short}</p>
         )}
-        <span className="brand-cta">
+        {/* Visual only: the title link covers the card; without this the pill sits above that link and swallows the click */}
+        <span className="brand-cta pointer-events-none">
           View details <ArrowMask />
         </span>
       </div>

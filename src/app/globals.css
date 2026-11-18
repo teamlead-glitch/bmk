@@ -197,6 +197,14 @@
   body {
     @apply bg-white font-sans text-black;
   }
+  /* Tailwind v4 resets buttons to the default cursor: every clickable control gets the hand */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
   /* Lenis */
   html.lenis,
   html.lenis body {
