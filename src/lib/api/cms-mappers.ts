@@ -1,4 +1,5 @@
 import { DEFAULT_BRAND_COLOR } from '@/constants/brand';
+import { getSiteUrl } from '@/lib/site-url';
 import type { BrandColor } from '@/types/catalogue';
 
 /* ---------- Mapping helpers for CMS answers (used by every content file) ---------- */
@@ -18,6 +19,17 @@ export function mediaUrl(url: unknown): string | null {
   const value = String(url ?? '').trim();
   if (!/^https?:\/\/[^\s"'<>]+$/i.test(value)) return null;
   return value.replace(/^http:\/\//i, 'https://');
+}
+
+/** CMS button link: site paths (and full links to this site) stay internal, other http(s) links open in a new tab */
+export function cmsLink(url: unknown): { href: string; external: boolean } | null {
+  const value = text(url);
+  if (/^\/(?!\/)/.test(value)) return { href: value, external: false };
+  const abs = mediaUrl(value);
+  if (!abs) return null;
+  const u = new URL(abs);
+  if (u.host === new URL(getSiteUrl()).host) return { href: `${u.pathname}${u.search}${u.hash}`, external: false };
+  return { href: abs, external: true };
 }
 
 /** Brand colour from the CMS ("#d12e2e"), with a black or white label colour that reads on it */

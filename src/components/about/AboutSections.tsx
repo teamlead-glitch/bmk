@@ -8,22 +8,19 @@ import { MilestoneCard } from '@/components/common/MilestoneCard';
 import { KindTag, MapPlaceholder } from '@/components/company/CompanyBits';
 import { href } from '@/lib/routes';
 import type { OwnBrand, PartnerBrand } from '@/types/brand';
-import type { CoreValue, Entity, Location } from '@/types/company';
+import type { CoreValue } from '@/types/about';
+import type { Entity, Location } from '@/types/company';
 import type { Milestone } from '@/types/timeline';
 
 /* ---------- Who we are: intro + globe + counts ---------- */
-export function WhoWeAre({ heading, paragraphs, companies, countries }: { heading: string; paragraphs: string[]; companies: number; countries: number }) {
+export function WhoWeAre({ heading, html, companies, countries }: { heading: string; html: string; companies: number; countries: number }) {
   return (
     <section id="who-we-are" className="section-y scroll-mt-24 bg-white" data-section>
       <div className="shell grid items-center gap-12 lg:grid-cols-[440px_1fr] lg:gap-[120px]">
         <div className="flex flex-col items-start gap-6">
           <span className="chip border-line text-ink">Who we are</span>
-          <h2 className="t-display">{heading}</h2>
-          <div className="t-body space-y-5">
-            {paragraphs.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
+          {heading && <h2 className="t-display">{heading}</h2>}
+          {html && <div className="t-body space-y-5" dangerouslySetInnerHTML={{ __html: html }} />}
           <a className="btn btn-navy" href="#our-brands" data-anchor>
             Explore our brands <Arrow />
           </a>
@@ -50,40 +47,44 @@ export function WhoWeAre({ heading, paragraphs, companies, countries }: { headin
 }
 
 /* ---------- Mission, vision and core values ---------- */
-const VALUE_ICON: Record<string, string> = { Integrity: 'verified', 'Customer-Centric': 'milestone-2012', 'Quality-Driven': 'star', 'Innovation-Focused': 'milestone-2022' };
-
 export function MissionValues({ mission, vision, values }: { mission: string; vision: string; values: CoreValue[] }) {
+  const statements = (
+    [
+      ['Our mission', mission],
+      ['Our vision', vision],
+    ] as const
+  ).filter(([, t]) => t);
+  if (!statements.length && !values.length) return null;
   return (
     <section id="mission" className="section-y relative isolate scroll-mt-24 overflow-hidden bg-navy text-white" data-section>
       <img src="/assets/patterns/history-mark-1.svg" alt="" className="absolute -top-24 -right-24 -z-10 w-[min(520px,50vw)] opacity-10 brightness-0 invert" />
       <div className="shell">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-          {(
-            [
-              ['Our mission', mission],
-              ['Our vision', vision],
-            ] as const
-          ).map(([k, t]) => (
-            <div key={k} className="flex flex-col items-start gap-6">
-              <h2 className="text-xs tracking-[0.14em] text-white/60 uppercase">{k}</h2>
-              <p className="text-[clamp(1.5rem,1.1rem+1.1vw,2.25rem)] leading-tight tracking-[-0.03em]">{t}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-16 border-t border-white/15 pt-12">
-          <h2 className="text-xs tracking-[0.14em] text-white/60 uppercase">Core values</h2>
-          <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {values.map((v) => (
-              <li key={v.name} className="value-card">
-                <span className="grid size-14 place-items-center rounded-full bg-white">
-                  <img src={`/assets/icons/${VALUE_ICON[v.name] ?? 'verified'}.svg`} alt="" className="size-7" />
-                </span>
-                <p className="mt-8 text-xl leading-7 font-semibold">{v.name}</p>
-                <p className="mt-2 text-[15px] leading-6 text-white/70">{v.text}</p>
-              </li>
+        {statements.length > 0 && (
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+            {statements.map(([k, t]) => (
+              <div key={k} className="flex flex-col items-start gap-6">
+                <h2 className="text-xs tracking-[0.14em] text-white/60 uppercase">{k}</h2>
+                <p className="text-[clamp(1.5rem,1.1rem+1.1vw,2.25rem)] leading-tight tracking-[-0.03em]">{t}</p>
+              </div>
             ))}
-          </ul>
-        </div>
+          </div>
+        )}
+        {values.length > 0 && (
+          <div className={statements.length ? 'mt-16 border-t border-white/15 pt-12' : ''}>
+            <h2 className="text-xs tracking-[0.14em] text-white/60 uppercase">Core values</h2>
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {values.map((v) => (
+                <li key={v.name} className="value-card">
+                  <span className="grid size-14 place-items-center rounded-full bg-white">
+                    <img src={v.icon} alt="" className="size-7" />
+                  </span>
+                  <p className="mt-8 text-xl leading-7 font-semibold">{v.name}</p>
+                  <p className="mt-2 text-[15px] leading-6 text-white/70">{v.text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -147,7 +148,7 @@ function CountryCard({ c, flip }: { c: Location; flip: boolean }) {
   );
 }
 
-export function Companies({ locations }: { locations: Location[] }) {
+export function Companies({ locations, intro }: { locations: Location[]; intro: string }) {
   return (
     <section id="companies" className="section-y scroll-mt-24 bg-fog" data-section>
       <div className="shell">
@@ -155,7 +156,7 @@ export function Companies({ locations }: { locations: Location[] }) {
           <div className="flex max-w-[620px] flex-col items-start gap-6">
             <span className="chip border-line bg-white text-ink">Group presence</span>
             <h2 className="t-display">Our companies</h2>
-            <p className="t-body">BMK Group operates an integrated network of corporate entities, retail outlets, and distribution hubs across six core markets.</p>
+            {intro && <p className="t-body">{intro}</p>}
           </div>
           <ul className="flex flex-wrap gap-2">
             {locations.map((c) => (
@@ -187,16 +188,14 @@ const domainOf = (url: string) => {
 };
 
 /* ---------- Our brands: BMK's own brands + partner logos (CMS: own-brands, brands) ---------- */
-export function OurBrands({ own, partners }: { own: OwnBrand[]; partners: PartnerBrand[] }) {
+export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; partners: PartnerBrand[]; title: string; intro: string }) {
   return (
     <section id="our-brands" className="section-y scroll-mt-24 bg-white" data-section>
       <div className="shell">
         <div className="flex max-w-[640px] flex-col items-start gap-6">
           <span className="chip border-line text-ink">Our brands</span>
-          <h2 className="t-display">Built by BMK, and distributed by BMK</h2>
-          <p className="t-body">
-            BMK Group develops and markets its own technology and home living brands, and is an official distributor and channel partner for premier global names.
-          </p>
+          {title && <h2 className="t-display">{title}</h2>}
+          {intro && <p className="t-body">{intro}</p>}
         </div>
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
           {own.map((b) => (

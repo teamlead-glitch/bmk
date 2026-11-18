@@ -29,11 +29,6 @@ export interface EnquiryType {
   text: string;
 }
 
-export interface CoreValue {
-  name: string;
-  text: string;
-}
-
 /** Visuals for a country: map pin position (% of the 1200×620 map), icon, city photo */
 export interface CountryVisual {
   x: number;

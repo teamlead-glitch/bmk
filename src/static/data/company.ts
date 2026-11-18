@@ -1,4 +1,4 @@
-import type { Country, CoreValue, Entity, EnquiryType } from '@/types/company';
+import type { Country, Entity, EnquiryType } from '@/types/company';
 
 // Company content (from the design reference; the CMS replaces it).
 // Read it through @/lib/content (src/static/company-content.ts), never directly from pages.
@@ -9,30 +9,6 @@ import type { Country, CoreValue, Entity, EnquiryType } from '@/types/company';
 // the earlier placeholder copy.
 
 export const YEARS = 24; // agreed figure for the homepage ("24 Years of Experience & Trust")
-
-export const intro = {
-  heading: 'Built on trust. Driven by innovation.',
-  // Full About text (About page)
-  paragraphs: [
-    'BMK Group has been a trusted leader and driving force across the UAE and international consumer electronics landscape since 2002. Originating as Island Valley Electronics LLC, a dedicated trading firm, BMK Group has evolved into a dynamic, diversified global enterprise specializing in global sourcing, authorized tier-one brand distribution, regional wholesale trade, dedicated retail showrooms, and original product manufacturing.',
-    'In addition to serving as official regional distributors and channel partners for premier global names — including Nikon, Canon, Fujifilm, Sony, Samsung, LG, Sujata, Prestige, Voltas, Symphony, and SanDisk — BMK Group develops and markets proprietary technology and home living solutions through its two core in-house brands, SEEKEN and TEAM Appliances.',
-    'Today, BMK Group operates an integrated network of corporate entities, retail outlets, and distribution hubs across six core markets: the United Arab Emirates, Singapore, Malaysia, Zambia, the Democratic Republic of the Congo, and India.',
-  ],
-  // Shortened for the homepage About block (sentences from the document, trimmed)
-  short: [
-    'BMK Group has been a trusted leader across the UAE and international consumer electronics landscape since 2002. Originating as Island Valley Electronics LLC, it has evolved into a diversified global enterprise: global sourcing, authorized tier-one brand distribution, regional wholesale trade, retail showrooms and original product manufacturing.',
-    'Today the group operates corporate entities, retail outlets and distribution hubs across six markets: the UAE, Singapore, Malaysia, Zambia, the DR Congo and India.',
-  ],
-};
-
-export const mission = 'To create and distribute technologically advanced products that seamlessly integrate into customers’ lives, delivering uncompromising quality and enduring performance.';
-export const vision = 'To build a global legacy of excellence in consumer electronics and home appliances, anchored in integrity, adaptability, and a customer-centric focus.';
-export const values: CoreValue[] = [
-  { name: 'Integrity', text: 'Conducting business transparently and ethically across all international partnerships.' },
-  { name: 'Customer-Centric', text: 'Prioritizing consumer lifestyle demands and reliable post-purchase support.' },
-  { name: 'Quality-Driven', text: 'Upholding rigorous standards in product durability, compliance, and performance.' },
-  { name: 'Innovation-Focused', text: 'Embracing emerging tech, agile distribution models, and intuitive product development.' },
-];
 
 // ── Group companies ──────────────────────────────────────────────────────────
 // Six countries, eight entities. Map pins are per country (x / y = % of the

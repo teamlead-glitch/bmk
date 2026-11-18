@@ -17,3 +17,12 @@ export interface HeroSlide {
   image: { src: string; alt: string };
   mobile?: { src: string; alt: string };
 }
+
+/** Homepage "About BMK Group", from the CMS setting GET /v1/settings/about/home. */
+export interface HomeAbout {
+  title: string;
+  /** Cleaned rich text (cleanHtml) */
+  html: string;
+  button: { text: string; href: string; external: boolean } | null;
+  image: { src: string; alt: string } | null;
+}

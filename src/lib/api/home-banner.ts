@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { mediaUrl } from '@/lib/api/cms-mappers';
+import { cmsLink, mediaUrl } from '@/lib/api/cms-mappers';
 import { serverGetData } from '@/lib/api/server-api';
 import type { HeroSlide, HomeBanner } from '@/types/home';
 
@@ -26,20 +26,12 @@ function youTubeId(url: unknown): string | null {
   return m ? m[1] : null;
 }
 
-/** CMS button link: site paths stay internal, other http(s) links open in a new tab */
-function slideLink(url: unknown): { href: string; external: boolean } | null {
-  const value = String(url ?? '').trim();
-  if (/^\/(?!\/)/.test(value)) return { href: value, external: false };
-  const abs = mediaUrl(value);
-  return abs ? { href: abs, external: true } : null;
-}
-
 function toSlide(s: CmsSlide): HeroSlide | null {
   const src = mediaUrl(s.images?.web?.url);
   const title = String(s.title ?? '').trim();
   if (!src || !title) return null;
   const mobileSrc = mediaUrl(s.images?.mobile?.url);
-  const link = slideLink(s.button?.url);
+  const link = cmsLink(s.button?.url);
   const text = String(s.button?.text ?? '').trim();
   return {
     id: String(s.id ?? src),
