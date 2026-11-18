@@ -2,21 +2,13 @@ import { cache } from 'react';
 import { getBrandShowcase } from '@/lib/api/brand-showcase';
 import { getCmsCategories } from '@/lib/api/brands-categories';
 import { isSlug, text } from '@/lib/api/cms-mappers';
+import { hostLabel } from '@/lib/routes';
 import type { NavCategory, NavData, NavOwnBrand } from '@/types/catalogue';
 
 /* ---------- Navigation (CMS: GET /v1/categories, /v1/brands, /v1/settings/own-brands) ---------- */
 // Loaded once in the layouts: mega menu, mobile menu, footer and search panel links.
 // Categories are flat in the CMS, so the menus list the main categories only.
 // CMS down -> CmsUnavailableError -> error.tsx.
-
-/** "https://www.seeken.com/" -> "seeken.com" (the label next to an own brand) */
-function hostLabel(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-}
 
 export const getNavData = cache(async (): Promise<NavData> => {
   const [cmsCategories, brands] = await Promise.all([getCmsCategories(), getBrandShowcase()]);

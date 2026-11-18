@@ -6,7 +6,7 @@ import { Arrow } from '@/components/common/Arrow';
 import { BrandMark } from '@/components/common/BrandMark';
 import { MilestoneCard } from '@/components/common/MilestoneCard';
 import { KindTag, MapPlaceholder } from '@/components/company/CompanyBits';
-import { href } from '@/lib/routes';
+import { hostLabel, href } from '@/lib/routes';
 import type { OwnBrand, PartnerBrand } from '@/types/brand';
 import type { CoreValue } from '@/types/about';
 import type { Entity, Location } from '@/types/company';
@@ -178,15 +178,6 @@ export function Companies({ locations, intro }: { locations: Location[]; intro: 
   );
 }
 
-/** "https://www.seeken.com/" -> "seeken.com" (the design's "Visit seeken.com" label) */
-const domainOf = (url: string) => {
-  try {
-    return new URL(url).hostname.replace(/^www./, '');
-  } catch {
-    return url;
-  }
-};
-
 /* ---------- Our brands: BMK's own brands + partner logos (CMS: own-brands, brands) ---------- */
 export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; partners: PartnerBrand[]; title: string; intro: string }) {
   return (
@@ -209,9 +200,9 @@ export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; pa
                 {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
                 {b.links.length > 0 && (
                   <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-                    {b.links.map((l) => (
-                      <a key={l.url} className="brand-cta" href={l.url} target="_blank" rel="noopener">
-                        Visit {domainOf(l.url)} <Arrow className="btn-icon -rotate-45" />
+                    {b.links.map((l, i) => (
+                      <a key={`${l.url}-${i}`} className="brand-cta" href={l.url} target="_blank" rel="noopener">
+                        Visit {hostLabel(l.url)} <Arrow className="btn-icon -rotate-45" />
                       </a>
                     ))}
                   </div>

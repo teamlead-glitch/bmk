@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- brand logos from the CMS */
 import { Arrow } from '@/components/common/Arrow';
 import { BrandsCarousel } from '@/components/home/brands/BrandsCarousel';
+import { hostLabel } from '@/lib/routes';
 import type { BrandShowcase } from '@/types/brand';
 
 /** "A", "A and B", "A, B and C" */
@@ -34,11 +35,15 @@ export function BrandsSection({ partner, own, filters }: BrandShowcase) {
                   <div className="mt-auto flex flex-col items-start gap-3 pt-16">
                     <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
                     {b.intro && <p className="t-body line-clamp-3 text-black/50">{b.intro}</p>}
-                    {b.links[0] && (
-                      <a href={b.links[0].url} target="_blank" rel="noopener" className="brand-cta mt-3 w-auto gap-8">
-                        Visit {b.name}
-                        <Arrow className="btn-icon -rotate-45" />
-                      </a>
+                    {b.links.length > 0 && (
+                      <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
+                        {b.links.map((l, i) => (
+                          <a key={`${l.url}-${i}`} href={l.url} target="_blank" rel="noopener" className="brand-cta w-auto gap-8">
+                            Visit {hostLabel(l.url)}
+                            <Arrow className="btn-icon -rotate-45" />
+                          </a>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </li>

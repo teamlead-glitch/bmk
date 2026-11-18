@@ -17,6 +17,15 @@ export function href(path: string, params: Params = {}): string {
 
 export const HOME = '/';
 
+/** "https://www.seeken.com/" → "seeken.com" (own-brand website labels) */
+export function hostLabel(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
 /** Link props for a brand: partner brands open their catalogue page; BMK's own
  *  brands (SEEKEN, TEAM) have no brand page and open their website instead. */
 export function brandLinkProps(b: { id: string; inHouse?: boolean; sites?: [string, string][] }) {
