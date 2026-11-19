@@ -32,7 +32,13 @@ export default async function HomePage() {
       <PresenceSection locations={company.locations} defaultLocation={company.defaultLocation} />
       <BrandsSection partner={brands.partner} own={brands.own} filters={brands.filters} />
       <HistorySection milestones={timeline} />
-      <EnquiryBlock types={company.enquiryTypes} id="contact" title="Let's do business together" animated />
+      <EnquiryBlock
+        types={company.enquiryTypes}
+        id="contact"
+        title="Partner With BMK Group"
+        sub="Select your partnership model below to connect directly with our commercial team."
+        animated
+      />
       <HomeReveals />
     </>
   );

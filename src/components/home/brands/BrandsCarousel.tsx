@@ -88,10 +88,10 @@ export function BrandsCarousel({ brands, filters }: { brands: PartnerBrand[]; fi
         <div className="flex max-w-[640px] flex-col gap-6">
           <div className="flex flex-col gap-3">
             <h2 id="brands-title" className="t-display" data-split>
-              Associated Brands
+              Global Partner Brands
             </h2>
             <p className="t-body" data-reveal="up">
-              The global names we distribute.
+              Authorised regional distribution for world-leading technology and home appliance brands.
             </p>
           </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter brands" data-reveal="up">
@@ -136,7 +136,8 @@ export function BrandsCarousel({ brands, filters }: { brands: PartnerBrand[]; fi
                   </span>
                 )}
                 <div className="flex w-full flex-col gap-3">
-                  <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
+                  {/* The logo shows the name: the heading stays for screen readers only */}
+                  <h3 className="sr-only">{b.name}</h3>
                   {b.intro && <p className="t-body line-clamp-5 text-black/50">{b.intro}</p>}
                   <Link href={href(`/brand/${b.slug}`)} className="brand-cta mt-3">
                     {b.name} Products

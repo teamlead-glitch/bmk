@@ -13,11 +13,10 @@ export function PresenceSection({ locations, defaultLocation }: { locations: Loc
       <div className="shell relative z-10 xl:absolute xl:bottom-[clamp(72px,7.5vw,120px)] xl:left-0 xl:w-auto xl:max-w-none">
         <div className="max-w-[360px]">
           <h2 id="presence-title" className="t-display" data-split>
-            BMK Group Presence
+            Global Footprint
           </h2>
           <p className="t-body mt-3 tracking-normal" data-reveal="up">
-            Eight registered companies and business entities across six countries, from the Middle East to Southeast Asia and Africa. Select a country to see the BMK
-            companies there.
+            Operating entities and distribution hubs across six countries spanning the Middle East, Asia, and Africa. Select a location to view our regional offices.
           </p>
         </div>
       </div>

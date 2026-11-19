@@ -154,7 +154,7 @@ export function Companies({ locations, intro }: { locations: Location[]; intro: 
       <div className="shell">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="flex max-w-[620px] flex-col items-start gap-6">
-            <span className="chip border-line bg-white text-ink">Group presence</span>
+            <span className="chip border-line bg-white text-ink">Global Footprint</span>
             <h2 className="t-display">Our companies</h2>
             {intro && <p className="t-body">{intro}</p>}
           </div>
@@ -184,7 +184,7 @@ export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; pa
     <section id="our-brands" className="section-y scroll-mt-24 bg-white" data-section>
       <div className="shell">
         <div className="flex max-w-[640px] flex-col items-start gap-6">
-          <span className="chip border-line text-ink">Our brands</span>
+          <span className="chip border-line text-ink">Proprietary Brands</span>
           {title && <h2 className="t-display">{title}</h2>}
           {intro && <p className="t-body">{intro}</p>}
         </div>
@@ -193,10 +193,11 @@ export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; pa
             <article key={b.id} className="ih-card">
               <div className="flex items-center justify-between gap-6">
                 <span className="brand-tag">BMK brand</span>
-                <BrandMark brand={b} className="h-[57px] !max-w-40 object-right" />
+                <BrandMark brand={b} className="h-[72px] !max-w-52 object-right" />
               </div>
               <div className="mt-auto flex flex-col items-start gap-3 pt-16">
-                <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
+                {/* The logo shows the name; without a logo the name stays visible */}
+                <h3 className={b.logo ? 'sr-only' : 'text-[32px] leading-8 font-semibold'}>{b.name}</h3>
                 {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
                 {b.links.length > 0 && (
                   <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">

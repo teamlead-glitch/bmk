@@ -121,8 +121,8 @@ export const entities: Entity[] = [
 export const entitiesIn = (countryId: string) => entities.filter((e) => e.country === countryId);
 
 export const enquiryTypes: EnquiryType[] = [
-  { type: 'Distribution Enquiry', title: 'Good business starts with the right connection', text: 'Enquire about becoming a distribution partner for BMK Group brands.' },
-  { type: 'Dealership Enquiry', title: 'Let’s build something valuable together.', text: 'Apply to become an authorised dealer for one or more BMK brands.' },
-  { type: 'Retail Sales Enquiry', title: 'Connect with BMK. Grow with confidence.', text: 'Enquire about retail supply, pricing, and product availability.' },
-  { type: 'General Enquiry', title: 'Your next opportunity starts here.', text: 'All other enquiries - partnerships, corporate, media, and more.' },
+  { type: 'Distribution Enquiry', title: 'Regional Distribution Partnerships', text: 'Partner with us for territory-wide wholesale distribution of SEEKEN and TEAM Appliances.' },
+  { type: 'Dealership Enquiry', title: 'Authorised Retail Dealerships', text: 'Stock BMK Group brands and distributed electronics in your retail outlets.' },
+  { type: 'Retail Sales Enquiry', title: 'Bulk & Corporate Orders', text: 'Request volume pricing, wholesale stock availability, and commercial quotes.' },
+  { type: 'General Enquiry', title: 'General & Corporate Enquiries', text: 'Get in touch for corporate communications, media requests, supplier onboarding, or general questions.' },
 ];

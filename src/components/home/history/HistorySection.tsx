@@ -38,7 +38,7 @@ export function HistorySection({ milestones }: { milestones: Milestone[] }) {
                   From global trade to new possibilities.
                 </h2>
                 <p className="t-body" data-reveal="up">
-                  A business built on international connections, evolving with the technology market and expanding into new opportunities.
+                  Over two decades of international trade, strategic brand partnerships, and proprietary product innovation.
                 </p>
               </div>
             </div>

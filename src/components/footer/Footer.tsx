@@ -19,7 +19,7 @@ export function Footer({ categories, contact }: { categories: NavCategory[]; con
       <div className="shell grid gap-10 py-20 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         <div className="flex flex-col gap-5">
           <img src="/assets/logo/bmk-white.svg" alt="BMK Group" width={92} height={48} className="h-12 w-[92px]" />
-          <p className="text-[15px] leading-[25px] text-white/40">Global technology distribution, trusted partnerships and a commitment to innovation.</p>
+          <p className="text-[15px] leading-[25px] text-white/40">Driving global technology distribution, trusted brand partnerships, and original consumer electronics innovation since 2002.</p>
         </div>
         <nav className="flex flex-col gap-5 text-[15px]" aria-label="Quick links">
           <p className="leading-5 font-bold">Quick links</p>
