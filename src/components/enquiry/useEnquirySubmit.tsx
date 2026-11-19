@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { readEnquiryForm, sendEnquiry } from '@/services/enquiry';
+import { readEnquiryBrands, readEnquiryForm, sendEnquiry } from '@/services/enquiry';
 import type { EnquiryInput } from '@/types/enquiry';
 
 /** Shared submit logic for the contact form and the enquiry popup:
@@ -15,7 +15,13 @@ export function useEnquirySubmit(build: (fields: Record<string, string>) => Enqu
     e.preventDefault();
     if (pending) return;
     const form = e.currentTarget;
-    const input = build(readEnquiryForm(form));
+    const fields = readEnquiryForm(form);
+    const countryId = Number(fields.country_id);
+    const input: EnquiryInput = {
+      ...build(fields),
+      country_id: Number.isInteger(countryId) && countryId > 0 ? countryId : undefined,
+      brands: readEnquiryBrands(form),
+    };
     setPending(true);
     setError('');
     setErrors({});
@@ -24,8 +30,8 @@ export function useEnquirySubmit(build: (fields: Record<string, string>) => Enqu
     if (result.ok) return onSent(input);
     setError(result.message);
     setErrors(result.errors ?? {});
-    // Move focus to the first field the API flagged
-    const first = Object.keys(result.errors ?? {})[0];
+    // Move focus to the first field the API flagged (names are plain words, safe in a selector)
+    const first = Object.keys(result.errors ?? {}).find((k) => /^[a-z_]+$/.test(k));
     if (first) form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
   };
 

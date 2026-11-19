@@ -6,7 +6,10 @@ export interface EnquiryInput {
   email: string;
   phone?: string;
   company?: string;
-  country?: string;
+  /** CMS country id (GET /v1/countries) */
+  country_id?: number;
+  /** CMS brand ids: distribution, dealership and retail enquiries only */
+  brands?: number[];
   subject?: string;
   message: string;
   /** Product slug: set by the product enquiry popup, sends to POST /v1/products/{slug}/enquiries */
@@ -17,3 +20,17 @@ export interface EnquiryInput {
 
 /** What POST /api/enquiry/ answers; `errors` maps a field name to its message */
 export type EnquiryResult = { ok: true } | { ok: false; message: string; errors?: Record<string, string> };
+
+/** A Country option of the enquiry forms */
+export interface EnquiryCountry {
+  id: number;
+  /** ISO code, used to load that country's brands */
+  code: string;
+  name: string;
+}
+
+/** A Brand checkbox of the enquiry forms */
+export interface EnquiryBrand {
+  id: number;
+  name: string;
+}

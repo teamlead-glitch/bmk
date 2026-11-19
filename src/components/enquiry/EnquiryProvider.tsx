@@ -5,7 +5,9 @@ import { createPortal } from 'react-dom';
 import { Arrow } from '@/components/common/Arrow';
 import { CloseIcon } from '@/components/common/Icons';
 import { Stage } from '@/components/common/Stage';
+import { CountryBrandFields } from '@/components/enquiry/CountryBrandFields';
 import { FieldError, Honeypot, useEnquirySubmit } from '@/components/enquiry/useEnquirySubmit';
+import { BRAND_ENQUIRY_TYPES } from '@/constants/enquiry';
 import { trackLead } from '@/lib/gtm';
 import type { TemplateId } from '@/types/catalogue';
 
@@ -22,6 +24,9 @@ const ID = 'enq';
 
 /** The popup's form. Its own component so the sending state resets with each open. */
 function EnquiryForm({ type, product, onSent }: { type?: string; product?: EnquiryProduct | null; onSent: () => void }) {
+  const [chosen, setChosen] = useState(type && ENQUIRY_TYPES.includes(type) ? type : '');
+  // Distribution, dealership and retail: company required, brands of the chosen country
+  const business = !product && BRAND_ENQUIRY_TYPES.includes(chosen);
   const { pending, error, errors, onSubmit, fieldProps } = useEnquirySubmit(
     (f) => ({
       ...f,
@@ -56,7 +61,7 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
       ) : (
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Enquiry type</span>
-          <select name="type" required className="field" defaultValue={type && ENQUIRY_TYPES.includes(type) ? type : ''} {...fieldProps('type', ID)}>
+          <select name="type" required className="field" value={chosen} onChange={(e) => setChosen(e.target.value)} {...fieldProps('type', ID)}>
             <option value="" disabled>
               Select a type
             </option>
@@ -76,8 +81,10 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
           <FieldError name="name" idPrefix={ID} errors={errors} />
         </label>
         <label className="grid gap-1.5 text-sm">
-          <span className="font-medium">Company</span>
-          <input name="company" maxLength={150} className="field" autoComplete="organization" {...fieldProps('company', ID)} />
+          <span className="font-medium">
+            Company{!business && <span className="font-normal text-muted"> (optional)</span>}
+          </span>
+          <input name="company" required={business} maxLength={150} className="field" autoComplete="organization" {...fieldProps('company', ID)} />
           <FieldError name="company" idPrefix={ID} errors={errors} />
         </label>
         <label className="grid gap-1.5 text-sm">
@@ -91,11 +98,7 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
           <FieldError name="phone" idPrefix={ID} errors={errors} />
         </label>
       </div>
-      <label className="grid gap-1.5 text-sm">
-        <span className="font-medium">Country</span>
-        <input name="country" maxLength={100} className="field" autoComplete="country-name" {...fieldProps('country', ID)} />
-        <FieldError name="country" idPrefix={ID} errors={errors} />
-      </label>
+      <CountryBrandFields idPrefix={ID} withBrands={business} errors={errors} fieldProps={fieldProps} />
       <label className="grid gap-1.5 text-sm">
         <span className="font-medium">Message</span>
         <textarea

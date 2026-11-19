@@ -3,15 +3,20 @@
 import { useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { CheckIcon } from '@/components/common/Icons';
+import { CountryBrandFields } from '@/components/enquiry/CountryBrandFields';
 import { FieldError, Honeypot, useEnquirySubmit } from '@/components/enquiry/useEnquirySubmit';
+import { BRAND_ENQUIRY_TYPES } from '@/constants/enquiry';
 import { trackLead } from '@/lib/gtm';
 
 const ID = 'contact';
 
 /** Send us a message: posted to the CMS through /api/enquiry/. The chosen subject
- *  is also the enquiry type. */
+ *  is also the enquiry type; distribution, dealership and retail also ask for the
+ *  company and the brands of the chosen country. */
 export function ContactForm({ subjects }: { subjects: string[] }) {
   const [sent, setSent] = useState(false);
+  const [subject, setSubject] = useState(subjects[0] ?? '');
+  const business = BRAND_ENQUIRY_TYPES.includes(subject);
   const { pending, error, errors, onSubmit, fieldProps } = useEnquirySubmit(
     (f) => ({ ...f, type: f.subject, name: f.name, email: f.email, message: f.message }),
     (input) => {
@@ -53,7 +58,7 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
           <label className="grid gap-1.5 text-sm">
             <span className="font-medium">Subject</span>
             <span className="select w-full">
-              <select name="subject" className="!w-full !rounded-xl !py-3" {...fieldProps('subject', ID)}>
+              <select name="subject" className="!w-full !rounded-xl !py-3" value={subject} onChange={(e) => setSubject(e.target.value)} {...fieldProps('subject', ID)}>
                 {subjects.map((s) => (
                   <option key={s}>{s}</option>
                 ))}
@@ -61,6 +66,14 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
             </span>
             <FieldError name="subject" idPrefix={ID} errors={errors} />
           </label>
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-medium">
+              Company{!business && <span className="font-normal text-muted"> (optional)</span>}
+            </span>
+            <input name="company" required={business} maxLength={150} className="field" autoComplete="organization" {...fieldProps('company', ID)} />
+            <FieldError name="company" idPrefix={ID} errors={errors} />
+          </label>
+          <CountryBrandFields idPrefix={ID} withBrands={business} errors={errors} fieldProps={fieldProps} />
           <label className="grid gap-1.5 text-sm">
             <span className="font-medium">Message</span>
             <textarea name="message" rows={5} required maxLength={5000} className="field" {...fieldProps('message', ID)} />

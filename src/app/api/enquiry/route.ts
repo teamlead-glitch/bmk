@@ -2,21 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/constants/config';
 import { cmsHeaders } from '@/lib/api/cms-headers';
 import { isSlug } from '@/lib/api/cms-mappers';
-import { ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES } from '@/constants/enquiry';
+import { BRAND_ENQUIRY_TYPES, ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES, MAX_ENQUIRY_BRANDS } from '@/constants/enquiry';
 import type { EnquiryResult } from '@/types/enquiry';
 
 /* ---------- SEND AN ENQUIRY (contact form + enquiry popup) ---------- */
-// POST /api/enquiry/ { type, name, email, phone?, company?, country?, subject?, message, product? }
-// Checks the fields, then forwards them to the CMS:
+// POST /api/enquiry/ { type, name, email, phone?, company?, country_id?, brands?, subject?, message, product? }
+// company is required for distribution, dealership and retail; brands (CMS brand ids) are
+// sent for those types only. Checks the fields, then forwards them to the CMS:
 //  - product enquiry (product slug set): POST {NEXT_PUBLIC_API_URI}/v1/products/{slug}/enquiries (no type)
 //  - any other enquiry:                  POST {NEXT_PUBLIC_API_URI}/v1/enquiries
 // Never retried (a retry could save the enquiry twice). Personal data is never logged.
 
-const LIMITS = { name: 120, email: 190, phone: 40, company: 150, country: 100, subject: 200, message: 5000 } as const;
+const LIMITS = { name: 120, email: 190, phone: 40, company: 150, subject: 200, message: 5000 } as const;
 type Field = keyof typeof LIMITS;
 const REQUIRED: Field[] = ['name', 'email', 'message'];
-const LABELS: Record<Field, string> = { name: 'Full name', email: 'Email', phone: 'Phone', company: 'Company', country: 'Country', subject: 'Subject', message: 'Message' };
+const LABELS: Record<Field, string> = { name: 'Full name', email: 'Email', phone: 'Phone', company: 'Company', subject: 'Subject', message: 'Message' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isId = (v: unknown): v is number => Number.isInteger(v) && (v as number) > 0;
 const TIMEOUT_MS = 10000;
 
 const reply = (body: EnquiryResult, status: number) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -40,8 +42,18 @@ export async function POST(request: NextRequest) {
 
   const product = String(raw.product ?? '').trim();
   if (product && !isSlug(product)) return reply({ ok: false, message: ENQUIRY_GENERIC_ERROR }, 400);
-  const type = product ? null : ENQUIRY_TYPE_VALUES[String(raw.type ?? '')];
+  const label = String(raw.type ?? '');
+  const type = product ? null : ENQUIRY_TYPE_VALUES[label];
   if (!product && !type) errors.type = 'Select an enquiry type.';
+  const business = !product && BRAND_ENQUIRY_TYPES.includes(label);
+  if (business && !fields.company && !errors.company) errors.company = 'Company is required.';
+
+  // country_id: a CMS country id (the CMS checks it exists); brands: CMS brand ids
+  const countryId = raw.country_id === undefined || raw.country_id === null || raw.country_id === '' ? null : Number(raw.country_id);
+  if (countryId !== null && !isId(countryId)) errors.country_id = 'Select a valid country.';
+  const brandList = raw.brands === undefined || raw.brands === null ? [] : raw.brands;
+  if (!Array.isArray(brandList) || brandList.length > MAX_ENQUIRY_BRANDS || !brandList.every(isId)) errors.brands = 'Select valid brands.';
+  const brands = business && Array.isArray(brandList) ? [...new Set(brandList as number[])] : [];
   if (Object.keys(errors).length) return reply({ ok: false, message: 'Please check the highlighted fields.', errors }, 422);
 
   if (!API_CONFIG.BASE_URL) {
@@ -54,7 +66,8 @@ export async function POST(request: NextRequest) {
     email: fields.email,
     phone: fields.phone || null,
     company: fields.company || null,
-    country: fields.country || null,
+    country_id: countryId,
+    ...(business ? { brands } : {}),
     ...(type ? { type } : {}),
     subject: fields.subject || null,
     message: fields.message,
@@ -77,7 +90,9 @@ export async function POST(request: NextRequest) {
       const body = (await res.json().catch(() => null)) as { errors?: Record<string, string[]> } | null;
       const cmsErrors: Record<string, string> = {};
       for (const [key, list] of Object.entries(body?.errors ?? {})) {
-        if (Array.isArray(list) && list[0]) cmsErrors[key] = String(list[0]);
+        // "brands.0" (one bad id) is shown on the Brands group
+        const field = key.startsWith('brands.') ? 'brands' : key;
+        if (Array.isArray(list) && list[0] && !cmsErrors[field]) cmsErrors[field] = String(list[0]);
       }
       console.warn(`[enquiry] CMS rejected the enquiry (422), fields: ${Object.keys(cmsErrors).join(', ') || 'none'}, type: ${kind}`);
       // A bad "type" is our mapping, not the visitor's mistake
