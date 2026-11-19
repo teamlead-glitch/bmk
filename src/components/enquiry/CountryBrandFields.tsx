@@ -105,7 +105,7 @@ export function CountryBrandFields({
               {brands.map((b) => {
                 const on = picked.includes(b.id);
                 return (
-                  <label key={b.id} className={`check ${on ? 'font-medium' : ''}`}>
+                  <label key={b.id} className={`check relative ${on ? 'font-medium' : ''}`}>
                     <input
                       type="checkbox"
                       name="brands"
@@ -113,9 +113,9 @@ export function CountryBrandFields({
                       checked={on}
                       disabled={!on && picked.length >= MAX_ENQUIRY_BRANDS}
                       onChange={(e) => toggle(b.id, e.target.checked)}
-                      className="peer sr-only"
+                      className="sr-only"
                     />
-                    <span className="check-box peer-checked:border-navy peer-checked:bg-navy peer-focus-visible:ring-2 peer-focus-visible:ring-navy/40">{on && <CheckIcon />}</span>
+                    <span className="check-box">{on && <CheckIcon />}</span>
                     {b.name}
                   </label>
                 );

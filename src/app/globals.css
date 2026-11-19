@@ -655,8 +655,13 @@ html.js-motion [data-reveal-group] > * {
 .check-box {
   @apply grid size-[18px] shrink-0 place-items-center rounded-[5px] border border-ink/25 bg-white transition-colors;
 }
-.check[aria-checked='true'] .check-box {
+.check[aria-checked='true'] .check-box,
+.check:has(input:checked) .check-box {
   @apply border-navy bg-navy;
+}
+/* Real checkbox inside .check (enquiry Brands, Next.js addition): keyboard focus ring */
+.check:has(input:focus-visible) .check-box {
+  @apply ring-2 ring-navy/40;
 }
 .check-count {
   @apply ml-auto rounded-full bg-fog px-2 py-0.5 text-[11px] text-muted;
