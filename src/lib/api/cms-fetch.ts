@@ -10,7 +10,7 @@ import { cmsHeaders } from '@/lib/api/cms-headers';
 //  - Nothing to serve -> CmsUnavailableError -> the page answers 5xx (never a fake 404).
 //  - POST /api/revalidate clears the cache after a CMS save.
 
-const REVALIDATE_SECONDS = Number(process.env.CMS_REVALIDATE_SECONDS) || 300;
+const REVALIDATE_SECONDS = Number(process.env.CMS_REVALIDATE_SECONDS) || 60; // TODO: back to 300 after development
 const RETRY_DELAYS_MS = [500, 1500];
 const MAX_RETRY_AFTER_MS = 3000;
 const TIMEOUT_MS = 6000;

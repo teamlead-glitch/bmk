@@ -11,7 +11,7 @@ Host: Vercel. Merging into `main` deploys production; every pull request gets a 
 | `NEXT_PUBLIC_MEGA_MENU` | all | `categories` (default) or `brands` |
 | `NEXT_PUBLIC_API_URI` | all | CMS API base (when the CMS is live) |
 | `CMS_API_KEY` | server only | Frontend key header for the CMS |
-| `CMS_REVALIDATE_SECONDS` | optional | CMS cache time (default 300) |
+| `CMS_REVALIDATE_SECONDS` | optional | CMS cache time (default 60 during development, 300 after) |
 | `REVALIDATE_SECRET` | server only | Secret for `POST /api/revalidate/` |
 
 ## Before the first production deploy

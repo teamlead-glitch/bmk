@@ -4,8 +4,8 @@ import { Footer } from '@/components/footer/Footer';
 import { SiteHeader } from '@/components/header/SiteHeader';
 import { getContact, getNavData } from '@/lib/content';
 
-// The footer's contact details come from the CMS: pages rebuild at most every 5 minutes, or at once via POST /api/revalidate/
-export const revalidate = 300;
+// The footer's contact details come from the CMS: pages rebuild at most every minute, or at once via POST /api/revalidate/
+export const revalidate = 60; // TODO: back to 300 after development
 
 /** Every page except the homepage: floating navbar, full-screen mobile menu, footer. */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {

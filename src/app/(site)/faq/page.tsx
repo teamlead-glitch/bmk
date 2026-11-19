@@ -3,8 +3,8 @@ import { FaqExplorer } from '@/components/faq/FaqExplorer';
 import { getFaqs } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 
-// Questions come from the CMS: rebuilt at most every 5 minutes, or at once via POST /api/revalidate/
-export const revalidate = 300;
+// Questions come from the CMS: rebuilt at most every minute, or at once via POST /api/revalidate/
+export const revalidate = 60; // TODO: back to 300 after development
 
 export const metadata: Metadata = pageMetadata({
   title: 'FAQ',
