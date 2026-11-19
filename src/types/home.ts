@@ -12,6 +12,8 @@ export type HomeBanner =
 export interface HeroSlide {
   id: string;
   title: string;
+  /** Badge text above the title (else the default badge) */
+  subtitle?: string;
   tagline?: string;
   button?: { text: string; href: string; external: boolean };
   image: { src: string; alt: string };

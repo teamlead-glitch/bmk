@@ -12,6 +12,7 @@ const FADE =
   'linear-gradient(to bottom, rgb(255 255 255 / 0.000) 0.0%, rgb(255 255 255 / 0.004) 5.7%, rgb(255 255 255 / 0.023) 11.4%, rgb(255 255 255 / 0.062) 17.1%, rgb(255 255 255 / 0.122) 22.9%, rgb(255 255 255 / 0.201) 28.6%, rgb(255 255 255 / 0.298) 34.3%, rgb(255 255 255 / 0.406) 40.0%, rgb(255 255 255 / 0.522) 45.7%, rgb(255 255 255 / 0.639) 51.4%, rgb(255 255 255 / 0.750) 57.1%, rgb(255 255 255 / 0.849) 62.9%, rgb(255 255 255 / 0.929) 68.6%, rgb(255 255 255 / 0.981) 74.3%, rgb(255 255 255 / 1.000) 80.0%, #fff 100%)';
 
 const TITLE = 'Connecting markets with the technology of tomorrow.';
+const BADGE = 'Global technology distribution';
 const COPY =
   'BMK Group brings global technology brands closer to businesses through trusted sourcing, international distribution and a forward-looking approach to product development.';
 
@@ -103,7 +104,14 @@ export function HeroSection({ years, banner }: { years: number; banner: HomeBann
           <div className="flex max-w-[760px] flex-col items-start gap-5 sm:gap-6">
             <p className="hero-badge inline-flex items-center gap-2 rounded-[20px] px-3 py-1 text-xs leading-5 tracking-[1px] uppercase backdrop-blur-[16px]">
               <img src="/assets/icons/badge-globe.svg" alt="" width={16} height={16} className="size-4" />
-              Global technology distribution
+              {/* Each slide's subtitle (HeroSlider shows the current one), else the default text */}
+              {slides
+                ? slides.map((s, i) => (
+                    <span key={s.id} className="hero-badge-text" data-slide={i} hidden={i > 0}>
+                      {s.subtitle || BADGE}
+                    </span>
+                  ))
+                : BADGE}
             </p>
             {/* Slide texts share one grid cell, so the block keeps the tallest slide's height */}
             <div className="grid w-full">

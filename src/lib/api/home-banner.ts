@@ -14,6 +14,7 @@ type CmsImage = { url?: string | null; alt?: string | null } | null;
 type CmsSlide = {
   id?: number | string;
   title?: string | null;
+  subtitle?: string | null;
   tagline?: string | null;
   button?: { text?: string | null; url?: string | null } | null;
   images?: { web?: CmsImage; mobile?: CmsImage } | null;
@@ -36,6 +37,7 @@ function toSlide(s: CmsSlide): HeroSlide | null {
   return {
     id: String(s.id ?? src),
     title,
+    subtitle: String(s.subtitle ?? '').trim() || undefined,
     tagline: String(s.tagline ?? '').trim() || undefined,
     button: link && text ? { text, ...link } : undefined,
     image: { src, alt: String(s.images?.web?.alt ?? '').trim() },

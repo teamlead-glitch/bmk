@@ -16,6 +16,7 @@ export function HeroSlider({ count }: { count: number }) {
     if (!section) return;
     const images = section.querySelectorAll<HTMLElement>('.hero-slide');
     const texts = section.querySelectorAll<HTMLElement>('.hero-text[data-slide]');
+    const badges = section.querySelectorAll<HTMLElement>('.hero-badge-text[data-slide]');
     const dots = section.querySelectorAll<HTMLButtonElement>('.hero-dot');
     const content = section.querySelector<HTMLElement>('.hero-content');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -38,6 +39,7 @@ export function HeroSlider({ count }: { count: number }) {
         if (on) el.removeAttribute('aria-hidden');
         else el.setAttribute('aria-hidden', 'true');
       });
+      badges.forEach((el, i) => (el.hidden = i !== current));
       dots.forEach((el, i) => {
         if (i === current) el.setAttribute('aria-current', 'true');
         else el.removeAttribute('aria-current');
