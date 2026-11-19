@@ -12,14 +12,18 @@ function linkTag(href: string): string {
   return `<a href="${href}"${external ? ' target="_blank" rel="noopener"' : ''}>`;
 }
 
-/** Keeps paragraphs, lists, emphasis and safe links; everything else becomes plain text. */
-export function cleanHtml(html: string): string {
+const HEADING_TAGS = new Set(['h2', 'h3', 'h4']);
+
+/** Keeps paragraphs, lists, emphasis and safe links; everything else becomes plain text.
+ *  `headings`: also keep h2-h4 (CMS pages such as the legal pages). */
+export function cleanHtml(html: string, { headings = false }: { headings?: boolean } = {}): string {
+  const allowed = (tag: string) => ALLOWED_TAGS.has(tag) || (headings && HEADING_TAGS.has(tag));
   return html
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(DROP_WITH_CONTENT, '')
     .replace(/<\s*(\/?)\s*([a-z][a-z0-9]*)\b([^>]*)>/gi, (_, close: string, name: string, attrs: string) => {
       const tag = name.toLowerCase();
-      if (!ALLOWED_TAGS.has(tag)) return '';
+      if (!allowed(tag)) return '';
       if (close) return tag === 'br' ? '' : `</${tag}>`;
       if (tag !== 'a') return `<${tag}>`;
       const m = attrs.match(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i);

@@ -1,6 +1,7 @@
 import { LegalPage, legalMetadata } from '@/components/legal/LegalPage';
 
-export const metadata = legalMetadata('privacy');
+// Content from the CMS: GET /v1/pages/{slug} (src/constants/legal.ts)
+export const generateMetadata = () => legalMetadata('privacy');
 
 export default function Page() {
   return <LegalPage id="privacy" />;

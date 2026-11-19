@@ -1087,11 +1087,8 @@ body.nav-hidden .site-nav {
 .legal-toc a.is-on {
   @apply border-navy text-ink;
 }
-.legal-note {
-  @apply mb-12 rounded-2xl border border-dashed border-accent/50 bg-accent/5 p-5 text-[15px] leading-6;
-}
-.legal-tbc {
-  @apply rounded-full border border-dashed border-ink/25 px-2.5 py-0.5 text-xs;
+.legal-intro {
+  @apply mb-10 text-sm leading-6 text-muted;
 }
 .legal-sec {
   @apply scroll-mt-32 border-t border-line py-10 first-of-type:border-t-0 first-of-type:pt-0;
@@ -1102,14 +1099,36 @@ body.nav-hidden .site-nav {
 .legal-sec h2 .n {
   @apply text-sm;
 }
-.legal-sec p {
+.legal-sec p,
+.legal-sec li {
   @apply text-base leading-7 tracking-[-0.01em] text-ink/80;
 }
-.legal-sec a {
-  @apply text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy;
+/* CMS rich text inside a section (Next.js addition: the CMS pages) */
+.legal-body > * + * {
+  @apply mt-4;
 }
-.legal-ph {
-  @apply mb-3 h-3.5 w-full rounded-full bg-mist;
+.legal-body ul {
+  @apply list-disc pl-6;
+}
+.legal-body ol {
+  @apply list-decimal pl-6;
+}
+.legal-body li + li {
+  @apply mt-2;
+}
+.legal-body h3,
+.legal-body h4 {
+  @apply mt-6 text-lg leading-7 font-medium text-ink;
+}
+.legal-body strong,
+.legal-body b,
+.legal-intro b,
+.legal-intro strong {
+  @apply font-semibold text-ink;
+}
+.legal-sec a,
+.legal-intro a {
+  @apply text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy;
 }
 
 /* 404: a wall of 4s and 0s (see wireNotFound) */

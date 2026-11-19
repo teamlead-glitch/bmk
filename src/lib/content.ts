@@ -12,6 +12,7 @@
 //   faqs.ts                FAQ
 //   home-banner.ts         homepage hero (settings/home-banner)
 //   navigation.ts          mega menu, mobile menu, footer and search panel links
+//   pages.ts               CMS pages: Privacy, Cookies, Terms (pages/{slug})
 //   home-about.ts          homepage About BMK Group (settings/about/home)
 //   timeline.ts            homepage Our Journey, About › Our journey (timeline-events)
 //
@@ -31,6 +32,7 @@ export * from '@/lib/api/faqs';
 export * from '@/lib/api/home-about';
 export * from '@/lib/api/home-banner';
 export * from '@/lib/api/navigation';
+export * from '@/lib/api/pages';
 export * from '@/lib/api/product-listings';
 export * from '@/lib/api/products';
 export * from '@/lib/api/timeline';
