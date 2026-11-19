@@ -5,7 +5,7 @@ import type { Milestone } from '@/types/timeline';
 
 /* ---------- Timeline (CMS: GET /v1/timeline-events) ---------- */
 // { data: [{ id, year, title, description, icon, image: { url, alt } }] }
-// Homepage "Our Journey" and About › Our journey, oldest year first.
+// Homepage "Our Journey" and About › Our journey, in the order set in the admin.
 // CMS down -> CmsUnavailableError -> error.tsx. 404/410 -> an empty list (the section is hidden).
 
 type CmsTimelineEvent = {
@@ -28,12 +28,11 @@ const iconPath = (key: unknown) => {
 export const getTimeline = cache(async (): Promise<Milestone[]> => {
   const list = await serverGetData<CmsTimelineEvent[]>('/v1/timeline-events');
 
-  return (list ?? [])
-    .flatMap((e, i): Milestone[] => {
-      const year = text(e.year);
-      const title = text(e.title);
-      if (!year || !title) return [];
-      return [{ id: String(e.id ?? i), year, title, description: text(e.description), icon: iconPath(e.icon), image: mediaUrl(e.image?.url) }];
-    })
-    .sort((a, b) => Number(a.year) - Number(b.year));
+  // Kept in the CMS order (drag to reorder in the admin), never re-sorted here
+  return (list ?? []).flatMap((e, i): Milestone[] => {
+    const year = text(e.year);
+    const title = text(e.title);
+    if (!year || !title) return [];
+    return [{ id: String(e.id ?? i), year, title, description: text(e.description), icon: iconPath(e.icon), image: mediaUrl(e.image?.url) }];
+  });
 });
