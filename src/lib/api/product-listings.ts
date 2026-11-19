@@ -90,7 +90,9 @@ export const getBrandPage = cache(async (slug: string): Promise<DetailsResult<Cm
       banner: mediaUrl(b.banner?.url),
       color: brandColor(b.color),
     },
-    categories: cats.map((c, i) => ({ id: text(c.slug), name: text(c.title), n: counts[i] })).filter((c) => c.n > 0),
+    // Tabs list only categories with products; a brand with no products yet keeps every
+    // assigned category (links in the "coming soon" box)
+    categories: cats.map((c, i) => ({ id: text(c.slug), name: text(c.title), n: counts[i] })).filter((c) => !first.total || c.n > 0),
     brands: [],
     first,
   };

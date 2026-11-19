@@ -169,7 +169,7 @@ export function CmsListing({ data, query = NO_FILTERS }: { data: CmsListingData;
                   category
                     ? 'Products for this category are being added. Explore related categories, or ask our team what’s available.'
                     : brand
-                      ? `We’re adding the ${brand.name} range to the catalogue. Meanwhile, ask our team what’s available.`
+                      ? `We’re adding the ${brand.name} range to the catalogue. Meanwhile, ${data.categories.length ? 'browse the categories it covers, or ' : ''}ask our team what’s available.`
                       : 'We’re adding products to the catalogue. Meanwhile, ask our team what’s available.'
                 }
               >
