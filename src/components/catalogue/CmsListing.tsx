@@ -167,15 +167,16 @@ export function CmsListing({ data, query = NO_FILTERS }: { data: CmsListingData;
                 title={category ? `${category.title}: products coming soon` : brand ? `${brand.name} products are coming soon` : 'Products coming soon'}
                 body={
                   category
-                    ? 'Products for this category are being added. Explore related categories, or ask our team what’s available.'
+                    ? 'Products for this category are being added. Meanwhile, ask our team what’s available.'
                     : brand
                       ? `We’re adding the ${brand.name} range to the catalogue. Meanwhile, ${data.categories.length ? 'browse the categories it covers, or ' : ''}ask our team what’s available.`
                       : 'We’re adding products to the catalogue. Meanwhile, ask our team what’s available.'
                 }
               >
-                {data.categories
-                  .filter((c) => c.id !== category?.slug)
-                  .map((c) => (
+                {/* Category links: brand pages (the brand's categories) and All products; the
+                    design has no related categories on a category page */}
+                {!category &&
+                  data.categories.map((c) => (
                     <Link key={c.id} className="pill" href={href(`/category/${c.id}`)}>
                       {c.name}
                     </Link>
