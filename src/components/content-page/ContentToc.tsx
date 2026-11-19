@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 /** "On this page": highlights the last section whose top has passed 35% of the viewport. */
-export function LegalToc({ sections }: { sections: { id: string; title: string; n: string }[] }) {
+export function ContentToc({ sections }: { sections: { id: string; title: string; n: string }[] }) {
   const [current, setCurrent] = useState(sections[0]?.id);
 
   useEffect(() => {

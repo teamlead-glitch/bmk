@@ -12,7 +12,7 @@ export interface PageSection {
 }
 
 /** A CMS page (GET /v1/pages/{slug}): legal pages */
-export interface CmsPage {
+export interface ContentPageData {
   title: string;
   /** Text before the first heading, e.g. "Last updated" (cleaned rich text) */
   intro: string;

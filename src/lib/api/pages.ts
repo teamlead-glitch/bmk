@@ -3,7 +3,7 @@ import { isSlug, text } from '@/lib/api/cms-mappers';
 import { serverGetData } from '@/lib/api/server-api';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { CmsSeo } from '@/types/common';
-import type { CmsPage, PageSection } from '@/types/page';
+import type { ContentPageData, PageSection } from '@/types/page';
 
 /* ---------- CMS pages (CMS: GET /v1/pages/{slug}) ---------- */
 // { data: { id, slug, title, content (HTML), seo } }. Used by the legal pages (Privacy, Cookies,
@@ -37,7 +37,7 @@ function toSections(html: string): { intro: string; sections: PageSection[] } {
   return { intro: parts[0].trim(), sections };
 }
 
-export const getCmsPage = cache(async (slug: string): Promise<CmsPage | null> => {
+export const getCmsPage = cache(async (slug: string): Promise<ContentPageData | null> => {
   if (!isSlug(slug)) return null;
   const data = await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
   if (!data) return null;

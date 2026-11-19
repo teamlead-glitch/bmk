@@ -3,27 +3,30 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
-import { LegalToc } from '@/components/legal/LegalToc';
-import { LEGAL_ORDER, LEGAL_PAGES, type LegalId } from '@/constants/legal';
+import { ContentToc } from '@/components/content-page/ContentToc';
+import { LEGAL_PAGES } from '@/constants/legal';
 import { getCmsPage, getContact } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import { mapSeoToMetadata } from '@/lib/seo-mapper';
 
 /** Title, description and share tags from the page's CMS `seo` block */
-export async function legalMetadata(id: LegalId): Promise<Metadata> {
-  const meta = LEGAL_PAGES[id];
-  const page = await getCmsPage(meta.slug);
-  return mapSeoToMetadata(page?.seo, { path: `/${id}/`, title: page?.title || meta.name, description: meta.sub });
+export async function cmsPageMetadata(slug: string): Promise<Metadata> {
+  const page = await getCmsPage(slug);
+  if (!page) return {};
+  const legal = LEGAL_PAGES.find((p) => p.slug === slug);
+  return mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub });
 }
 
-/** Privacy / Cookies / Terms: the CMS page (GET /v1/pages/{slug}) with a sticky table of
- *  contents built from its h2 headings. Unknown page in the CMS -> 404. */
-export async function LegalPage({ id }: { id: LegalId }) {
-  const meta = LEGAL_PAGES[id];
-  const [page, contact] = await Promise.all([getCmsPage(meta.slug), getContact()]);
+/** A CMS page (GET /v1/pages/{slug}) at /{slug}/: Privacy, Cookies, Terms or any page made in
+ *  the admin. A sticky table of contents is built from its h2 headings. Unknown slug -> 404. */
+export async function ContentPage({ slug }: { slug: string }) {
+  const [page, contact] = await Promise.all([getCmsPage(slug), getContact()]);
   if (!page) notFound();
-  const title = page.title || meta.name;
+  const legal = LEGAL_PAGES.find((p) => p.slug === slug); // legal pages: subtitle and "Other policies"
+  const others = legal ? LEGAL_PAGES.filter((p) => p.slug !== slug) : [];
+  const title = page.title || legal?.name || slug;
   const empty = !page.intro && !page.sections.length;
+  const aside = page.sections.length > 0 || others.length > 0;
 
   return (
     <>
@@ -31,22 +34,26 @@ export async function LegalPage({ id }: { id: LegalId }) {
         <div className="shell">
           <Crumbs items={[['Home', HOME], [title]]} />
           <h1 className="t-display mt-6 max-w-4xl">{title}</h1>
-          <p className="t-body mt-3 max-w-2xl text-ink/80">{meta.sub}</p>
+          {legal && <p className="t-body mt-3 max-w-2xl text-ink/80">{legal.sub}</p>}
         </div>
       </section>
       <section className="shell section-y !pt-12">
-        <div className="grid gap-12 lg:grid-cols-[280px_1fr] lg:gap-20">
-          <aside className="h-fit lg:sticky lg:top-32">
-            {page.sections.length > 0 && <LegalToc sections={page.sections} />}
-            <div className={`hidden flex-col gap-2 lg:flex ${page.sections.length ? 'mt-8 border-t border-line pt-6' : ''}`}>
-              <p className="mb-1 text-xs tracking-[0.14em] text-muted uppercase">Other policies</p>
-              {LEGAL_ORDER.filter((k) => k !== id).map((k) => (
-                <Link key={k} className="group inline-flex items-center gap-2 text-[15px] hover:text-navy" href={href(`/${k}`)}>
-                  {LEGAL_PAGES[k].name} <Arrow />
-                </Link>
-              ))}
-            </div>
-          </aside>
+        <div className={`grid gap-12 lg:gap-20 ${aside ? 'lg:grid-cols-[280px_1fr]' : ''}`}>
+          {aside && (
+            <aside className="h-fit lg:sticky lg:top-32">
+              {page.sections.length > 0 && <ContentToc sections={page.sections} />}
+              {others.length > 0 && (
+                <div className={`hidden flex-col gap-2 lg:flex ${page.sections.length ? 'mt-8 border-t border-line pt-6' : ''}`}>
+                  <p className="mb-1 text-xs tracking-[0.14em] text-muted uppercase">Other policies</p>
+                  {others.map((p) => (
+                    <Link key={p.slug} className="group inline-flex items-center gap-2 text-[15px] hover:text-navy" href={href(`/${p.slug}`)}>
+                      {p.name} <Arrow />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </aside>
+          )}
           <article className="legal max-w-3xl">
             {empty ? (
               <div className="legal-sec">

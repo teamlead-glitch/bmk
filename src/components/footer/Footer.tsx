@@ -2,16 +2,14 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 import { FooterTagline } from '@/components/footer/FooterTagline';
+import { LEGAL_PAGES } from '@/constants/legal';
 import { telHref } from '@/lib/content';
 import { HOME, href } from '@/lib/routes';
 import type { NavCategory } from '@/types/catalogue';
 import type { Contact } from '@/types/contact';
 
-const LEGAL_LINKS: [string, string][] = [
-  ['/privacy', 'Privacy Policy'],
-  ['/cookies', 'Cookie Policy'],
-  ['/terms', 'Terms & Conditions'],
-];
+// CMS pages at their admin slug (src/constants/legal.ts)
+const LEGAL_LINKS: [string, string][] = LEGAL_PAGES.map((p) => [`/${p.slug}`, p.name]);
 
 export function Footer({ categories, contact }: { categories: NavCategory[]; contact: Contact }) {
   return (

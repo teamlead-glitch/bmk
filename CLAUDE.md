@@ -17,7 +17,7 @@ The approved design reference is the Vite repo `bmk` (preview https://bmkbyphita
 - `trailingSlash: true`: every URL ends with `/`, API routes included (`/api/search/?q=`).
 
 ## Structure
-- Components are grouped by site section: `header/`, `footer/`, `common/` (shared UI), `enquiry/` (popup, forms), `home/` (one subfolder per section: `hero/`, `presence/`, `brands/`, `history/`), `catalogue/` (CMS listings), `search/`, `product/`, `about/`, `faq/`, `contact/`, `legal/`, `company/`.
+- Components are grouped by site section: `header/`, `footer/`, `common/` (shared UI), `content-page/` (CMS pages at /{slug}/: privacy, cookies, terms…), `enquiry/` (popup, forms), `home/` (one subfolder per section: `hero/`, `presence/`, `brands/`, `history/`), `catalogue/` (CMS listings), `search/`, `product/`, `about/`, `faq/`, `contact/`, `company/`.
 - Elsewhere in `src/`: `types/` (one file per resource), `constants/` (page sizes, enquiry types, brand colour, config), `services/` (browser fetchers for this site's `/api/*` routes: `api.ts` returns `{ success, data, error }`, `list-api.ts` calls `/api/list/[kind]/`), `lib/api/` (CMS API), `lib/` (other helpers: routes, SEO, site URL, GTM, GSAP, HTML sanitising), `static/` (designer's static content).
 - Server components render the markup; small client components own state and motion. Homepage motion components must stay in page order (pinned sections are measured top to bottom): `SmoothScroll` first, `HomeReveals` last.
 - Styles live in `src/app/globals.css` (ported from the design). Keep class names in sync with the design repo. The catalogue navbar rules are scoped to `.site-nav`; the homepage navbar is animated by GSAP and must not get CSS transform transitions.
