@@ -3,7 +3,7 @@ import { Companies, Journey, MissionValues, OurBrands, WhoWeAre } from '@/compon
 import { SectionPills } from '@/components/about/SectionPills';
 import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { getAboutPage, getBrandShowcase, getCompany, getTimeline } from '@/lib/content';
+import { getAboutPage, getBrandShowcase, getCompany, getGroupLocations, getTimeline, toGlobePlaces } from '@/lib/content';
 import { HOME } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -24,7 +24,11 @@ const SECTIONS: [string, string][] = [
 ];
 
 export default async function AboutPage() {
-  const [company, about, brands, timeline] = await Promise.all([getCompany(), getAboutPage(), getBrandShowcase(), getTimeline()]);
+  const [company, about, brands, timeline, groupLocations] = await Promise.all([getCompany(), getAboutPage(), getBrandShowcase(), getTimeline(), getGroupLocations()]);
+  // Our companies: only locations with at least one company; the counts and globe follow them
+  const locations = groupLocations.filter((l) => l.companies.length > 0);
+  const companyCount = locations.reduce((n, l) => n + l.companies.length, 0);
+  const countryCount = new Set(locations.map((l) => l.countryCode || l.country)).size;
   return (
     <>
       <PhotoHero
@@ -39,9 +43,9 @@ export default async function AboutPage() {
         titleClass="max-w-3xl"
       />
       <SectionPills sections={SECTIONS} />
-      <WhoWeAre heading={about.title} html={about.html} companies={company.entities.length} countries={company.countries.length} />
+      <WhoWeAre heading={about.title} html={about.html} places={toGlobePlaces(locations)} companies={companyCount} countries={countryCount} />
       <MissionValues mission={about.mission} vision={about.vision} values={about.values} />
-      <Companies locations={company.locations} intro={about.companiesText} />
+      <Companies locations={locations} intro={about.companiesText} />
       <OurBrands own={brands.own} partners={brands.partner} title={about.brandsTitle} intro={about.brandsText} />
       <Journey milestones={timeline} />
       <EnquiryBlock types={company.enquiryTypes} />

@@ -2,9 +2,9 @@
 import { MailIcon, PhoneIcon, PinIcon } from '@/components/common/Icons';
 
 
-/** Office type tag; retail showrooms are highlighted. */
-export function KindTag({ e }: { e: { kind: string; retail?: boolean } }) {
-  return <span className={`co-tag ${e.retail ? 'is-retail' : ''}`}>{e.kind}</span>;
+/** Office type tag (the company category from the CMS) */
+export function KindTag({ e }: { e: { kind: string } }) {
+  return <span className="co-tag">{e.kind}</span>;
 }
 
 const Tbc = () => <span className="text-muted/70 italic">To be confirmed</span>;

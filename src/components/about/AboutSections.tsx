@@ -5,15 +5,17 @@ import { JourneyRail } from '@/components/about/JourneyRail';
 import { Arrow } from '@/components/common/Arrow';
 import { BrandMark } from '@/components/common/BrandMark';
 import { MilestoneCard } from '@/components/common/MilestoneCard';
-import { KindTag, MapPlaceholder } from '@/components/company/CompanyBits';
+import { KindTag, MapPlaceholder, OfficeMap } from '@/components/company/CompanyBits';
+import { MarkersMap } from '@/components/company/MarkersMap';
+import { companyMarkers, hasMarkersMap } from '@/lib/google-maps';
 import { hostLabel, href } from '@/lib/routes';
 import type { OwnBrand, PartnerBrand } from '@/types/brand';
 import type { CoreValue } from '@/types/about';
-import type { Entity, Location } from '@/types/company';
+import type { GlobePlace, GroupLocation } from '@/types/company';
 import type { Milestone } from '@/types/timeline';
 
 /* ---------- Who we are: intro + globe + counts ---------- */
-export function WhoWeAre({ heading, html, companies, countries }: { heading: string; html: string; companies: number; countries: number }) {
+export function WhoWeAre({ heading, html, places, companies, countries }: { heading: string; html: string; places: GlobePlace[]; companies: number; countries: number }) {
   return (
     <section id="who-we-are" className="section-y scroll-mt-24 bg-white" data-section>
       <div className="shell grid items-center gap-12 lg:grid-cols-[440px_1fr] lg:gap-[120px]">
@@ -26,7 +28,7 @@ export function WhoWeAre({ heading, html, companies, countries }: { heading: str
           </a>
         </div>
         <div className="relative">
-          <Globe />
+          <Globe places={places} />
           <dl className="relative z-10 mx-auto -mt-6 grid max-w-[560px] grid-cols-2 gap-2 rounded-3xl bg-mist p-2">
             {(
               [
@@ -90,65 +92,51 @@ export function MissionValues({ mission, vision, values }: { mission: string; vi
   );
 }
 
-/* ---------- Our companies: one card per country ---------- */
-// Company cards carry no contact details (those live on Contact Us); each button says which office it reaches
-const CTA_LABEL: Record<string, string> = {
-  'bmk-gulf': 'Contact Our HQ',
-  'island-valley': 'Contact Retail Office',
-  'bmk-international': 'Contact Our Corporate Office',
-  'bmk-electronics': 'Contact SEA HQ',
-  'seeken-malaysia': 'Contact Regional Office',
-  'seeken-zambia': 'Contact Zambia Office',
-  'ets-hb': 'Contact DRC Distributor',
-};
+/* ---------- Our companies: one card per location (CMS: group-locations) ---------- */
+// Company cards carry no contact details (those live on Contact Us); each button opens that office there
 
-function CountryCard({ c, flip }: { c: Location; flip: boolean }) {
+function LocationCard({ l, flip }: { l: GroupLocation; flip: boolean }) {
+  const embed = l.companies.find((e) => e.mapEmbed)?.mapEmbed ?? null;
+  const markers = companyMarkers(l.companies);
   return (
-    <article id={c.id} className={`co-card ${flip ? 'is-flip' : ''} scroll-mt-40`}>
-      {c.photo ? (
-        <img className="co-photo" src={c.photo} alt="" loading="lazy" style={{ objectPosition: c.pos || 'center' }} />
-      ) : (
-        <img className="co-mark" src="/assets/patterns/history-mark-2.svg" alt="" />
-      )}
-      <span className="co-badge">
-        <img src={c.icon} alt="" width={40} height={40} />
-      </span>
-      <p className="co-city">{c.city.split(',')[0]}</p>
+    <article id={`location-${l.id}`} className={`co-card ${flip ? 'is-flip' : ''} scroll-mt-40`}>
+      {l.photo ? <img className="co-photo" src={l.photo} alt="" loading="lazy" /> : <img className="co-mark" src="/assets/patterns/history-mark-2.svg" alt="" />}
+      <span className="co-badge">{l.icon ? <img src={l.icon} alt="" width={40} height={40} /> : <span className="size-3 rounded-full bg-accent" />}</span>
+      <p className="co-city">{l.city}</p>
       <div className="co-panel">
         <p className="text-xs tracking-[0.14em] text-muted uppercase">
-          {c.city}, {c.name}
+          {l.city}
+          {l.country !== l.city ? `, ${l.country}` : ''}
         </p>
-        {c.companies.map((e: Entity, k) => (
-          <section key={e.id} id={e.id} className={`scroll-mt-40 ${k ? 'mt-6 border-t border-ink/10 pt-6' : 'mt-2'}`}>
+        {l.companies.map((e, k) => (
+          <section key={e.id} id={`company-${e.id}`} className={`scroll-mt-40 ${k ? 'mt-6 border-t border-ink/10 pt-6' : 'mt-2'}`}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               <h3 className="text-[clamp(1.5rem,1.2rem+0.8vw,2rem)] leading-tight font-semibold tracking-[-0.03em]">{e.name}</h3>
-              <KindTag e={e} />
+              {e.kind && <KindTag e={e} />}
             </div>
-            <p className="mt-2 text-[15px] leading-6 text-muted">{e.role}</p>
-            {e.mandate && (
-              <p className="mt-2 text-sm">
-                <span className="text-muted">Authorized mandate:</span> {e.mandate}
-              </p>
-            )}
-            {e.products && (
-              <p className="mt-2 text-sm">
-                <span className="text-muted">In store:</span> {e.products}
-              </p>
-            )}
+            {e.summary && <p className="mt-2 text-[15px] leading-6 text-muted">{e.summary}</p>}
             <Link className="btn btn-navy mt-5" href={href('/contact', { office: e.id })}>
-              {CTA_LABEL[e.id] || (e.retail ? 'Visit the showroom' : 'Contact this office')} <Arrow />
+              Contact this office <Arrow />
             </Link>
           </section>
         ))}
         <div className="mt-6">
-          <MapPlaceholder label={c.city} className="aspect-[16/7]" pins={c.companies.length} />
+          {/* Live Google map with a marker per company (needs the API key), else the admin's embed, else the preview */}
+          {hasMarkersMap(markers) ? (
+            <MarkersMap markers={markers} label={l.city} className="aspect-[16/7]!" />
+          ) : embed ? (
+            <OfficeMap label={l.city} embed={embed} className="aspect-[16/7]!" />
+          ) : (
+            <MapPlaceholder label={l.city} className="aspect-[16/7]" pins={l.companies.length} />
+          )}
         </div>
       </div>
     </article>
   );
 }
 
-export function Companies({ locations, intro }: { locations: Location[]; intro: string }) {
+export function Companies({ locations, intro }: { locations: GroupLocation[]; intro: string }) {
+  if (!locations.length) return null;
   return (
     <section id="companies" className="section-y scroll-mt-24 bg-fog" data-section>
       <div className="shell">
@@ -159,18 +147,18 @@ export function Companies({ locations, intro }: { locations: Location[]; intro: 
             {intro && <p className="t-body">{intro}</p>}
           </div>
           <ul className="flex flex-wrap gap-2">
-            {locations.map((c) => (
-              <li key={c.id}>
-                <a className="pill" href={`#${c.id}`} data-anchor>
-                  {c.short} <span className="n">{c.companies.length}</span>
+            {locations.map((l) => (
+              <li key={l.id}>
+                <a className="pill" href={`#location-${l.id}`} data-anchor>
+                  {l.city} <span className="n">{l.companies.length}</span>
                 </a>
               </li>
             ))}
           </ul>
         </div>
         <div className="mt-14 grid gap-8 lg:gap-12">
-          {locations.map((c, i) => (
-            <CountryCard key={c.id} c={c} flip={i % 2 === 1} />
+          {locations.map((l, i) => (
+            <LocationCard key={l.id} l={l} flip={i % 2 === 1} />
           ))}
         </div>
       </div>

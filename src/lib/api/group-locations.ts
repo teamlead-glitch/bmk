@@ -3,7 +3,7 @@ import { mediaUrl, text } from '@/lib/api/cms-mappers';
 import { serverGetData } from '@/lib/api/server-api';
 import { href } from '@/lib/routes';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
-import type { GroupCompany, GroupLocation } from '@/types/company';
+import type { GlobePlace, GroupCompany, GroupLocation } from '@/types/company';
 
 /* ---------- Group locations (CMS: GET /v1/group-locations) ---------- */
 // Homepage Global Footprint (map pins + location card) and Contact › Our offices (one tab per
@@ -33,6 +33,7 @@ type CmsGroupLocation = {
   country?: { code?: string | null; name?: string | null } | null;
   map_position?: unknown;
   icon?: { url?: string | null } | null;
+  background?: { url?: string | null } | null;
   group_companies?: CmsCompany[] | null;
 };
 
@@ -41,6 +42,8 @@ const SUMMARY_MAX = 240;
 // lat/lng -> % of the map frame: least-squares fit of the design's six pins to their cities'
 // real coordinates (Dubai, Kochi, Singapore, Petaling Jaya, Lusaka, Kinshasa; within ~2%)
 const fromLatLng = (lat: number, lng: number) => ({ x: 0.2928 * lng + 45.98, y: -0.6114 * lat + 63.25 });
+/** The same fit backwards: an admin map_position -> approximate lat/lng (About globe) */
+const toLatLng = (p: { x: number; y: number }) => ({ lat: round((63.25 - p.y) / 0.6114), lng: round((p.x - 45.98) / 0.2928) });
 
 const inFrame = (p: { x: number; y: number }) => p.x >= 0 && p.x <= 100 && p.y >= 0 && p.y <= 100;
 const round = (n: number) => Math.round(n * 100) / 100;
@@ -52,18 +55,30 @@ function mapPosition(v: unknown): { x: number; y: number } | null {
   return Number.isFinite(x) && Number.isFinite(y) && inFrame({ x, y }) ? { x, y } : null;
 }
 
-function position(l: CmsGroupLocation): { x: number; y: number } | null {
-  const set = mapPosition(l.map_position);
-  if (set) return set;
+/** A company's coordinates when both are numbers in range */
+function companyGeo(c: CmsCompany): { lat: number; lng: number } | null {
+  const lat = Number(c.coordinates?.lat);
+  const lng = Number(c.coordinates?.lng);
+  return c.coordinates && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+}
+
+/** The first company with valid coordinates */
+function coordinates(l: CmsGroupLocation): { lat: number; lng: number } | null {
   for (const c of l.group_companies ?? []) {
-    const lat = Number(c.coordinates?.lat);
-    const lng = Number(c.coordinates?.lng);
-    if (c.coordinates && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
-      const p = fromLatLng(lat, lng);
-      if (inFrame(p)) return { x: round(p.x), y: round(p.y) };
-    }
+    const geo = companyGeo(c);
+    if (geo) return geo;
   }
   return null;
+}
+
+/** Map pin (homepage) and globe position (About): admin map_position first, else coordinates */
+function place(l: CmsGroupLocation): { position: { x: number; y: number } | null; geo: { lat: number; lng: number } | null } {
+  const set = mapPosition(l.map_position);
+  const geo = coordinates(l);
+  if (set) return { position: set, geo: geo ?? toLatLng(set) };
+  if (!geo) return { position: null, geo: null };
+  const p = fromLatLng(geo.lat, geo.lng);
+  return { position: inFrame(p) ? { x: round(p.x), y: round(p.y) } : null, geo };
 }
 
 /** Only a Google Maps embed may go in the office card's iframe */
@@ -94,6 +109,7 @@ function toCompany(c: CmsCompany, i: number): GroupCompany | null {
     website: mediaUrl(c.website_url),
     directions: mediaUrl(c.directions_url) ?? (address ? `https://www.google.com/maps/search/${encodeURIComponent(address.replace(/\n/g, ', '))}` : null),
     mapEmbed: mapEmbed(c.map_embed_url),
+    geo: companyGeo(c),
   };
 }
 
@@ -104,7 +120,7 @@ export const getGroupLocations = cache(async (): Promise<GroupLocation[]> => {
     const country = text(l.country?.name);
     if (!city && !country) return [];
     const id = String(l.id ?? i);
-    const at = position(l);
+    const { position: at, geo } = place(l);
     if (!at) console.warn(`[group-locations] "${city || country}" has no map_position or company coordinates: no pin on the homepage map`);
     return [
       {
@@ -113,10 +129,31 @@ export const getGroupLocations = cache(async (): Promise<GroupLocation[]> => {
         country: country || city,
         countryCode: text(l.country?.code).toLowerCase(),
         position: at,
+        geo,
         icon: mediaUrl(l.icon?.url),
+        photo: mediaUrl(l.background?.url),
         href: href('/contact', { location: id }),
         companies: (l.group_companies ?? []).map(toCompany).filter((c): c is GroupCompany => !!c),
       },
     ];
   });
 });
+
+/** Globe pins (About › Who we are) for the locations with a real-world position. Two places
+ *  close together (within 12° both ways) get their tags on opposite sides. */
+export function toGlobePlaces(locations: GroupLocation[]): GlobePlace[] {
+  const places: GlobePlace[] = locations.flatMap((l) =>
+    l.geo ? [{ id: l.id, label: l.country && l.country !== l.city ? `${l.city}, ${l.country}` : l.city, lat: l.geo.lat, lon: l.geo.lng }] : [],
+  );
+  for (const a of places) {
+    for (const b of places) {
+      if (a === b || a.side || b.side) continue;
+      if (Math.abs(a.lat - b.lat) < 12 && Math.abs(a.lon - b.lon) < 12) {
+        const [west, east] = a.lon <= b.lon ? [a, b] : [b, a];
+        west.side = 'left';
+        east.side = 'right';
+      }
+    }
+  }
+  return places;
+}

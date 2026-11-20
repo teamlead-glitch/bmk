@@ -1258,9 +1258,6 @@ input[type='search']::-webkit-search-cancel-button {
 .co-tag {
   @apply rounded-full border border-ink/15 px-2.5 py-1 text-[11px] leading-4 tracking-[0.06em] text-muted uppercase;
 }
-.co-tag.is-retail {
-  @apply border-accent bg-accent text-white;
-}
 
 /* Region map (Who we are) */
 

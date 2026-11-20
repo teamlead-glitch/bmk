@@ -1,42 +1,7 @@
-export interface Country {
-  id: string;
-  name: string;
-  short: string;
-  city: string;
-}
-
-export interface Entity {
-  id: string;
-  country: string;
-  name: string;
-  kind: string;
-  retail?: boolean;
-  city: string;
-  role: string;
-  mandate?: string;
-  products?: string;
-  address: string;
-  phone: string | null;
-  email: string | null;
-}
-
 export interface EnquiryType {
   type: string;
   title: string;
   text: string;
-}
-
-/** Visuals for a country (About › companies): icon, city photo */
-export interface CountryVisual {
-  icon: string;
-  photo: string;
-  /** object-position for the photo */
-  pos: string;
-}
-
-/** A country with its visuals and companies (About › companies; static until it moves to group-locations) */
-export interface Location extends Country, CountryVisual {
-  companies: Entity[];
 }
 
 /** A group company in a location (CMS: GET /v1/group-locations › group_companies) */
@@ -56,6 +21,8 @@ export interface GroupCompany {
   directions: string | null;
   /** Google Maps embed URL (https://www.google.com/maps/embed?…), else no map */
   mapEmbed: string | null;
+  /** Marker position (CMS coordinates); null when missing or invalid */
+  geo: { lat: number; lng: number } | null;
 }
 
 /** A group location (CMS: GET /v1/group-locations): homepage Global Footprint pin + card,
@@ -70,7 +37,11 @@ export interface GroupLocation {
   countryCode: string;
   /** Pin position in % of the 1200×620 map frame; null: no pin on the homepage map */
   position: { x: number; y: number } | null;
+  /** Real-world position (About globe); null: not on the globe */
+  geo: { lat: number; lng: number } | null;
   icon: string | null;
+  /** City photo (About › Our companies card) */
+  photo: string | null;
   /** "View Details": Contact › Our offices on this location */
   href: string;
   companies: GroupCompany[];
@@ -81,3 +52,12 @@ export type PinnedLocation = Omit<GroupLocation, 'position' | 'companies'> & {
   position: { x: number; y: number };
   companies: Pick<GroupCompany, 'id' | 'name' | 'kind'>[];
 };
+
+/** A pin on the About › Who we are globe. `side` keeps neighbouring tags apart. */
+export interface GlobePlace {
+  id: string;
+  label: string;
+  lat: number;
+  lon: number;
+  side?: 'left' | 'right';
+}

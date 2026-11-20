@@ -19,7 +19,7 @@
 //   timeline.ts            homepage Our Journey, About › Our journey (timeline-events)
 //
 // Designer's static content (src/static/), until these get a CMS endpoint
-//   company-content.ts     company and offices (static/data/company.ts)
+//   company-content.ts     hero years and enquiry-type cards (static/data/company.ts)
 //
 // Functions are wrapped in React cache() so generateMetadata and the page share one call.
 

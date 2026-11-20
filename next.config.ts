@@ -7,6 +7,8 @@ import { LEGACY_REDIRECTS } from './src/constants/legacy-redirects';
 // uploaded into CMS pages.
 // frame-src youtube-nocookie: the homepage hero YouTube background (home-banner "video_url");
 // youtube-nocookie and player.vimeo.com: videos embedded in CMS pages (src/lib/sanitize-html.ts).
+// maps.googleapis.com / fonts: the live map with a marker per company (About › Our companies;
+// src/components/company/MarkersMap.tsx; key: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).
 const CMS_ORIGIN = (() => {
   try {
     return new URL(process.env.NEXT_PUBLIC_API_URI || '').origin;
@@ -17,12 +19,12 @@ const CMS_ORIGIN = (() => {
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com",
-  "connect-src 'self' https://*.google-analytics.com https://*.googletagmanager.com https://*.analytics.google.com",
+  "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://maps.googleapis.com",
+  "connect-src 'self' https://*.google-analytics.com https://*.googletagmanager.com https://*.analytics.google.com https://maps.googleapis.com",
   "img-src 'self' data: blob: https:",
   `media-src 'self'${CMS_ORIGIN ? ` ${CMS_ORIGIN}` : ''}`,
-  "style-src 'self' 'unsafe-inline'",
-  "font-src 'self' data:",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
   "frame-src 'self' https://www.googletagmanager.com https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
   "object-src 'none'",
   "base-uri 'self'",

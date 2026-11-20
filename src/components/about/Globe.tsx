@@ -2,11 +2,11 @@
 
 /* eslint-disable @next/next/no-img-element -- pin icon (SVG) */
 import { useEffect, useRef } from 'react';
-import { globePlaces } from '@/static/data/visuals';
+import type { GlobePlace } from '@/types/company';
 
 /**
  * About › Who we are: a dotted globe that tours BMK's locations and can be
- * dragged (design: catalogue/src/globe.js). Canvas 2D orthographic projection,
+ * dragged (design: catalogue/src/globe.js). Places: the CMS group locations (src/lib/api/group-locations.ts). Canvas 2D orthographic projection,
  * GSAP for the tour and Draggable + InertiaPlugin for the throw. GSAP and the
  * 46k-dot data load after the page is interactive.
  */
@@ -17,14 +17,14 @@ const PHI_MIN = -50;
 const PHI_MAX = 55;
 const BUCKETS = 7;
 
-export function Globe() {
+export function Globe({ places }: { places: GlobePlace[] }) {
   const el = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = el.current!;
     const canvas = root.querySelector('canvas')!;
     const ctx = canvas.getContext('2d')!;
-    const pins = globePlaces.map((p) => ({ ...p, el: root.querySelector<HTMLElement>(`[data-place="${p.id}"]`)! }));
+    const pins = places.map((p) => ({ ...p, el: root.querySelector<HTMLElement>(`[data-place="${p.id}"]`)! }));
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const coarse = matchMedia('(pointer: coarse)').matches;
     let cleanup = () => {};
@@ -46,7 +46,8 @@ export function Globe() {
         }
         const SPACING = Math.sqrt((4 * Math.PI) / globe.n);
 
-        const view = { lam: globePlaces[0].lon, phi: globePlaces[0].lat - LIFT };
+        // No places: a still view over the Middle East and Africa
+        const view = places.length ? { lam: places[0].lon, phi: places[0].lat - LIFT } : { lam: 45, phi: 10 - LIFT };
         let W = 0;
         let H = 0;
         let R = 0;
@@ -120,10 +121,10 @@ export function Globe() {
         const shortest = (from: number, to: number) => from + ((((to - from) % 360) + 540) % 360) - 180;
         const goTo = (i: number) => {
           active = i;
-          const p = globePlaces[i];
+          const p = places[i];
           tween?.kill();
           tween = gsap
-            .timeline({ onUpdate: draw, onComplete: () => goTo((i + 1) % globePlaces.length) })
+            .timeline({ onUpdate: draw, onComplete: () => goTo((i + 1) % places.length) })
             .to(view, { lam: shortest(view.lam, p.lon), phi: p.lat - LIFT, duration: 2.4, ease: 'power2.inOut', onUpdate: draw })
             .add(() => draw())
             .to(view, { lam: '+=3', duration: 2.8, ease: 'none', onUpdate: draw });
@@ -131,7 +132,7 @@ export function Globe() {
         const nearest = () => {
           let best = 0;
           let bd = Infinity;
-          globePlaces.forEach((p, i) => {
+          places.forEach((p, i) => {
             const dd = Math.abs(shortest(view.lam, p.lon) - view.lam) + Math.abs(p.lat - LIFT - view.phi);
             if (dd < bd) {
               bd = dd;
@@ -140,7 +141,7 @@ export function Globe() {
           });
           return best;
         };
-        const startTour = (i = nearest()) => !reduced && goTo(i);
+        const startTour = (i = nearest()) => !reduced && places.length > 0 && goTo(i);
         const pauseTour = () => (tween?.kill(), idle?.kill());
 
         // Drag: spin (x) and tilt (y), mouse and touch
@@ -214,13 +215,13 @@ export function Globe() {
       alive = false;
       cleanup();
     };
-  }, []);
+  }, [places]);
 
   return (
-    <div ref={el} className="globe" role="img" aria-label={`Globe showing BMK Group locations: ${globePlaces.map((p) => p.label).join(', ')}`}>
+    <div ref={el} className="globe" role="img" aria-label={`Globe showing BMK Group locations: ${places.map((p) => p.label).join(', ')}`}>
       <canvas className="globe-canvas" aria-hidden="true" />
       <div className="globe-pins" aria-hidden="true">
-        {globePlaces.map((p) => (
+        {places.map((p) => (
           <div key={p.id} className="globe-pin" data-place={p.id}>
             <span className="globe-dot" />
             <span className={`globe-tag is-${p.side || 'center'}`}>
