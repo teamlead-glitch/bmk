@@ -137,7 +137,7 @@ export function BrandsCarousel({ brands, filters }: { brands: PartnerBrand[]; fi
                 )}
                 <div className="flex w-full flex-col gap-3">
                   <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
-                  {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
+                  {b.intro && <p className="t-body line-clamp-5 text-black/50">{b.intro}</p>}
                   <Link href={href(`/brand/${b.slug}`)} className="brand-cta mt-3">
                     {b.name} Products
                     <Arrow />

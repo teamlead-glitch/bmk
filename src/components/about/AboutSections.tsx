@@ -196,8 +196,7 @@ export function OurBrands({ own, partners, title, intro }: { own: OwnBrand[]; pa
                 <BrandMark brand={b} className="h-[72px] !max-w-52 object-right" />
               </div>
               <div className="mt-auto flex flex-col items-start gap-3 pt-16">
-                {/* The logo shows the name; without a logo the name stays visible */}
-                <h3 className={b.logo ? 'sr-only' : 'text-[32px] leading-8 font-semibold'}>{b.name}</h3>
+                <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
                 {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
                 {b.links.length > 0 && (
                   <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
