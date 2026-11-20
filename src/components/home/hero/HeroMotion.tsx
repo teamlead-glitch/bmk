@@ -31,7 +31,10 @@ export function HeroMotion() {
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: section,
-            start: 'top top',
+            // A hero taller than the screen (phones: title, copy, CTAs, dots and years card
+            // stacked) pins once its bottom is in view, so the CTAs and years card are seen
+            // before the fade rises over them. Otherwise (desktop, h-svh) the two are the same.
+            start: () => (section.offsetHeight > window.innerHeight + 1 ? 'bottom bottom' : 'top top'),
             end: () => `+=${window.innerHeight * (small ? 1 : 1.6)}`,
             pin: true,
             scrub: 0.6,
