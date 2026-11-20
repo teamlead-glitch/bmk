@@ -5,7 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
-import type { PresenceLocation } from '@/types/company';
+import type { PinnedLocation } from '@/types/company';
 
 /**
  * Group presence map (design: src/modules/map.js).
@@ -22,7 +22,7 @@ const EDGE = 24; // popover: breathing room from the viewport edges
 
 type MapData = { w: number; h: number; r: number; dots: number[] };
 
-export function PresenceMap({ locations }: { locations: PresenceLocation[] }) {
+export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const card = useRef<HTMLElement>(null);
@@ -278,7 +278,7 @@ export function PresenceMap({ locations }: { locations: PresenceLocation[] }) {
                 }}
                 type="button"
                 className="pin group absolute grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full"
-                style={{ left: `${l.x}%`, top: `${l.y}%` }}
+                style={{ left: `${l.position.x}%`, top: `${l.position.y}%` }}
                 aria-pressed={i === current}
                 aria-label={`${l.city}, ${l.country}: ${l.companies.length} compan${l.companies.length === 1 ? 'y' : 'ies'}`}
                 onClick={() => select(i)}

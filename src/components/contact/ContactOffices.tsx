@@ -1,22 +1,49 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element -- city icons (SVG) */
+/* eslint-disable @next/next/no-img-element -- location icons (CMS) */
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { ContactRows, KindTag, OfficeMap } from '@/components/company/CompanyBits';
-import type { Location } from '@/types/company';
+import type { GroupCompany, GroupLocation } from '@/types/company';
 
-/** Reads ?office= / ?country= (links from About and the homepage map). */
-export function ContactOfficesFromUrl({ locations }: { locations: Location[] }) {
-  const params = useSearchParams();
-  return <ContactOffices locations={locations} office={params.get('office')} country={params.get('country')} />;
+/** One tab per country: every company of the country's locations, each with its location */
+type CountryTab = { id: string; name: string; offices: { company: GroupCompany; location: GroupLocation }[] };
+
+function byCountry(locations: GroupLocation[]): CountryTab[] {
+  const tabs = new Map<string, CountryTab>();
+  for (const l of locations) {
+    const id = l.countryCode || `loc-${l.id}`;
+    const tab = tabs.get(id) ?? { id, name: l.country, offices: [] };
+    tab.offices.push(...l.companies.map((company) => ({ company, location: l })));
+    tabs.set(id, tab);
+  }
+  return [...tabs.values()];
 }
 
-/** Our offices: one tab per country, each office with contact rows and directions. */
-export function ContactOffices({ locations, office = null, country = null }: { locations: Location[]; office?: string | null; country?: string | null }) {
-  const fromOffice = locations.flatMap((l) => l.companies).find((e) => e.id === office);
-  const initial = fromOffice?.country || locations.find((c) => c.id === (country || office))?.id || 'uae';
+/** Reads ?location= (homepage map "View Details"), ?country= (ISO code) and ?office= (a company id). */
+export function ContactOfficesFromUrl({ locations }: { locations: GroupLocation[] }) {
+  const params = useSearchParams();
+  return <ContactOffices locations={locations} location={params.get('location')} country={params.get('country')} office={params.get('office')} />;
+}
+
+/** Our offices (CMS: GET /v1/group-locations): one tab per country (its locations' companies
+ *  together), each company with its contact rows, directions, website and Google map. */
+export function ContactOffices({
+  locations,
+  location = null,
+  country = null,
+  office = null,
+}: {
+  locations: GroupLocation[];
+  location?: string | null;
+  country?: string | null;
+  office?: string | null;
+}) {
+  const tabs = byCountry(locations);
+  const tabOf = (find: (o: CountryTab['offices'][number]) => boolean) => tabs.find((t) => t.offices.some(find))?.id;
+  const fromOffice = office ? tabOf((o) => o.company.id === office) : undefined;
+  const initial = tabOf((o) => o.location.id === location) ?? fromOffice ?? tabs.find((t) => t.id === country?.toLowerCase())?.id ?? tabs[0]?.id;
   const [current, setCurrent] = useState(initial);
   const [prevInitial, setPrevInitial] = useState(initial);
   if (initial !== prevInitial) {
@@ -25,57 +52,75 @@ export function ContactOffices({ locations, office = null, country = null }: { l
   }
 
   useEffect(() => {
-    if (fromOffice) requestAnimationFrame(() => document.querySelector(`[data-entity="${fromOffice.id}"]`)?.scrollIntoView({ block: 'center' }));
-  }, [fromOffice]);
+    if (fromOffice && office) requestAnimationFrame(() => document.querySelector(`[data-entity="${CSS.escape(office)}"]`)?.scrollIntoView({ block: 'center' }));
+  }, [fromOffice, office]);
 
-  const c = locations.find((l) => l.id === current) ?? locations[0];
+  const tab = tabs.find((t) => t.id === current) ?? tabs[0];
+  if (!tab) return null;
+  const anyMap = tab.offices.some((o) => o.company.mapEmbed);
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+    <div id="offices">
+      <div className="flex flex-col items-start gap-4">
         <h2 className="text-[28px] leading-tight tracking-[-0.04em]">Our offices</h2>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Countries">
-          {locations.map((l) => (
+          {tabs.map((t) => (
             <button
-              key={l.id}
+              key={t.id}
               type="button"
               role="tab"
-              id={`tab-${l.id}`}
+              id={`tab-${t.id}`}
               aria-controls="offices-panel"
-              className={`pill ${l.id === current ? 'is-on' : ''}`}
-              aria-selected={l.id === current}
-              onClick={() => setCurrent(l.id)}
+              className={`pill ${t.id === tab.id ? 'is-on' : ''}`}
+              aria-selected={t.id === tab.id}
+              onClick={() => setCurrent(t.id)}
             >
-              {l.short}
+              {t.name}
             </button>
           ))}
         </div>
       </div>
-      <div id="offices-panel" className="mt-5 grid gap-2 rounded-3xl border border-line bg-mist p-2" role="tabpanel" aria-labelledby={`tab-${c.id}`}>
-        {c.companies.map((e) => (
-          <div key={e.id} className={`rounded-2xl bg-white p-6 sm:p-8 ${fromOffice?.id === e.id ? 'ring-2 ring-navy' : ''}`} data-entity={e.id}>
+      <div id="offices-panel" className="mt-5 grid gap-2 rounded-3xl border border-line bg-mist p-2" role="tabpanel" aria-labelledby={`tab-${tab.id}`}>
+        {tab.offices.map(({ company: e, location: c }) => (
+          <div key={e.id} className={`rounded-2xl bg-white p-6 sm:p-8 ${office === e.id ? 'ring-2 ring-navy' : ''}`} data-entity={e.id}>
             <div className="flex items-start gap-4 max-sm:flex-col">
-              <span className="grid size-16 shrink-0 place-items-center rounded-full bg-mist">
-                <img src={c.icon} alt="" width={36} height={36} />
+              <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-mist">
+                {c.icon ? <img src={c.icon} alt="" width={36} height={36} className="size-9 object-contain" /> : <span className="size-3 rounded-full bg-accent" />}
               </span>
               <div className="min-w-0">
-                <p className="text-xs tracking-[0.14em] text-muted uppercase">{c.city}</p>
+                <p className="text-xs tracking-[0.14em] text-muted uppercase">
+                  {c.city}
+                  {c.country && c.country !== c.city ? `, ${c.country}` : ''}
+                </p>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
                   <p className="text-xl leading-7 font-semibold tracking-[-0.02em]">{e.name}</p>
-                  <KindTag e={e} />
+                  {e.kind && <KindTag e={e} />}
                 </div>
-                <p className="mt-1 text-[15px] leading-6 text-muted">{e.mandate || e.role}</p>
+                {e.summary && <p className="mt-1 text-[15px] leading-6 text-muted">{e.summary}</p>}
               </div>
             </div>
             <div className="mt-5 border-t border-line pt-5">
               <ContactRows e={e} />
             </div>
-            <a className="group mt-5 inline-flex items-center gap-2 text-sm font-semibold" href={`https://www.google.com/maps/search/${encodeURIComponent(e.address)}`} target="_blank" rel="noopener">
-              Get directions <Arrow />
-            </a>
+            {(e.directions || e.website) && (
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+                {e.directions && (
+                  <a className="group inline-flex items-center gap-2 text-sm font-semibold" href={e.directions} target="_blank" rel="noopener">
+                    Get directions <Arrow />
+                  </a>
+                )}
+                {e.website && (
+                  <a className="group inline-flex items-center gap-2 text-sm font-semibold" href={e.website} target="_blank" rel="noopener">
+                    Visit website <Arrow />
+                  </a>
+                )}
+              </div>
+            )}
+            {e.mapEmbed && <OfficeMap label={`${e.name}, ${c.city}`} embed={e.mapEmbed} className="mt-5" />}
           </div>
         ))}
-        <OfficeMap label={c.city} />
+        {/* No embed set in the admin for any company here: the design's map preview */}
+        {!anyMap && <OfficeMap label={tab.name} />}
       </div>
     </div>
   );

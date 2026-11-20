@@ -1,13 +1,17 @@
 import { PresenceMap } from '@/components/home/presence/PresenceMap';
-import type { PresenceLocation } from '@/types/company';
+import type { GroupLocation, PinnedLocation } from '@/types/company';
 
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 
 /** Group presence: dotted world map with a pin per location and a location card (CMS: group-locations).
- *  No locations in the CMS -> no section. */
-export function PresenceSection({ locations }: { locations: PresenceLocation[] }) {
+ *  Only locations with a map position are shown; none -> no section. */
+export function PresenceSection({ locations: all }: { locations: GroupLocation[] }) {
+  // Client component: only what the map and card show (no addresses, maps or contact details)
+  const locations: PinnedLocation[] = all.flatMap(({ position, companies, ...l }) =>
+    position ? [{ ...l, position, companies: companies.map(({ id, name, kind }) => ({ id, name, kind })) }] : [],
+  );
   if (!locations.length) return null;
-  const n = new Set(locations.map((l) => l.country)).size;
+  const n = new Set(all.map((l) => l.country)).size;
   const countries = `${WORDS[n] ?? n} ${n === 1 ? 'country' : 'countries'}`;
   return (
     <section

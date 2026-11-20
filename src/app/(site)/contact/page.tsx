@@ -6,7 +6,7 @@ import { ContactOffices, ContactOfficesFromUrl } from '@/components/contact/Cont
 import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { MailIcon, PhoneIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
-import { getCompany, getContact, telHref } from '@/lib/content';
+import { getCompany, getContact, getGroupLocations, telHref } from '@/lib/content';
 import { HOME } from '@/lib/routes';
 import { pageMetadata } from '@/lib/seo';
 
@@ -18,15 +18,17 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function ContactPage() {
-  const [company, contact] = await Promise.all([getCompany(), getContact()]);
+  const [company, contact, groupLocations] = await Promise.all([getCompany(), getContact(), getGroupLocations()]);
+  // Our offices: only locations with at least one company
+  const locations = groupLocations.filter((l) => l.companies.length > 0);
   const hasOffice = contact.address.length > 0 || contact.phone || contact.email;
   return (
     <>
       <PhotoHero trail={[['Home', HOME], ['Contact Us']]} title="Get in touch" sub="Reach the right BMK Group company, or send us a message." image="/assets/images/contact-hero.webp" />
       <section className="shell section-y !pt-12">
         <div className="grid items-start gap-10 lg:grid-cols-[688fr_608fr] lg:gap-16">
-          <Suspense fallback={<ContactOffices locations={company.locations} />}>
-            <ContactOfficesFromUrl locations={company.locations} />
+          <Suspense fallback={<ContactOffices locations={locations} />}>
+            <ContactOfficesFromUrl locations={locations} />
           </Suspense>
           <div className="lg:sticky lg:top-32">
             <h2 className="text-[28px] leading-tight tracking-[-0.04em]">Send us a message</h2>
