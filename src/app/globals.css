@@ -347,8 +347,9 @@
   width: auto;
   gap: 32px;
 }
+/* Up to 208px wide; shrinks inside narrow cards (phones, 2-up tablet) instead of overflowing */
 .own-brand-logo {
-  @apply h-[72px] w-52 object-contain object-right;
+  @apply h-14 w-52 max-w-[60%] min-w-0 object-contain object-right sm:h-[72px];
 }
 .brand-card .brand-wordmark {
   @apply flex min-h-11 max-w-[62%] items-center justify-end text-right text-[20px] leading-6 font-bold tracking-[-0.03em] text-black;

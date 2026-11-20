@@ -26,7 +26,7 @@ export function BrandsSection({ partner, own, filters }: BrandShowcase) {
               {own.map((b) => (
                 <li key={b.id} className="own-brand">
                   <div className="flex items-center justify-between gap-6">
-                    <span className="brand-tag">BMK brand</span>
+                    <span className="brand-tag shrink-0">BMK brand</span>
                     {b.logo && <img className="own-brand-logo" src={b.logo} alt={`${b.name} logo`} width={208} height={72} loading="lazy" />}
                   </div>
                   <div className="mt-auto flex flex-col items-start gap-3 pt-16">
