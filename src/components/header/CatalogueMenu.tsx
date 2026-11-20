@@ -7,11 +7,12 @@ import type { NavData } from '@/types/catalogue';
 const Label = ({ children }: { children: string }) => <p className="mt-4 mb-2 text-xs tracking-[0.14em] text-muted uppercase">{children}</p>;
 
 /** Mobile menu: Brands & Products accordion (brands, then main categories), all from the CMS.
- *  `compact` is the homepage's inline menu (smaller summary, no border). */
-export function CatalogueMenu({ nav, open = false, compact = false }: { nav: NavData; open?: boolean; compact?: boolean }) {
+ *  `compact` is the homepage's inline menu (smaller summary, no border).
+ *  `active`: a catalogue page is open (summary semibold, like the current item in the menu). */
+export function CatalogueMenu({ nav, open = false, compact = false, active = false }: { nav: NavData; open?: boolean; compact?: boolean; active?: boolean }) {
   return (
     <details className={`facet ${compact ? '' : 'border-b border-line'}`} open={open}>
-      <summary className={compact ? '!py-2.5 !text-[22px] !font-normal' : '!py-4 !text-[22px] !font-semibold'}>
+      <summary className={`${compact ? '!py-2.5' : '!py-4'} !text-[22px] ${active ? '!font-semibold' : '!font-normal'}`}>
         Brands &amp; Products <ChevIcon />
       </summary>
       <div className="grid gap-1 pb-5 text-base">

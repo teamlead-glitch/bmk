@@ -91,6 +91,17 @@ export function SiteHeader({ nav }: { nav: NavData }) {
     return () => (removeEventListener('scroll', onScroll), document.body.classList.remove('nav-hidden'));
   }, []);
 
+  // Mobile menu: the current page is semibold, like the desktop navbar's bold item.
+  // Home ('') never matches here: the homepage has its own header (HomeHeader).
+  const drawerLink = (key: string, to: string, label: string) => {
+    const on = key !== '' && current === key;
+    return (
+      <Link className={`block border-b border-line py-4 ${on ? 'font-semibold' : ''}`} aria-current={on ? 'page' : undefined} href={to}>
+        {label}
+      </Link>
+    );
+  };
+
   const navLink = (key: string, to: string, label: string) => (
     <li>
       <Link className={`nav-link ${current === key ? 'font-bold' : ''}`} aria-current={current === key ? 'page' : undefined} href={to}>
@@ -198,19 +209,11 @@ export function SiteHeader({ nav }: { nav: NavData }) {
             <input name="q" type="search" placeholder="Search products" className="min-w-0 flex-1 bg-transparent outline-none" aria-label="Search products" />
           </form>
           <nav className="text-[22px] leading-tight tracking-[-0.02em]" aria-label="Mobile">
-            <Link className="block border-b border-line py-4" href={HOME}>
-              Home
-            </Link>
-            <Link className="block border-b border-line py-4" href={href('/about')}>
-              About Us
-            </Link>
-            <CatalogueMenu nav={nav} open />
-            <Link className="block border-b border-line py-4" href={href('/faq')}>
-              FAQ
-            </Link>
-            <Link className="block border-b border-line py-4" href={href('/contact')}>
-              Contact Us
-            </Link>
+            {drawerLink('', HOME, 'Home')}
+            {drawerLink('about', href('/about'), 'About Us')}
+            <CatalogueMenu nav={nav} open active={current === 'catalogue'} />
+            {drawerLink('faq', href('/faq'), 'FAQ')}
+            {drawerLink('contact', href('/contact'), 'Contact Us')}
           </nav>
         </div>
         <div className="absolute inset-x-0 bottom-0 border-t border-line bg-white p-5">
