@@ -4,32 +4,33 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Crumbs } from '@/components/common/Crumbs';
 import { SearchIcon } from '@/components/common/Icons';
-import { BrandLink } from '@/components/common/SmartLink';
 import type { ListingState } from '@/components/search/search-state';
-import type { ListingData } from '@/lib/content';
+import type { SearchStatus } from '@/components/search/useSearch';
 import { HOME, href } from '@/lib/routes';
-import { searchBrands, searchCategories } from '@/static/search-helpers';
-
+import type { SearchResults } from '@/types/search';
 
 /** Hero for Search. (All products and category pages: CmsListing.tsx.) */
-export function SearchHero({ data, s }: { data: ListingData; s: ListingState }) {
+export function SearchHero({ s, status, results }: { s: ListingState; status: SearchStatus; results: SearchResults | null }) {
+  const n = s.base.length;
+  const summary = status === 'loading' ? 'Searching…' : status === 'done' ? `${n} product${n === 1 ? '' : 's'} found.` : '';
   return (
     <section className="bg-mist pt-[clamp(128px,11vw,168px)] pb-[clamp(40px,4.5vw,64px)]">
       <div className="shell">
         <Crumbs items={[['Home', HOME], ['Search']]} />
         <span className="chip mt-8 border-line bg-white text-ink">Search results</span>
         <h1 className="t-display mt-5 max-w-4xl">{s.q ? `“${s.q}”` : 'Search'}</h1>
-        <p className="t-body mt-3 max-w-2xl text-ink/80">{`${s.base.length} product${s.base.length === 1 ? '' : 's'} found.`}</p>
-        <SearchExtra data={data} q={s.q} />
+        {summary && <p className="t-body mt-3 max-w-2xl text-ink/80">{summary}</p>}
+        <SearchExtra q={s.q} results={status === 'done' ? results : null} />
       </div>
     </section>
   );
 }
 
-function SearchExtra({ data, q }: { data: ListingData; q: string }) {
+/** Search box, then the brands and categories that also match (pill links) */
+function SearchExtra({ q, results }: { q: string; results: SearchResults | null }) {
   const router = useRouter();
-  const bs = q ? searchBrands(data.brands, q) : [];
-  const cs = q ? searchCategories(data.categories, data.groups, q) : [];
+  const bs = results?.brands ?? [];
+  const cs = results?.categories ?? [];
   return (
     <>
       <form
@@ -50,12 +51,12 @@ function SearchExtra({ data, q }: { data: ListingData; q: string }) {
         <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted">Also matching</span>
           {bs.map((b) => (
-            <BrandLink key={b.id} brand={b} className="pill">
+            <Link key={b.slug} className="pill" href={href(`/brand/${b.slug}`)}>
               Brand · {b.name}
-            </BrandLink>
+            </Link>
           ))}
           {cs.map((c) => (
-            <Link key={c.id} className="pill" href={href(`/category/${c.id}`)}>
+            <Link key={c.slug} className="pill" href={href(`/category/${c.slug}`)}>
               Category · {c.name}
             </Link>
           ))}

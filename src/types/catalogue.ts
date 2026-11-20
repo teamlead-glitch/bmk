@@ -153,4 +153,6 @@ export interface NavData {
   categories: NavCategory[];
   ownBrands: NavOwnBrand[];
   partnerBrands: NavPartnerBrand[];
+  /** The first partner brands in the admin's sort order (search panel "Popular searches") */
+  latestBrands: { slug: string; name: string }[];
 }

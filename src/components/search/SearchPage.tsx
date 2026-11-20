@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
 import { SearchListing, SearchListingFromUrl } from '@/components/search/SearchListing';
-import type { ListingData } from '@/lib/content';
 
-/** Server wrapper: the unfiltered first page is in the static HTML (crawlable
- *  product links); in the browser the listing follows the URL's query and filters. */
-export function SearchPage({ data }: { data: ListingData }) {
+/** Server wrapper: the static HTML has the page frame (no query yet); in the browser the
+ *  listing reads the URL's query and filters and loads the matches from /api/search/. */
+export function SearchPage() {
   return (
-    <Suspense fallback={<SearchListing data={data} />}>
-      <SearchListingFromUrl data={data} />
+    <Suspense fallback={<SearchListing status="idle" results={null} />}>
+      <SearchListingFromUrl />
     </Suspense>
   );
 }

@@ -34,6 +34,3 @@ export const globePlaces: GlobePlace[] = [
 
 /** Homepage enquiry block / About + Contact enquiry block: one photo per type */
 export const enquiryImages = ['enquiry-distribution', 'enquiry-dealership', 'enquiry-retail', 'enquiry-general'];
-
-/** Popular searches (search panel, empty search results) */
-export const POPULAR_SEARCHES = ['X-T5', 'Nikon Z8', 'NIKKOR', 'instax'];

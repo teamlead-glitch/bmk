@@ -5,47 +5,34 @@ import { useRouter } from 'next/navigation';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { CloseIcon, SearchIcon } from '@/components/common/Icons';
-import { BrandLink } from '@/components/common/SmartLink';
 import { Stage } from '@/components/common/Stage';
-import { POPULAR_SEARCHES } from '@/static/data/visuals';
+import { useSearch } from '@/components/search/useSearch';
+import { MIN_SEARCH_LENGTH, SEARCH_PANEL_PRODUCTS } from '@/constants/listing';
 import { href } from '@/lib/routes';
-import type { SearchSuggestions } from '@/static/search-helpers';
-import type { NavCategory } from '@/types/catalogue';
+import type { NavCategory, NavData } from '@/types/catalogue';
 
 const Label = ({ children }: { children: string }) => <p className="mb-3 text-xs tracking-[0.14em] text-muted uppercase">{children}</p>;
 
-/** Search panel under the navbar: popular searches and categories, then live
- *  product / brand / category matches. Enter opens the search page. */
-export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[]; open: boolean; className: string; onClose: () => void }>(function SearchPanel(
-  { categories, open, className, onClose },
+/** Search panel under the navbar: popular searches (the latest brands added in the CMS) and
+ *  categories, then live product / brand / category matches from the CMS search (/api/search/).
+ *  Enter opens the search page. */
+export const SearchPanel = forwardRef<
+  HTMLDivElement,
+  { categories: NavCategory[]; popular: NavData['latestBrands']; open: boolean; className: string; onClose: () => void }
+>(function SearchPanel(
+  { categories, popular, open, className, onClose },
   ref,
 ) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [q, setQ] = useState('');
-  const [result, setResult] = useState<{ q: string; data: SearchSuggestions } | null>(null);
+  const { status, data } = useSearch(q);
+  const term = q.trim();
+  const total = data?.products.length ?? 0;
 
   useEffect(() => {
     if (open) requestAnimationFrame(() => input.current?.focus());
   }, [open]);
-
-  // Live suggestions (debounced, cancelled when the query changes)
-  useEffect(() => {
-    const term = q.trim();
-    if (!term) return;
-    const ctl = new AbortController();
-    const t = setTimeout(() => {
-      // Trailing slash: trailingSlash in next.config.ts applies to API routes too
-      fetch(`/api/search/?q=${encodeURIComponent(term)}`, { signal: ctl.signal })
-        .then((r) => (r.ok ? r.json() : null))
-        .then((data: SearchSuggestions | null) => data && setResult({ q: term, data }))
-        .catch(() => {});
-    }, 120);
-    return () => (clearTimeout(t), ctl.abort());
-  }, [q]);
-
-  const term = q.trim();
-  const data = result && result.q === term ? result.data : null;
 
   return (
     <div ref={ref} id="search-panel" className={className} data-lenis-prevent onClick={(e) => (e.target as Element).closest('a') && onClose()}>
@@ -54,7 +41,7 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
         className="flex items-center gap-3 rounded-full border border-ink/15 px-5 py-3 transition-colors focus-within:border-navy"
         onSubmit={(e) => {
           e.preventDefault();
-          if (!term) return;
+          if (term.length < MIN_SEARCH_LENGTH) return;
           onClose();
           router.push(href('/search', { q: term }));
         }}
@@ -75,18 +62,20 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
         </button>
       </form>
       <div className="max-h-[60svh] overflow-y-auto pt-6" aria-live="polite">
-        {!term ? (
+        {status === 'idle' ? (
           <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <Label>Popular searches</Label>
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_SEARCHES.map((t) => (
-                  <Link key={t} className="pill" href={href('/search', { q: t })}>
-                    {t}
-                  </Link>
-                ))}
+            {popular.length > 0 && (
+              <div>
+                <Label>Popular searches</Label>
+                <div className="flex flex-wrap gap-2">
+                  {popular.map((b) => (
+                    <Link key={b.slug} className="pill" href={href('/search', { q: b.name })}>
+                      {b.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             <div>
               <Label>Browse categories</Label>
               <div className="flex flex-wrap gap-2">
@@ -98,15 +87,15 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
               </div>
             </div>
           </div>
-        ) : !data ? (
+        ) : status === 'short' ? (
+          <p className="text-muted">Type at least {MIN_SEARCH_LENGTH} characters to search.</p>
+        ) : status === 'loading' ? (
           <p className="text-muted">Searching…</p>
-        ) : !data.total && !data.brands.length && !data.categories.length ? (
+        ) : status === 'error' || !data ? (
+          <p className="text-muted">Search is unavailable right now. Please try again in a moment.</p>
+        ) : !total && !data.brands.length && !data.categories.length ? (
           <p className="text-muted">
-            No matches for “{term}”. Try a model name such as{' '}
-            <Link className="text-ink underline" href={href('/search', { q: 'X-T5' })}>
-              X-T5
-            </Link>
-            , or{' '}
+            No matches for “{term}”. Try a product name or brand, or{' '}
             <Link className="text-ink underline" href={href('/products')}>
               browse all products
             </Link>
@@ -116,8 +105,9 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
           <div className="grid gap-8 md:grid-cols-[2fr_1fr]">
             <div>
               <Label>Products</Label>
+              {!total && <p className="text-muted">No products match “{term}”.</p>}
               <ul className="grid gap-1">
-                {data.products.map((p) => (
+                {data.products.slice(0, SEARCH_PANEL_PRODUCTS).map((p) => (
                   <li key={p.slug}>
                     <Link href={href(`/product/${p.slug}`)} className="flex items-center gap-4 rounded-xl p-2 transition-colors hover:bg-mist">
                       <div className="w-20 shrink-0">
@@ -125,17 +115,15 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
                       </div>
                       <span className="min-w-0">
                         <span className="block truncate font-semibold">{p.name}</span>
-                        <span className="block text-sm text-muted">
-                          {p.brandName} · {p.categoryName}
-                        </span>
+                        <span className="block text-sm text-muted">{[p.brandName, p.categoryName].filter(Boolean).join(' · ')}</span>
                       </span>
                     </Link>
                   </li>
                 ))}
               </ul>
-              {data.total > 0 && (
+              {total > 0 && (
                 <Link href={href('/search', { q: term })} className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold">
-                  See all {data.total} result{data.total === 1 ? '' : 's'} for “{term}” <Arrow />
+                  See all {total} result{total === 1 ? '' : 's'} for “{term}” <Arrow />
                 </Link>
               )}
             </div>
@@ -145,9 +133,9 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
                   <Label>Brands</Label>
                   <div className="flex flex-wrap gap-2">
                     {data.brands.map((b) => (
-                      <BrandLink key={b.id} brand={b} className="pill">
+                      <Link key={b.slug} className="pill" href={href(`/brand/${b.slug}`)}>
                         {b.name}
-                      </BrandLink>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -157,7 +145,7 @@ export const SearchPanel = forwardRef<HTMLDivElement, { categories: NavCategory[
                   <Label>Categories</Label>
                   <div className="flex flex-wrap gap-2">
                     {data.categories.map((c) => (
-                      <Link key={c.id} className="pill" href={href(`/category/${c.id}`)}>
+                      <Link key={c.slug} className="pill" href={href(`/category/${c.slug}`)}>
                         {c.name}
                       </Link>
                     ))}

@@ -6,24 +6,26 @@ import { useEffect, useState } from 'react';
 import { EmptyBox, FacetCheck } from '@/components/catalogue/ListingParts';
 import { SearchHero } from '@/components/search/SearchHero';
 import { listingState, type ListingState } from '@/components/search/search-state';
+import { useSearch, type SearchStatus } from '@/components/search/useSearch';
 import { Arrow } from '@/components/common/Arrow';
 import { ChevIcon, CloseIcon, FilterIcon } from '@/components/common/Icons';
 import { ProductCard } from '@/components/common/ProductCard';
-import { POPULAR_SEARCHES } from '@/static/data/visuals';
-import type { ListingData } from '@/lib/content';
+import { MIN_SEARCH_LENGTH } from '@/constants/listing';
 import { href, NO_FILTERS, type Query } from '@/lib/routes';
+import type { SearchResults } from '@/types/search';
 
-/** Reads the query and filters from the URL. Wrap in <Suspense fallback={<SearchListing data={data} />}>
- *  so the first page is in the server HTML (static), then follows the URL. */
-export function SearchListingFromUrl({ data }: { data: ListingData }) {
+/** Reads the query and filters from the URL and loads the matches (CMS search via /api/search/).
+ *  Wrap in <Suspense fallback={<SearchListing status="idle" results={null} />}>. */
+export function SearchListingFromUrl() {
   const params = useSearchParams();
-  return <SearchListing data={data} query={params} />;
+  const { status, data } = useSearch(params.get('q') || '', 0);
+  return <SearchListing status={status} results={data} query={params} />;
 }
 
 /** Search results. (All products, category and brand pages: src/components/catalogue/CmsListing.tsx.) */
-export function SearchListing({ data, query = NO_FILTERS }: { data: ListingData; query?: Query }) {
+export function SearchListing({ status, results, query = NO_FILTERS }: { status: SearchStatus; results: SearchResults | null; query?: Query }) {
   const router = useRouter();
-  const s = listingState(data, query);
+  const s = listingState(results, query);
   const [sheet, setSheet] = useState(false);
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export function SearchListing({ data, query = NO_FILTERS }: { data: ListingData;
 
   return (
     <>
-      <SearchHero data={data} s={s} />
+      <SearchHero s={s} status={status} results={results} />
       <section className="shell section-y !pt-12">
         {s.sidebar && (
           <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
@@ -86,7 +88,11 @@ export function SearchListing({ data, query = NO_FILTERS }: { data: ListingData;
                 </Link>
               </div>
             )}
-            {s.results.length ? (
+            {status === 'loading' ? (
+              <p className="t-body text-muted" role="status">
+                Searching…
+              </p>
+            ) : s.results.length ? (
               <>
                 <ul className={`grid gap-5 sm:grid-cols-2 ${s.sidebar ? 'xl:grid-cols-3' : 'lg:grid-cols-3 xl:grid-cols-4'}`}>
                   {s.shown.map((p, i) => (
@@ -110,7 +116,7 @@ export function SearchListing({ data, query = NO_FILTERS }: { data: ListingData;
                 )}
               </>
             ) : (
-              <Empty s={s} />
+              <Empty s={s} status={status} />
             )}
           </div>
         </div>
@@ -175,15 +181,18 @@ function Facets({ s }: { s: ListingState }) {
   );
 }
 
-/** Empty state: no search matches yet. */
-function Empty({ s }: { s: ListingState }) {
+/** Empty state: no query, a query that is too short, the CMS unavailable, or no matches. */
+function Empty({ s, status }: { s: ListingState; status: SearchStatus }) {
+  const [title, body] =
+    status === 'error'
+      ? ['Search is unavailable right now', 'Please try again in a moment, or browse the catalogue.']
+      : status === 'short'
+        ? ['Search the catalogue', `Type at least ${MIN_SEARCH_LENGTH} characters: a product name, model or brand.`]
+        : s.q
+          ? [`No products match “${s.q}”`, 'Check the spelling, or search by product name or brand.']
+          : ['Search the catalogue', 'Search by product, model name or brand.'];
   return (
-    <EmptyBox title={s.q ? `No products match “${s.q}”` : 'Search the catalogue'} body={s.q ? 'Check the spelling, or search by model name or brand.' : 'Search by product, model name or brand.'}>
-      {POPULAR_SEARCHES.map((t) => (
-        <Link key={t} className="pill" href={href('/search', { q: t })}>
-          {t}
-        </Link>
-      ))}
+    <EmptyBox title={title} body={body}>
       <Link className="btn btn-navy" href={href('/products')}>
         Browse all products <Arrow />
       </Link>

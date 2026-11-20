@@ -14,7 +14,7 @@ import type { ProductDetail } from '@/types/product';
 // getProducts: one page of products for the listings (the browser loads more pages,
 // filters and sorts through /api/list/products/, which calls it). getProduct: the product page.
 
-type CmsProductItem = {
+export type CmsProductItem = {
   slug?: string | null;
   name?: string | null;
   short_description?: string | null;
@@ -26,7 +26,7 @@ type CmsProductItem = {
 type CmsProductList = { data?: CmsProductItem[]; meta?: { total?: number; current_page?: number; last_page?: number } };
 
 /** CMS product -> the design's product card (no model, release date or spec template in the CMS) */
-function toCmsCard(p: CmsProductItem): CardProduct | null {
+export function toCmsCard(p: CmsProductItem): CardProduct | null {
   const slug = text(p.slug);
   const name = text(p.name);
   if (!slug || !name) return null;

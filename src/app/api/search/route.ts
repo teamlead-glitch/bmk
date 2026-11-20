@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSearchIndex } from '@/lib/content';
-import { searchBrands, searchCategories, searchProducts, type SearchSuggestions } from '@/static/search-helpers';
+import { normalizeQuery, searchCatalogue } from '@/lib/content';
 
-/* ---------- SEARCH SUGGESTIONS (navbar search panel) ---------- */
-// GET /api/search?q=x-t5 → top 5 products (card fields only) + total, matching
-// brands and categories. Answers are cached at the edge for a minute.
-const MAX_PRODUCTS = 5;
+/* ---------- CATALOGUE SEARCH FOR THE BROWSER ---------- */
+// GET /api/search/?q=nik → { products, brands, categories }: every match from the CMS
+// (GET /v1/search, through the shared cache). Used by the navbar search panel (first few
+// products + "See all N") and the search page (all results, filtered and sorted in the
+// browser). Under 2 characters → empty lists, the CMS is not called. Edge-cached a minute.
 
 export async function GET(request: NextRequest) {
-  const q = (request.nextUrl.searchParams.get('q') || '').slice(0, 100);
-  const index = await getSearchIndex();
-  const products = searchProducts(index.products, q);
-  const body: SearchSuggestions = {
-    products: products.slice(0, MAX_PRODUCTS),
-    total: products.length,
-    brands: searchBrands(index.brands, q),
-    categories: searchCategories(index.categories, index.groups, q),
-  };
-  return NextResponse.json(body, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600' } });
+  const q = normalizeQuery(request.nextUrl.searchParams.get('q') || '');
+  try {
+    const body = await searchCatalogue(q);
+    return NextResponse.json(body, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600' } });
+  } catch (error) {
+    if ((error as { digest?: string })?.digest === 'DYNAMIC_SERVER_USAGE') throw error;
+    console.error('[search] CMS unavailable:', (error as Error)?.message);
+    return NextResponse.json({ error: 'unavailable' }, { status: 502, headers: { 'Cache-Control': 'no-store' } });
+  }
 }

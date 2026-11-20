@@ -10,8 +10,14 @@ import type { NavCategory, NavData, NavOwnBrand } from '@/types/catalogue';
 // Categories are flat in the CMS, so the menus list the main categories only.
 // CMS down -> CmsUnavailableError -> error.tsx.
 
+/** Brands the search panel suggests before anything is typed */
+const LATEST_BRANDS = 4;
+
 export const getNavData = cache(async (): Promise<NavData> => {
   const [cmsCategories, brands] = await Promise.all([getCmsCategories(), getBrandShowcase()]);
+
+  // The first brands in the admin's sort order (GET /v1/brands answers in that order)
+  const latestBrands = brands.partner.slice(0, LATEST_BRANDS).map((b) => ({ slug: b.slug, name: b.name }));
 
   const categories: NavCategory[] = cmsCategories.flatMap((c) => {
     const slug = text(c.slug);
@@ -24,5 +30,5 @@ export const getNavData = cache(async (): Promise<NavData> => {
     return { id: b.id, name: b.name, logo: b.logo, site: url ? { url, label: hostLabel(url) } : null };
   });
 
-  return { categories, ownBrands, partnerBrands: brands.partner.map((b) => ({ slug: b.slug, name: b.name, logo: b.logo })) };
+  return { categories, ownBrands, partnerBrands: brands.partner.map((b) => ({ slug: b.slug, name: b.name, logo: b.logo })), latestBrands };
 });
