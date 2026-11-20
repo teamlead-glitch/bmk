@@ -37,6 +37,10 @@ export default async function ProductPage({ params }: Props) {
   const enquiry: EnquiryProduct = { slug: p.slug, name: p.name, brandName: p.brand.name, categoryName: p.category?.name ?? '', thumb: p.images[0]?.src, glyph: 'generic' };
   const hasOverview = p.descriptionHtml.length > 0;
   const hasSpecs = p.specGroups.length > 0;
+  // Related strips only when they have products; no strips -> no "Related" section or tab
+  const showBrand = Boolean(p.brand.slug) && p.fromBrand.length > 0;
+  const showCategory = Boolean(p.category) && p.inCategory.length > 0;
+  const hasRelated = showBrand || showCategory;
 
   return (
     <>
@@ -57,36 +61,24 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </section>
 
-      <ProductSectionBar product={enquiry} sections={[...(hasOverview ? ['overview'] : []), ...(hasSpecs ? ['specifications'] : []), 'more']} />
+      <ProductSectionBar product={enquiry} sections={[...(hasOverview ? ['overview'] : []), ...(hasSpecs ? ['specifications'] : []), ...(hasRelated ? ['more'] : [])]} />
       {hasOverview && <ProductOverview name={p.name} html={p.descriptionHtml} />}
       {hasSpecs && <ProductSpecs groups={p.specGroups} />}
 
-      <section id="more" className="scroll-mt-24" data-section>
-        {p.brand.slug && (
-          <div className="on-brand section-y" style={{ ...brandVars(p.brand.color), background: 'var(--brand)', color: 'var(--on)' }}>
-            <ProductStrip
-              title={`More from ${p.brand.name}`}
-              list={p.fromBrand}
-              more={href(`/brand/${p.brand.slug}`)}
-              dark
-              emptyText={`No other ${p.brand.name} products yet.`}
-              emptyLink={['View all products', href('/products')]}
-              brandColor={p.brand.color}
-            />
-          </div>
-        )}
-        {p.category && (
-          <div className="section-y">
-            <ProductStrip
-              title={`More in ${p.category.name}`}
-              list={p.inCategory}
-              more={href(`/category/${p.category.slug}`)}
-              emptyText={`No other ${p.category.name.toLowerCase()} products yet.`}
-              emptyLink={['View all products', href('/products')]}
-            />
-          </div>
-        )}
-      </section>
+      {hasRelated && (
+        <section id="more" className="scroll-mt-24" data-section>
+          {showBrand && (
+            <div className="on-brand section-y" style={{ ...brandVars(p.brand.color), background: 'var(--brand)', color: 'var(--on)' }}>
+              <ProductStrip title={`More from ${p.brand.name}`} list={p.fromBrand} more={href(`/brand/${p.brand.slug}`)} brandColor={p.brand.color} />
+            </div>
+          )}
+          {showCategory && p.category && (
+            <div className="section-y">
+              <ProductStrip title={`More in ${p.category.name}`} list={p.inCategory} more={href(`/category/${p.category.slug}`)} />
+            </div>
+          )}
+        </section>
+      )}
     </>
   );
 }
