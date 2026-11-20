@@ -69,8 +69,11 @@ export async function ContentPage({ slug }: { slug: string }) {
               </div>
             ) : (
               <>
-                {/* Text before the first heading (e.g. "Last updated"); cleaned in src/lib/api/pages.ts */}
-                {page.intro && <div className="legal-intro" dangerouslySetInnerHTML={{ __html: page.intro }} />}
+                {/* Text before the first heading (e.g. "Last updated"), or the whole body of a page
+                    without h2 headings (then shown as body text); cleaned in src/lib/api/pages.ts */}
+                {page.intro && (
+                  <div className={page.sections.length ? 'legal-intro legal-body' : 'legal-sec legal-body'} dangerouslySetInnerHTML={{ __html: page.intro }} />
+                )}
                 {page.sections.map((s) => (
                   <section key={s.id} id={s.id} className="legal-sec" data-section>
                     <h2>

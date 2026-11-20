@@ -3,8 +3,10 @@ import { LEGACY_REDIRECTS } from './src/constants/legacy-redirects';
 
 // Content-Security-Policy: one entry per directive, every third party listed with a reason.
 // 'unsafe-inline' scripts: Next.js bootstrap, the js-motion flag in the root layout and GTM.
-// media-src CMS: the homepage hero video uploaded in the CMS (home-banner "video").
-// frame-src youtube-nocookie: the homepage hero YouTube background (home-banner "video_url").
+// media-src CMS: the homepage hero video uploaded in the CMS (home-banner "video") and videos
+// uploaded into CMS pages.
+// frame-src youtube-nocookie: the homepage hero YouTube background (home-banner "video_url");
+// youtube-nocookie and player.vimeo.com: videos embedded in CMS pages (src/lib/sanitize-html.ts).
 const CMS_ORIGIN = (() => {
   try {
     return new URL(process.env.NEXT_PUBLIC_API_URI || '').origin;
@@ -21,7 +23,7 @@ const CSP = [
   `media-src 'self'${CMS_ORIGIN ? ` ${CMS_ORIGIN}` : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
-  "frame-src 'self' https://www.googletagmanager.com https://www.google.com https://www.youtube-nocookie.com",
+  "frame-src 'self' https://www.googletagmanager.com https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

@@ -1130,6 +1130,51 @@ body.nav-hidden .site-nav {
 .legal-intro a {
   @apply text-navy underline decoration-navy/30 underline-offset-4 hover:decoration-navy;
 }
+/* CMS page media and the editor's other formatting (cleanHtml `page`) */
+.legal-body img,
+.legal-body video,
+.legal-body iframe {
+  @apply block h-auto max-w-full rounded-xl;
+}
+.legal-body video,
+.legal-body iframe {
+  @apply aspect-video w-full bg-ink;
+}
+.legal-body figcaption {
+  @apply mt-2 text-sm text-muted;
+}
+.legal-body blockquote {
+  @apply border-l-2 border-navy pl-5 text-ink/80 italic;
+}
+.legal-body hr {
+  @apply border-line;
+}
+.legal-body table {
+  @apply block w-full overflow-x-auto border-collapse text-[15px] leading-6;
+}
+.legal-body th,
+.legal-body td {
+  @apply border border-line px-3 py-2 text-left align-top;
+}
+.legal-body th {
+  @apply bg-mist font-medium text-ink;
+}
+.legal-body .ta-center {
+  @apply text-center;
+}
+.legal-body .ta-right {
+  @apply text-right;
+}
+.legal-body .ta-justify {
+  @apply text-justify;
+}
+/* An aligned paragraph holding an image (how the editor aligns images) */
+.legal-body .ta-center img {
+  @apply mx-auto;
+}
+.legal-body .ta-right img {
+  @apply ml-auto;
+}
 
 /* 404: a wall of 4s and 0s (see wireNotFound) */
 .nf {

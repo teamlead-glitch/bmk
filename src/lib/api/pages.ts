@@ -7,7 +7,8 @@ import type { ContentPageData, PageSection } from '@/types/page';
 
 /* ---------- CMS pages (CMS: GET /v1/pages/{slug}) ---------- */
 // { data: { id, slug, title, content (HTML), seo } }. Used by the legal pages (Privacy, Cookies,
-// Terms). The content is cleaned (headings kept) and split at each h2 into numbered sections
+// Terms) and any page made in the admin. The content is cleaned with cleanHtml `page` (headings,
+// images, videos, embeds and alignment kept; h1 becomes h2) and split at each h2 into numbered sections
 // for the table of contents; a leading "1." in a heading is dropped (the page numbers them).
 // 404/410 -> null (the page answers 404). CMS down -> CmsUnavailableError -> error.tsx.
 
@@ -22,7 +23,7 @@ const anchor = (s: string) =>
     .replace(/^-|-$/g, '');
 
 function toSections(html: string): { intro: string; sections: PageSection[] } {
-  const parts = html.split(/<h2>([\s\S]*?)<\/h2>/);
+  const parts = html.split(/<h2\b[^>]*>([\s\S]*?)<\/h2>/);
   const sections: PageSection[] = [];
   const used = new Set<string>();
   // parts: [intro, heading1, body1, heading2, body2, …]
@@ -41,5 +42,5 @@ export const getCmsPage = cache(async (slug: string): Promise<ContentPageData | 
   if (!isSlug(slug)) return null;
   const data = await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
   if (!data) return null;
-  return { title: text(data.title), ...toSections(cleanHtml(text(data.content), { headings: true })), seo: data.seo ?? null };
+  return { title: text(data.title), ...toSections(cleanHtml(text(data.content), { page: true })), seo: data.seo ?? null };
 });
