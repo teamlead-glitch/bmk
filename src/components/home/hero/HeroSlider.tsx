@@ -17,6 +17,7 @@ export function HeroSlider({ count }: { count: number }) {
     const images = section.querySelectorAll<HTMLElement>('.hero-slide');
     const texts = section.querySelectorAll<HTMLElement>('.hero-text[data-slide]');
     const badges = section.querySelectorAll<HTMLElement>('.hero-badge-text[data-slide]');
+    const badge = section.querySelector<HTMLElement>('.hero-badge');
     const dots = section.querySelectorAll<HTMLButtonElement>('.hero-dot');
     const content = section.querySelector<HTMLElement>('.hero-content');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -40,6 +41,8 @@ export function HeroSlider({ count }: { count: number }) {
         else el.setAttribute('aria-hidden', 'true');
       });
       badges.forEach((el, i) => (el.hidden = i !== current));
+      // A slide without a subtitle (optional in the admin) shows no badge at all
+      if (badge) badge.hidden = !badges[current]?.textContent?.trim();
       dots.forEach((el, i) => {
         if (i === current) el.setAttribute('aria-current', 'true');
         else el.removeAttribute('aria-current');

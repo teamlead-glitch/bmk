@@ -102,13 +102,17 @@ export function HeroSection({ years, banner }: { years: number; banner: HomeBann
       <div className="hero-content relative flex h-full flex-col justify-end pb-[clamp(32px,9.6vh,88px)] max-lg:min-h-svh max-lg:pt-28" style={{ paddingInline: 'clamp(20px, 6.25vw, 100px)' }}>
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex max-w-[760px] flex-col items-start gap-5 sm:gap-6">
-            <p className="hero-badge inline-flex items-center gap-2 rounded-[20px] px-3 py-1 text-xs leading-5 tracking-[1px] uppercase backdrop-blur-[16px]">
+            {/* Slides: each slide's subtitle (optional in the admin; HeroSlider shows the current one and
+                hides the whole badge for a slide without one). Video / YouTube: the design's text. */}
+            <p
+              className="hero-badge inline-flex items-center gap-2 rounded-[20px] px-3 py-1 text-xs leading-5 tracking-[1px] uppercase backdrop-blur-[16px]"
+              hidden={slides ? !slides[0].subtitle : undefined}
+            >
               <img src="/assets/icons/badge-globe.svg" alt="" width={16} height={16} className="size-4" />
-              {/* Each slide's subtitle (HeroSlider shows the current one), else the default text */}
               {slides
                 ? slides.map((s, i) => (
                     <span key={s.id} className="hero-badge-text" data-slide={i} hidden={i > 0}>
-                      {s.subtitle || BADGE}
+                      {s.subtitle ?? ''}
                     </span>
                   ))
                 : BADGE}
