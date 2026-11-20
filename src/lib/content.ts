@@ -10,6 +10,7 @@
 //   contact-settings.ts    site contact details (settings/contact)
 //   enquiry-options.ts     enquiry forms: countries and each country's brands (/api/enquiry/options/)
 //   faqs.ts                FAQ
+//   group-locations.ts     homepage Global Footprint: map pins and their companies (group-locations)
 //   home-banner.ts         homepage hero (settings/home-banner)
 //   navigation.ts          mega menu, mobile menu, footer and search panel links
 //   pages.ts               CMS pages: Privacy, Cookies, Terms (pages/{slug})
@@ -29,6 +30,7 @@ export { isSlug } from '@/lib/api/cms-mappers';
 export * from '@/lib/api/contact-settings';
 export * from '@/lib/api/enquiry-options';
 export * from '@/lib/api/faqs';
+export * from '@/lib/api/group-locations';
 export * from '@/lib/api/home-about';
 export * from '@/lib/api/home-banner';
 export * from '@/lib/api/navigation';

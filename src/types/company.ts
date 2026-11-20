@@ -44,3 +44,19 @@ export interface Location extends Country, CountryVisual {
   companies: Entity[];
   href: string;
 }
+
+/** A homepage Global Footprint location (CMS: GET /v1/group-locations): a map pin + its companies */
+export interface PresenceLocation {
+  id: string;
+  /** City, e.g. "Dubai" (card label, pin tooltip) */
+  city: string;
+  /** Country name (card heading) */
+  country: string;
+  /** Pin position in % of the 1200×620 map frame */
+  x: number;
+  y: number;
+  icon: string | null;
+  /** "View Details": the Contact page on this country (?country=ae) */
+  href: string;
+  companies: { id: string; name: string; kind: string }[];
+}

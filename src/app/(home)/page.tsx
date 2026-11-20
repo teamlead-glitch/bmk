@@ -8,7 +8,7 @@ import { HomeReveals } from '@/components/home/HomeReveals';
 import { PresenceSection } from '@/components/home/presence/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
-import { getBrandShowcase, getCompany, getHomeAbout, getHomeBanner, getTimeline } from '@/lib/content';
+import { getBrandShowcase, getCompany, getGroupLocations, getHomeAbout, getHomeBanner, getTimeline } from '@/lib/content';
 import { pageMetadata } from '@/lib/seo';
 
 // Hero, about, brands and timeline come from the CMS: rebuilt at most every minute, or at once via POST /api/revalidate/
@@ -22,14 +22,21 @@ export const metadata: Metadata = {
 // Order matters: effects run top to bottom, and pinned sections (hero, history)
 // must be created before the triggers below them measure the pin spacing.
 export default async function HomePage() {
-  const [company, brands, banner, about, timeline] = await Promise.all([getCompany(), getBrandShowcase(), getHomeBanner(), getHomeAbout(), getTimeline()]);
+  const [company, brands, banner, about, timeline, locations] = await Promise.all([
+    getCompany(),
+    getBrandShowcase(),
+    getHomeBanner(),
+    getHomeAbout(),
+    getTimeline(),
+    getGroupLocations(),
+  ]);
 
   return (
     <>
       <SmoothScroll />
       <HeroSection years={company.YEARS} banner={banner} />
       <AboutSection about={about} />
-      <PresenceSection locations={company.locations} defaultLocation={company.defaultLocation} />
+      <PresenceSection locations={locations} />
       <BrandsSection partner={brands.partner} own={brands.own} filters={brands.filters} />
       <HistorySection milestones={timeline} />
       <EnquiryBlock

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
-import type { Location } from '@/types/company';
+import type { PresenceLocation } from '@/types/company';
 
 /**
  * Group presence map (design: src/modules/map.js).
@@ -22,7 +22,7 @@ const EDGE = 24; // popover: breathing room from the viewport edges
 
 type MapData = { w: number; h: number; r: number; dots: number[] };
 
-export function PresenceMap({ locations, defaultLocation }: { locations: Location[]; defaultLocation: string }) {
+export function PresenceMap({ locations }: { locations: PresenceLocation[] }) {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const card = useRef<HTMLElement>(null);
@@ -30,7 +30,7 @@ export function PresenceMap({ locations, defaultLocation }: { locations: Locatio
   const bodyRef = useRef<HTMLDivElement>(null);
   const pins = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const start = Math.max(0, locations.findIndex((l) => l.id === defaultLocation));
+  const start = 0; // the first location in the admin's order
   const [current, setCurrent] = useState(start); // selected pin
   const [shown, setShown] = useState(start); // content in the card
   const currentRef = useRef(start);
@@ -280,13 +280,13 @@ export function PresenceMap({ locations, defaultLocation }: { locations: Locatio
                 className="pin group absolute grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full"
                 style={{ left: `${l.x}%`, top: `${l.y}%` }}
                 aria-pressed={i === current}
-                aria-label={`${l.name}: ${l.companies.length} compan${l.companies.length === 1 ? 'y' : 'ies'}`}
+                aria-label={`${l.city}, ${l.country}: ${l.companies.length} compan${l.companies.length === 1 ? 'y' : 'ies'}`}
                 onClick={() => select(i)}
               >
                 <span className="pin-ring" />
                 <span className="pin-dot" />
                 <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 translate-y-1 rounded-full bg-ink px-3 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
-                  {l.short}
+                  {l.city}
                 </span>
               </button>
             ))}
@@ -326,15 +326,15 @@ export function PresenceMap({ locations, defaultLocation }: { locations: Locatio
           </div>
           <div ref={bodyRef} className="loc-body flex flex-col items-start gap-4">
             <div>
-              <p className="loc-city text-xs tracking-[0.14em] text-black/50 uppercase">{loc.region}</p>
-              <h3 className="loc-entity mt-1 text-2xl leading-7 font-semibold text-black">{loc.name}</h3>
+              <p className="loc-city text-xs tracking-[0.14em] text-black/50 uppercase">{loc.city}</p>
+              <h3 className="loc-entity mt-1 text-2xl leading-7 font-semibold text-black">{loc.country}</h3>
             </div>
             <ul className="loc-list flex w-full flex-col gap-2">
               {loc.companies.map((c) => (
                 <li key={c.id} className="flex flex-col gap-0.5 rounded-lg bg-fog px-4 py-3">
                   <span className="text-[15px] leading-5 font-semibold text-black">{c.name}</span>
                   <span className="text-[13px] leading-5 text-black/50">
-                    {c.kind} · {c.city}
+                    {[c.kind, loc.city].filter(Boolean).join(' · ')}
                   </span>
                 </li>
               ))}

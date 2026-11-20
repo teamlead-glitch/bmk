@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import * as company from '@/static/data/company';
-import { countryVisual, DEFAULT_LOCATION } from '@/static/data/visuals';
+import { countryVisual } from '@/static/data/visuals';
 import { href } from '@/lib/routes';
 import type { Location } from '@/types/company';
 
@@ -16,6 +16,5 @@ export const getCompany = cache(async () => ({
       href: href('/contact', { country: c.id }),
     }),
   ),
-  defaultLocation: DEFAULT_LOCATION,
 }));
 

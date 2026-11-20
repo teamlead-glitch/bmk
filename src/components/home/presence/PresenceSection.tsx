@@ -1,8 +1,14 @@
 import { PresenceMap } from '@/components/home/presence/PresenceMap';
-import type { Location } from '@/types/company';
+import type { PresenceLocation } from '@/types/company';
 
-/** Group presence: dotted world map with a pin per country and a location card. */
-export function PresenceSection({ locations, defaultLocation }: { locations: Location[]; defaultLocation: string }) {
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+
+/** Group presence: dotted world map with a pin per location and a location card (CMS: group-locations).
+ *  No locations in the CMS -> no section. */
+export function PresenceSection({ locations }: { locations: PresenceLocation[] }) {
+  if (!locations.length) return null;
+  const n = new Set(locations.map((l) => l.country)).size;
+  const countries = `${WORDS[n] ?? n} ${n === 1 ? 'country' : 'countries'}`;
   return (
     <section
       id="presence"
@@ -16,11 +22,11 @@ export function PresenceSection({ locations, defaultLocation }: { locations: Loc
             Global Footprint
           </h2>
           <p className="t-body mt-3 tracking-normal" data-reveal="up">
-            Operating entities and distribution hubs across six countries spanning the Middle East, Asia, and Africa. Select a location to view our regional offices.
+            Operating entities and distribution hubs across {countries} spanning the Middle East, Asia, and Africa. Select a location to view our regional offices.
           </p>
         </div>
       </div>
-      <PresenceMap locations={locations} defaultLocation={defaultLocation} />
+      <PresenceMap locations={locations} />
     </section>
   );
 }

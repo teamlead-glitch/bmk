@@ -13,8 +13,6 @@ export const countryVisual: Record<string, CountryVisual> = {
   drc: { x: 51.1, y: 65.4, icon: '/assets/icons/loc-kinshasa.svg', photo: '/assets/images/city-kinshasa.webp', pos: '75% center' },
 };
 
-export const DEFAULT_LOCATION = 'uae';
-
 /** About › Who we are globe: city coordinates. `side` keeps neighbouring tags apart. */
 export interface GlobePlace {
   id: string;
