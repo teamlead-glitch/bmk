@@ -40,7 +40,19 @@ export function ProductSectionBar({ product, sections }: { product: EnquiryProdu
     const main = document.getElementById('cta');
     const io2 = new IntersectionObserver(([e]) => mobile.classList.toggle('translate-y-full', e.isIntersecting || e.boundingClientRect.top > 0));
     if (main) io2.observe(main);
-    return () => (mo.disconnect(), io.disconnect(), io2.disconnect());
+
+    // The phone bar is fixed over the page end: the footer's last strip (copyright, legal links)
+    // reserves its height through --mobile-cta (Footer.tsx), only while this page is open
+    const root = document.documentElement;
+    const ro = new ResizeObserver(() => root.style.setProperty('--mobile-cta', `${mobile.offsetHeight}px`));
+    ro.observe(mobile);
+    return () => {
+      mo.disconnect();
+      io.disconnect();
+      io2.disconnect();
+      ro.disconnect();
+      root.style.removeProperty('--mobile-cta');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sections are fixed for the page
   }, []);
 

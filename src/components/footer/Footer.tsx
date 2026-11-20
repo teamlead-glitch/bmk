@@ -109,7 +109,8 @@ export function Footer({ categories, contact }: { categories: NavCategory[]; con
         <FooterTagline />
       </div>
 
-      <div className="bg-navy">
+      {/* --mobile-cta: room for the product page's fixed phone enquiry bar (ProductSectionBar); 0 elsewhere */}
+      <div className="bg-navy max-sm:pb-[var(--mobile-cta,0px)]">
         <div className="shell flex flex-col gap-4 py-10 text-[13px] leading-5 text-white/40 md:h-32 md:flex-row md:items-center md:justify-between md:py-0">
           <p>
             © BMK Group. All Rights Reserved. Website made by{' '}
