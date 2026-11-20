@@ -16,7 +16,9 @@ import type { NavData } from '@/types/catalogue';
 /** Which navbar item is current for a path */
 function navKey(pathname: string) {
   const page = pathname.split('/')[1] || '';
-  if (['about', 'faq', 'contact'].includes(page)) return page;
+  if (page === 'about-us') return 'about';
+  if (page === 'contact-us') return 'contact';
+  if (page === 'faqs') return 'faq';
   if (['products', 'search', 'category', 'brand', 'product'].includes(page)) return 'catalogue';
   return '';
 }
@@ -126,7 +128,7 @@ export function SiteHeader({ nav }: { nav: NavData }) {
                 Home
               </Link>
             </li>
-            {navLink('about', href('/about'), 'About Us')}
+            {navLink('about', href('/about-us'), 'About Us')}
             <li>
               <button
                 type="button"
@@ -142,8 +144,8 @@ export function SiteHeader({ nav }: { nav: NavData }) {
                 Brands &amp; Products <ChevIcon />
               </button>
             </li>
-            {navLink('faq', href('/faq'), 'FAQ')}
-            {navLink('contact', href('/contact'), 'Contact Us')}
+            {navLink('faq', href('/faqs'), 'FAQ')}
+            {navLink('contact', href('/contact-us'), 'Contact Us')}
           </ul>
           <div className="flex items-center gap-2">
             <button type="button" id="search-toggle" className="icon-btn size-12 hover:bg-ink/5" aria-label="Search products" aria-expanded={search} onClick={() => setSearch((o) => !o)}>
@@ -211,10 +213,10 @@ export function SiteHeader({ nav }: { nav: NavData }) {
           </form>
           <nav className="text-[22px] leading-tight tracking-[-0.02em]" aria-label="Mobile">
             {drawerLink('', HOME, 'Home')}
-            {drawerLink('about', href('/about'), 'About Us')}
+            {drawerLink('about', href('/about-us'), 'About Us')}
             <CatalogueMenu nav={nav} open active={current === 'catalogue'} />
-            {drawerLink('faq', href('/faq'), 'FAQ')}
-            {drawerLink('contact', href('/contact'), 'Contact Us')}
+            {drawerLink('faq', href('/faqs'), 'FAQ')}
+            {drawerLink('contact', href('/contact-us'), 'Contact Us')}
           </nav>
         </div>
         <div className="absolute inset-x-0 bottom-0 border-t border-line bg-white p-5">

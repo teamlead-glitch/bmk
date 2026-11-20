@@ -9,7 +9,7 @@ import { siteUrl } from '@/lib/site-url';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [brands, categories, slugs] = await Promise.all([getBrandSlugs(), getCategorySlugs(), getProductSlugs()]);
   // Legal CMS pages at their admin slug. Other CMS pages can't be listed yet (no GET /v1/pages list).
-  const fixed = ['/', '/about/', '/products/', '/faq/', '/contact/', ...LEGAL_PAGES.map((p) => `/${p.slug}/`)];
+  const fixed = ['/', '/about-us/', '/products/', '/faqs/', '/contact-us/', ...LEGAL_PAGES.map((p) => `/${p.slug}/`)];
   return [
     ...fixed.map((p) => ({ url: siteUrl(p), changeFrequency: 'monthly' as const, priority: p === '/' ? 1 : 0.7 })),
     ...categories.map((id) => ({ url: siteUrl(`/category/${id}/`), changeFrequency: 'weekly' as const, priority: 0.6 })),

@@ -132,7 +132,7 @@ export const getGroupLocations = cache(async (): Promise<GroupLocation[]> => {
         geo,
         icon: mediaUrl(l.icon?.url),
         photo: mediaUrl(l.background?.url),
-        href: href('/contact', { location: id }),
+        href: href('/contact-us', { location: id }),
         companies: (l.group_companies ?? []).map(toCompany).filter((c): c is GroupCompany => !!c),
       },
     ];

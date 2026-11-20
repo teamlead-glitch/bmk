@@ -28,7 +28,7 @@ export function Footer({ categories, contact }: { categories: NavCategory[]; con
               </Link>
             </li>
             <li>
-              <Link className="footer-link" href={href('/about')}>
+              <Link className="footer-link" href={href('/about-us')}>
                 About Us
               </Link>
             </li>
@@ -38,12 +38,12 @@ export function Footer({ categories, contact }: { categories: NavCategory[]; con
               </Link>
             </li>
             <li>
-              <Link className="footer-link" href={href('/faq')}>
+              <Link className="footer-link" href={href('/faqs')}>
                 FAQ
               </Link>
             </li>
             <li>
-              <Link className="footer-link" href={href('/contact')}>
+              <Link className="footer-link" href={href('/contact-us')}>
                 Contact Us
               </Link>
             </li>

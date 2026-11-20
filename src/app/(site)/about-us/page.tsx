@@ -10,7 +10,7 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata: Metadata = pageMetadata({
   title: 'About Us',
   description: 'Who BMK Group is, what we stand for, where we operate and how we got here: eight companies across six countries since 2002.',
-  path: '/about/',
+  path: '/about-us/',
   image: '/assets/images/about.webp',
 });
 

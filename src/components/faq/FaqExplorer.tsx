@@ -119,7 +119,7 @@ export function FaqExplorer({ faqs, topics }: { faqs: Faq[]; topics: FaqTopic[] 
               <button type="button" className="btn bg-white text-ink hover:bg-accent hover:text-white" data-enquire="General Enquiry">
                 Send an enquiry <Arrow />
               </button>
-              <Link className="btn btn-outline-light" href={href('/contact')}>
+              <Link className="btn btn-outline-light" href={href('/contact-us')}>
                 Contact us
               </Link>
             </div>

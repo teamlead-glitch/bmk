@@ -9,7 +9,7 @@ export const revalidate = 60; // TODO: back to 300 after development
 export const metadata: Metadata = pageMetadata({
   title: 'FAQ',
   description: 'Answers to common questions about BMK Group, our brands, where to buy and partnering with us.',
-  path: '/faq/',
+  path: '/faqs/',
   image: '/assets/images/faq-hero.webp',
 });
 

@@ -6,6 +6,10 @@ type LegacyRedirect = { source: string; destination: string; permanent: true };
 const EXACT_REDIRECTS: [string, string][] = [
   // Design reference: the catalogue app lived at /catalogue/
   ['/catalogue', '/products/'],
+  // About, Contact and FAQ moved to the admin's slugs (query kept: /contact/?office=1 still works)
+  ['/about', '/about-us/'],
+  ['/contact', '/contact-us/'],
+  ['/faq', '/faqs/'],
 ];
 
 // Pattern rules: old folder -> new folder, slug kept

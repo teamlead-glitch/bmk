@@ -115,7 +115,7 @@ function LocationCard({ l, flip }: { l: GroupLocation; flip: boolean }) {
               {e.kind && <KindTag e={e} />}
             </div>
             {e.summary && <p className="mt-2 text-[15px] leading-6 text-muted">{e.summary}</p>}
-            <Link className="btn btn-navy mt-5" href={href('/contact', { office: e.id })}>
+            <Link className="btn btn-navy mt-5" href={href('/contact-us', { office: e.id })}>
               Contact this office <Arrow />
             </Link>
           </section>

@@ -13,7 +13,7 @@ import { pageMetadata } from '@/lib/seo';
 export const metadata: Metadata = pageMetadata({
   title: 'Contact Us',
   description: 'Reach the right BMK Group company in the UAE, India, Singapore, Malaysia, Zambia or the DR Congo, or send us a message.',
-  path: '/contact/',
+  path: '/contact-us/',
   image: '/assets/images/contact-hero.webp',
 });
 

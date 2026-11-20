@@ -29,7 +29,7 @@ export default async function NotFound() {
             <Link className="btn nf-btn" href={HOME}>
               Back to home <Arrow />
             </Link>
-            <Link className="btn nf-btn" href={href('/contact')}>
+            <Link className="btn nf-btn" href={href('/contact-us')}>
               Contact us <Arrow />
             </Link>
           </div>

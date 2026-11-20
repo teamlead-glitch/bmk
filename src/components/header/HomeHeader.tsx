@@ -156,7 +156,7 @@ export function HomeHeader({ nav }: { nav: NavData }) {
               </a>
             </li>
             <li>
-              <Link className="nav-link" href={href('/about')}>
+              <Link className="nav-link" href={href('/about-us')}>
                 About Us
               </Link>
             </li>
@@ -178,12 +178,12 @@ export function HomeHeader({ nav }: { nav: NavData }) {
               </button>
             </li>
             <li>
-              <Link className="nav-link" href={href('/faq')}>
+              <Link className="nav-link" href={href('/faqs')}>
                 FAQ
               </Link>
             </li>
             <li>
-              <Link className="nav-link" href={href('/contact')}>
+              <Link className="nav-link" href={href('/contact-us')}>
                 Contact Us
               </Link>
             </li>
@@ -239,7 +239,7 @@ export function HomeHeader({ nav }: { nav: NavData }) {
               </a>
             </li>
             <li className="menu-item">
-              <Link className="block py-2.5" href={href('/about')}>
+              <Link className="block py-2.5" href={href('/about-us')}>
                 About Us
               </Link>
             </li>
@@ -247,12 +247,12 @@ export function HomeHeader({ nav }: { nav: NavData }) {
               <CatalogueMenu nav={nav} compact />
             </li>
             <li className="menu-item">
-              <Link className="block py-2.5" href={href('/faq')}>
+              <Link className="block py-2.5" href={href('/faqs')}>
                 FAQ
               </Link>
             </li>
             <li className="menu-item">
-              <Link className="block py-2.5" href={href('/contact')}>
+              <Link className="block py-2.5" href={href('/contact-us')}>
                 Contact Us
               </Link>
             </li>

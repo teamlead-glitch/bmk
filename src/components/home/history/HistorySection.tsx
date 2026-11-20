@@ -42,7 +42,7 @@ export function HistorySection({ milestones }: { milestones: Milestone[] }) {
                 </p>
               </div>
             </div>
-            <Link href={href('/about', { section: 'journey' })} className="btn btn-navy shrink-0 self-start md:self-auto" data-reveal="up">
+            <Link href={href('/about-us', { section: 'journey' })} className="btn btn-navy shrink-0 self-start md:self-auto" data-reveal="up">
               Discover About Us <Arrow />
             </Link>
           </div>

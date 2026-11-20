@@ -5,7 +5,7 @@ import { LEGAL_PAGES } from '@/constants/legal';
 type Props = { params: Promise<{ slug: string }> };
 
 // /{slug}/: any page created in the admin (CMS: GET /v1/pages/{slug}), e.g. /privacy-policy/.
-// The site's own routes (/about/, /contact/, …) take priority over a CMS page with the same slug.
+// The site's own routes (/about-us/, /contact-us/, …) take priority over a CMS page with the same slug.
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return cmsPageMetadata((await params).slug);

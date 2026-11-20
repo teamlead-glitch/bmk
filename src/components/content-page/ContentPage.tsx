@@ -65,7 +65,7 @@ export async function ContentPage({ slug }: { slug: string }) {
                       email <a href={`mailto:${contact.email}`}>{contact.email}</a> or{' '}
                     </>
                   )}
-                  use our <Link href={href('/contact')}>contact page</Link>.
+                  use our <Link href={href('/contact-us')}>contact page</Link>.
                 </p>
               </div>
             ) : (
