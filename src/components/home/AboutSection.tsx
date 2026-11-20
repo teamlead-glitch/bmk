@@ -10,7 +10,12 @@ export function AboutSection({ about }: { about: HomeAbout | null }) {
   return (
     <section id="about" className="section-y bg-white" aria-labelledby="about-title">
       <div className="shell grid items-stretch gap-10 lg:grid-cols-2 lg:gap-16 xl:grid-cols-[520px_520px] xl:gap-[120px]">
-        <figure className="about-media relative aspect-[520/504] overflow-hidden rounded-xl lg:aspect-auto lg:min-h-[504px]" data-reveal="clip">
+        {/* Full width below lg: a wide frame (4:3 phones, 16:9 tablets) capped at 60% of the screen
+            height, so the photo never fills the screen; desktop keeps the design's 520×504 column */}
+        <figure
+          className="about-media relative aspect-[4/3] max-h-[60svh] overflow-hidden rounded-xl md:aspect-video lg:aspect-auto lg:max-h-none lg:min-h-[504px]"
+          data-reveal="clip"
+        >
           <img src={image?.src ?? '/assets/images/about.webp'} alt={image?.alt ?? ''} className="absolute inset-0 size-full object-cover object-[66%_50%]" loading="lazy" data-parallax-img />
         </figure>
         <div className="flex flex-col items-start gap-6">
