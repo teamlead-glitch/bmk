@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- art-directed photos */
 import { Arrow } from '@/components/common/Arrow';
 import { enquiryImages } from '@/static/data/visuals';
+import { PARTNER_SUB, PARTNER_TITLE } from '@/constants/enquiry';
 import type { EnquiryType } from '@/types/company';
 
 const ALT: Record<string, string> = {
@@ -16,8 +17,8 @@ const ALT: Record<string, string> = {
 export function EnquiryBlock({
   types,
   id = 'work-with-us',
-  title = 'Let’s do business together',
-  sub = 'Have a business enquiry? Select the enquiry type below and get in touch with the relevant BMK Group team.',
+  title = PARTNER_TITLE,
+  sub = PARTNER_SUB,
   animated = false,
 }: {
   types: EnquiryType[];

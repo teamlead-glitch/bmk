@@ -18,3 +18,7 @@ export const MAX_ENQUIRY_BRANDS = 50;
 
 /** Shown when an enquiry can't be sent (network, CMS down, a type the CMS rejects) */
 export const ENQUIRY_GENERIC_ERROR = 'Sorry, we couldn’t send your message. Please try again in a moment.';
+
+/** Heading of the enquiry-type cards on the homepage, About and Contact (EnquiryBlock defaults) */
+export const PARTNER_TITLE = 'Partner With BMK Group';
+export const PARTNER_SUB = 'Select your partnership model below to connect directly with our commercial team.';

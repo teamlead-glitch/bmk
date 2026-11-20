@@ -35,8 +35,6 @@ export default async function HomePage() {
       <EnquiryBlock
         types={company.enquiryTypes}
         id="contact"
-        title="Partner With BMK Group"
-        sub="Select your partnership model below to connect directly with our commercial team."
         animated
       />
       <HomeReveals />

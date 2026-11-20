@@ -44,7 +44,7 @@ export default async function AboutPage() {
       <Companies locations={company.locations} intro={about.companiesText} />
       <OurBrands own={brands.own} partners={brands.partner} title={about.brandsTitle} intro={about.brandsText} />
       <Journey milestones={timeline} />
-      <EnquiryBlock types={company.enquiryTypes} title="Work with BMK" sub="Distribution, dealership, retail supply or something else." />
+      <EnquiryBlock types={company.enquiryTypes} />
     </>
   );
 }

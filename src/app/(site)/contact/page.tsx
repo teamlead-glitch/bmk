@@ -62,7 +62,7 @@ export default async function ContactPage() {
           </div>
         </section>
       )}
-      <EnquiryBlock types={company.enquiryTypes} id="business-enquiries" title="Business enquiries" />
+      <EnquiryBlock types={company.enquiryTypes} id="business-enquiries" />
     </>
   );
 }
