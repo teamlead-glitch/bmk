@@ -26,13 +26,6 @@ export function hostLabel(url: string): string {
   }
 }
 
-/** Link props for a brand: partner brands open their catalogue page; BMK's own
- *  brands (SEEKEN, TEAM) have no brand page and open their website instead. */
-export function brandLinkProps(b: { id: string; inHouse?: boolean; sites?: [string, string][] }) {
-  if (b.inHouse && b.sites?.[0]) return { href: `https://${b.sites[0][0]}`, target: '_blank', rel: 'noopener', external: true as const };
-  return { href: href(`/brand/${b.id}`), external: false as const };
-}
-
 /* ---------- URL filters (listing pages) ---------- */
 
 /** What a listing reads from the URL: useSearchParams() in the browser, NO_FILTERS on the server */

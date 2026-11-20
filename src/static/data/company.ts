@@ -11,16 +11,15 @@ import type { Country, Entity, EnquiryType } from '@/types/company';
 export const YEARS = 24; // agreed figure for the homepage ("24 Years of Experience & Trust")
 
 // ── Group companies ──────────────────────────────────────────────────────────
-// Six countries, eight entities. Map pins are per country (x / y = % of the
-// world map frame, rough positions; the design sets them).
+// Six countries, eight entities (About › companies; the homepage map and Contact read the CMS).
 // Phone and email per office are not in the document → null.
 export const countries: Country[] = [
-  { id: 'uae', name: 'United Arab Emirates', short: 'UAE', city: 'Dubai', region: 'Middle East', x: 60.4, y: 47.1 },
-  { id: 'india', name: 'India', short: 'India', city: 'Kochi, Kerala', region: 'South Asia', x: 68.6, y: 58.2 },
-  { id: 'singapore', name: 'Singapore', short: 'Singapore', city: 'Singapore', region: 'Southeast Asia', x: 77.3, y: 62.7 },
-  { id: 'malaysia', name: 'Malaysia', short: 'Malaysia', city: 'Petaling Jaya', region: 'Southeast Asia', x: 75.6, y: 59.8 },
-  { id: 'zambia', name: 'Zambia', short: 'Zambia', city: 'Lusaka', region: 'Africa', x: 55.4, y: 72.6 },
-  { id: 'drc', name: 'Democratic Republic of the Congo', short: 'DR Congo', city: 'Kinshasa', region: 'Africa', x: 52.6, y: 65.4 },
+  { id: 'uae', name: 'United Arab Emirates', short: 'UAE', city: 'Dubai' },
+  { id: 'india', name: 'India', short: 'India', city: 'Kochi, Kerala' },
+  { id: 'singapore', name: 'Singapore', short: 'Singapore', city: 'Singapore' },
+  { id: 'malaysia', name: 'Malaysia', short: 'Malaysia', city: 'Petaling Jaya' },
+  { id: 'zambia', name: 'Zambia', short: 'Zambia', city: 'Lusaka' },
+  { id: 'drc', name: 'Democratic Republic of the Congo', short: 'DR Congo', city: 'Kinshasa' },
 ];
 
 export const entities: Entity[] = [
