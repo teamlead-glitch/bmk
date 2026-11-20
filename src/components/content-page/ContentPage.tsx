@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
 import { ContentToc } from '@/components/content-page/ContentToc';
@@ -12,7 +12,7 @@ import { mapSeoToMetadata } from '@/lib/seo-mapper';
 /** Title, description and share tags from the page's CMS `seo` block */
 export async function cmsPageMetadata(slug: string): Promise<Metadata> {
   const page = await getCmsPage(slug);
-  if (!page) return {};
+  if (!page || 'redirect' in page) return {};
   const legal = LEGAL_PAGES.find((p) => p.slug === slug);
   return mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub });
 }
@@ -22,6 +22,7 @@ export async function cmsPageMetadata(slug: string): Promise<Metadata> {
 export async function ContentPage({ slug }: { slug: string }) {
   const [page, contact] = await Promise.all([getCmsPage(slug), getContact()]);
   if (!page) notFound();
+  if ('redirect' in page) permanentRedirect(href(`/${page.redirect}`)); // slug renamed in the admin
   const legal = LEGAL_PAGES.find((p) => p.slug === slug); // legal pages: subtitle and "Other policies"
   const others = legal ? LEGAL_PAGES.filter((p) => p.slug !== slug) : [];
   const title = page.title || legal?.name || slug;

@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { isSlug, text } from '@/lib/api/cms-mappers';
 import { serverGetData } from '@/lib/api/server-api';
+import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { CmsSeo } from '@/types/common';
 import type { ContentPageData, PageSection } from '@/types/page';
@@ -10,7 +11,8 @@ import type { ContentPageData, PageSection } from '@/types/page';
 // Terms) and any page made in the admin. The content is cleaned with cleanHtml `page` (headings,
 // images, videos, embeds and alignment kept; h1 becomes h2) and split at each h2 into numbered sections
 // for the table of contents; a leading "1." in a heading is dropped (the page numbers them).
-// 404/410 -> null (the page answers 404). CMS down -> CmsUnavailableError -> error.tsx.
+// 404/410 -> null (the page answers 404). Renamed slug -> { redirect } (the page answers 308 to
+// the new URL). CMS down -> CmsUnavailableError -> error.tsx.
 
 type CmsPageData = { slug?: string | null; title?: string | null; content?: string | null; seo?: CmsSeo | null };
 
@@ -38,9 +40,13 @@ function toSections(html: string): { intro: string; sections: PageSection[] } {
   return { intro: parts[0].trim(), sections };
 }
 
-export const getCmsPage = cache(async (slug: string): Promise<ContentPageData | null> => {
+/** null -> 404. { redirect } -> the slug was renamed in the admin: the API answers 301 and fetch
+ *  follows it to the current page, so the slug that comes back differs (src/lib/api/slug-redirect.ts). */
+export const getCmsPage = cache(async (slug: string): Promise<DetailsResult<ContentPageData>> => {
   if (!isSlug(slug)) return null;
   const data = await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
   if (!data) return null;
+  const moved = getRedirectSlug(slug, text(data.slug));
+  if (moved) return { redirect: moved };
   return { title: text(data.title), ...toSections(cleanHtml(text(data.content), { page: true })), seo: data.seo ?? null };
 });
