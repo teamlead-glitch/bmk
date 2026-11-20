@@ -136,9 +136,8 @@ export function BrandsCarousel({ brands, filters }: { brands: PartnerBrand[]; fi
                   </span>
                 )}
                 <div className="flex w-full flex-col gap-3">
-                  {/* The logo shows the name: the heading stays for screen readers only */}
-                  <h3 className="sr-only">{b.name}</h3>
-                  {b.intro && <p className="t-body line-clamp-5 text-black/50">{b.intro}</p>}
+                  <h3 className="text-[32px] leading-8 font-semibold">{b.name}</h3>
+                  {b.intro && <p className="t-body text-black/50">{b.intro}</p>}
                   <Link href={href(`/brand/${b.slug}`)} className="brand-cta mt-3">
                     {b.name} Products
                     <Arrow />
