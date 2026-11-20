@@ -18,7 +18,8 @@ export function AboutSection({ about }: { about: HomeAbout | null }) {
         >
           <img src={image?.src ?? '/assets/images/about.webp'} alt={image?.alt ?? ''} className="absolute inset-0 size-full object-cover object-[66%_50%]" loading="lazy" data-parallax-img />
         </figure>
-        <div className="flex flex-col items-start gap-6">
+        {/* Stacked (phones, tablets): the text comes first, right under the banner; desktop keeps photo | text */}
+        <div className="flex flex-col items-start gap-6 max-lg:order-first">
           <span className="chip border-line text-ink" data-reveal="up">
             About BMK Group
           </span>
