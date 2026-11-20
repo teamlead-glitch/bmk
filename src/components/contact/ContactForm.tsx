@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Arrow } from '@/components/common/Arrow';
 import { CheckIcon } from '@/components/common/Icons';
 import { CountryBrandFields } from '@/components/enquiry/CountryBrandFields';
+import { Captcha } from '@/components/enquiry/Captcha';
 import { FieldError, Honeypot, useEnquirySubmit } from '@/components/enquiry/useEnquirySubmit';
 import { BRAND_ENQUIRY_TYPES } from '@/constants/enquiry';
 import { trackLead } from '@/lib/gtm';
@@ -79,6 +80,7 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
             <textarea name="message" rows={5} required maxLength={5000} className="field" {...fieldProps('message', ID)} />
             <FieldError name="message" idPrefix={ID} errors={errors} />
           </label>
+          <Captcha idPrefix={ID} error={errors.captcha_answer} />
           {error && (
             <p className="text-sm text-danger" role="alert">
               {error}

@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_CONFIG } from '@/constants/config';
 import { cmsHeaders } from '@/lib/api/cms-headers';
+import { verifyCaptcha } from '@/lib/captcha';
 import { isSlug } from '@/lib/api/cms-mappers';
 import { BRAND_ENQUIRY_TYPES, ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES, MAX_ENQUIRY_BRANDS } from '@/constants/enquiry';
 import type { EnquiryResult } from '@/types/enquiry';
 
 /* ---------- SEND AN ENQUIRY (contact form + enquiry popup) ---------- */
-// POST /api/enquiry/ { type, name, email, phone, company?, country_id?, brands?, subject?, message, product? }
+// POST /api/enquiry/ { type, name, email, phone, company?, country_id?, brands?, subject?, message, product?,
+//                      captcha_token, captcha_answer }
+// The CAPTCHA (GET /api/captcha/) must be right, else 422 with errors.captcha_answer.
 // company is required for distribution, dealership and retail; brands (CMS brand ids) are
 // sent for those types only. Checks the fields, then forwards them to the CMS:
 //  - product enquiry (product slug set): POST {NEXT_PUBLIC_API_URI}/v1/products/{slug}/enquiries (no type)
@@ -35,6 +38,9 @@ export async function POST(request: NextRequest) {
 
   const fields = {} as Record<Field, string>;
   const errors: Record<string, string> = {};
+  // CAPTCHA (src/lib/captcha.ts): the code from the form's picture, checked before anything else counts
+  if (!String(raw.captcha_answer ?? '').trim()) errors.captcha_answer = 'Enter the code shown in the picture.';
+  else if (!verifyCaptcha(raw.captcha_token, raw.captcha_answer)) errors.captcha_answer = 'The code is wrong or has expired. Please enter the new code.';
   for (const key of Object.keys(LIMITS) as Field[]) {
     const value = String(raw[key] ?? '').trim();
     if (REQUIRED.includes(key) && !value) errors[key] = `${LABELS[key]} is required.`;

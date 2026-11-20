@@ -21,7 +21,7 @@ export async function sendEnquiry(input: EnquiryInput): Promise<EnquiryResult> {
 export function readEnquiryForm(form: HTMLFormElement): Record<string, string> {
   const data = new FormData(form);
   const out: Record<string, string> = {};
-  for (const key of ['type', 'name', 'email', 'phone', 'company', 'country_id', 'subject', 'message', 'website']) {
+  for (const key of ['type', 'name', 'email', 'phone', 'company', 'country_id', 'subject', 'message', 'website', 'captcha_token', 'captcha_answer']) {
     out[key] = String(data.get(key) ?? '').trim();
   }
   return out;

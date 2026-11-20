@@ -16,6 +16,9 @@ export interface EnquiryInput {
   product?: string;
   /** Honeypot: hidden from people, filled in by bots */
   website?: string;
+  /** CAPTCHA: the signed token from GET /api/captcha/ and the code the visitor typed */
+  captcha_token?: string;
+  captcha_answer?: string;
 }
 
 /** What POST /api/enquiry/ answers; `errors` maps a field name to its message */
