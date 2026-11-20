@@ -6,7 +6,7 @@ import { BRAND_ENQUIRY_TYPES, ENQUIRY_GENERIC_ERROR, ENQUIRY_TYPE_VALUES, MAX_EN
 import type { EnquiryResult } from '@/types/enquiry';
 
 /* ---------- SEND AN ENQUIRY (contact form + enquiry popup) ---------- */
-// POST /api/enquiry/ { type, name, email, phone?, company?, country_id?, brands?, subject?, message, product? }
+// POST /api/enquiry/ { type, name, email, phone, company?, country_id?, brands?, subject?, message, product? }
 // company is required for distribution, dealership and retail; brands (CMS brand ids) are
 // sent for those types only. Checks the fields, then forwards them to the CMS:
 //  - product enquiry (product slug set): POST {NEXT_PUBLIC_API_URI}/v1/products/{slug}/enquiries (no type)
@@ -15,9 +15,12 @@ import type { EnquiryResult } from '@/types/enquiry';
 
 const LIMITS = { name: 120, email: 190, phone: 40, company: 150, subject: 200, message: 5000 } as const;
 type Field = keyof typeof LIMITS;
-const REQUIRED: Field[] = ['name', 'email', 'message'];
+const REQUIRED: Field[] = ['name', 'email', 'phone', 'message'];
 const LABELS: Record<Field, string> = { name: 'Full name', email: 'Email', phone: 'Phone', company: 'Company', subject: 'Subject', message: 'Message' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** Digits with an optional leading +, spaces, dots, dashes and brackets; 7 to 15 digits (E.164 max) */
+const PHONE = /^\+?[\d\s().-]+$/;
+const isPhone = (v: string) => PHONE.test(v) && /^\d{7,15}$/.test(v.replace(/\D/g, ''));
 const isId = (v: unknown): v is number => Number.isInteger(v) && (v as number) > 0;
 const TIMEOUT_MS = 10000;
 
@@ -39,6 +42,7 @@ export async function POST(request: NextRequest) {
     fields[key] = value;
   }
   if (fields.email && !errors.email && !EMAIL.test(fields.email)) errors.email = 'Enter a valid email address.';
+  if (fields.phone && !errors.phone && !isPhone(fields.phone)) errors.phone = 'Enter a valid phone number.';
 
   const product = String(raw.product ?? '').trim();
   if (product && !isSlug(product)) return reply({ ok: false, message: ENQUIRY_GENERIC_ERROR }, 400);

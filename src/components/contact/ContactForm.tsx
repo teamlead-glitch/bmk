@@ -51,7 +51,7 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
             </label>
             <label className="grid gap-1.5 text-sm">
               <span className="font-medium">Phone</span>
-              <input name="phone" type="tel" maxLength={40} className="field" autoComplete="tel" {...fieldProps('phone', ID)} />
+              <input name="phone" type="tel" required minLength={7} maxLength={40} className="field" autoComplete="tel" {...fieldProps('phone', ID)} />
               <FieldError name="phone" idPrefix={ID} errors={errors} />
             </label>
           </div>
