@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Arrow } from '@/components/common/Arrow';
+import { BrandMark } from '@/components/common/BrandMark';
 import { ChevIcon } from '@/components/common/Icons';
 import { href } from '@/lib/routes';
 import type { NavData } from '@/types/catalogue';
@@ -19,19 +20,31 @@ export function CatalogueMenu({ nav, open = false, compact = false, active = fal
         {nav.ownBrands.length > 0 && (
           <>
             <Label>Our brands</Label>
-            <div className="flex flex-wrap gap-2">
-              {nav.ownBrands.map((b) =>
-                b.site ? (
-                  <a key={b.id} href={b.site.url} target="_blank" rel="noopener" className="pill">
-                    {b.name}
-                  </a>
-                ) : (
-                  <span key={b.id} className="pill">
-                    {b.name}
-                  </span>
-                ),
-              )}
-            </div>
+            {/* Logos, one brand per row (the desktop mega menu shows the same cards) */}
+            <ul className="grid gap-2">
+              {nav.ownBrands.map((b) => (
+                <li key={b.id}>
+                  {b.site ? (
+                    <a
+                      href={b.site.url}
+                      target="_blank"
+                      rel="noopener"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-line bg-white px-4 py-3"
+                      aria-label={`${b.name}, ${b.site.label} (opens in a new tab)`}
+                    >
+                      <BrandMark brand={b} className="h-6" />
+                      <span className="flex items-center gap-2 text-xs text-muted">
+                        {b.site.label} <Arrow className="btn-icon -rotate-45" />
+                      </span>
+                    </a>
+                  ) : (
+                    <div className="flex items-center rounded-xl border border-line bg-white px-4 py-3">
+                      <BrandMark brand={b} className="h-6" />
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
           </>
         )}
         {nav.partnerBrands.length > 0 && (
