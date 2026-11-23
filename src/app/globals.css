@@ -839,14 +839,24 @@ body.nav-hidden .site-nav {
 }
 
 /* Listing filter sidebar (products, category, brand, search): pinned just under the navbar,
-   and moves up with it when the navbar hides on scroll */
+   and moves up with it when the navbar hides on scroll. When the Category and Brand lists are
+   taller than the window, the sidebar scrolls on its own (the page doesn't scroll with it). */
 .filter-rail {
   position: sticky;
   top: 8rem;
-  transition: top 0.6s var(--ease-out-expo);
+  max-height: calc(100svh - 8rem - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+  transition:
+    top 0.6s var(--ease-out-expo),
+    max-height 0.6s var(--ease-out-expo);
 }
 body.nav-hidden .filter-rail {
   top: 2.5rem;
+  max-height: calc(100svh - 2.5rem - 1.5rem);
 }
 
 /* ── Motion ───────────────────────────────────────────────────────────────
