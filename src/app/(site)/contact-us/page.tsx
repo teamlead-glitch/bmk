@@ -8,14 +8,17 @@ import { MailIcon, PhoneIcon } from '@/components/common/Icons';
 import { PhotoHero } from '@/components/common/PhotoHero';
 import { getCompany, getContact, getGroupLocations, telHref } from '@/lib/content';
 import { HOME } from '@/lib/routes';
-import { pageMetadata } from '@/lib/seo';
+import { cmsSeoMetadata } from '@/lib/page-metadata';
 
-export const metadata: Metadata = pageMetadata({
-  title: 'Contact Us',
-  description: 'Reach the right BMK Group company in the UAE, India, Singapore, Malaysia, Zambia or the DR Congo, or send us a message.',
-  path: '/contact-us/',
-  image: '/assets/images/contact-hero.webp',
-});
+// SEO from the admin's "contact-us" page (CMS: GET /v1/pages/contact-us); these values are the fallback
+export function generateMetadata(): Promise<Metadata> {
+  return cmsSeoMetadata('contact-us', {
+    title: 'Contact Us',
+    description: 'Reach the right BMK Group company in the UAE, India, Singapore, Malaysia, Zambia or the DR Congo, or send us a message.',
+    path: '/contact-us/',
+    image: '/assets/images/contact-hero.webp',
+  });
+}
 
 export default async function ContactPage() {
   const [company, contact, groupLocations] = await Promise.all([getCompany(), getContact(), getGroupLocations()]);

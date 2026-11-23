@@ -5,14 +5,17 @@ import { EnquiryBlock } from '@/components/enquiry/EnquiryBlock';
 import { PhotoHero } from '@/components/common/PhotoHero';
 import { getAboutPage, getBrandShowcase, getCompany, getGroupLocations, getTimeline, toGlobePlaces } from '@/lib/content';
 import { HOME } from '@/lib/routes';
-import { pageMetadata } from '@/lib/seo';
+import { cmsSeoMetadata } from '@/lib/page-metadata';
 
-export const metadata: Metadata = pageMetadata({
-  title: 'About Us',
-  description: 'Who BMK Group is, what we stand for, where we operate and how we got here: eight companies across six countries since 2002.',
-  path: '/about-us/',
-  image: '/assets/images/about.webp',
-});
+// SEO from the admin's "about-us" page (CMS: GET /v1/pages/about-us); these values are the fallback
+export function generateMetadata(): Promise<Metadata> {
+  return cmsSeoMetadata('about-us', {
+    title: 'About Us',
+    description: 'Who BMK Group is, what we stand for, where we operate and how we got here: eight companies across six countries since 2002.',
+    path: '/about-us/',
+    image: '/assets/images/about.webp',
+  });
+}
 
 const SECTIONS: [string, string][] = [
   ['who-we-are', 'Who we are'],

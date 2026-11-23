@@ -9,15 +9,17 @@ import { PresenceSection } from '@/components/home/presence/PresenceSection';
 import { SmoothScroll } from '@/components/home/SmoothScroll';
 import { SEO_CONFIG } from '@/constants/config';
 import { getBrandShowcase, getCompany, getGroupLocations, getHomeAbout, getHomeBanner, getTimeline } from '@/lib/content';
-import { pageMetadata } from '@/lib/seo';
+import { cmsSeoMetadata } from '@/lib/page-metadata';
 
 // Hero, about, brands and timeline come from the CMS: rebuilt at most every minute, or at once via POST /api/revalidate/
 export const revalidate = 60; // TODO: back to 300 after development
 
-export const metadata: Metadata = {
-  ...pageMetadata({ title: SEO_CONFIG.DEFAULT_TITLE, path: '/' }),
-  title: { absolute: SEO_CONFIG.DEFAULT_TITLE },
-};
+// SEO from the admin's "home" page (CMS: GET /v1/pages/home). The title is used as written,
+// without the " | BMK Group" suffix the other pages get.
+export async function generateMetadata(): Promise<Metadata> {
+  const meta = await cmsSeoMetadata('home', { title: SEO_CONFIG.DEFAULT_TITLE, path: '/' });
+  return { ...meta, title: { absolute: typeof meta.title === 'string' && meta.title ? meta.title : SEO_CONFIG.DEFAULT_TITLE } };
+}
 
 // Order matters: effects run top to bottom, and pinned sections (hero, history)
 // must be created before the triggers below them measure the pin spacing.
