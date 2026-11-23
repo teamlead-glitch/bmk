@@ -245,6 +245,11 @@
     line-height: 1.143;
     letter-spacing: -0.027em; /* -1.5px @ 56 */
     @apply font-semibold;
+    /* Phones: smaller, so a long CMS title doesn't fill the screen (~28px @ 375, ~30px @ 425) */
+    @media (max-width: 767px) {
+      font-size: clamp(1.75rem, 1rem + 3.2vw, 2.4rem);
+      line-height: 1.18;
+    }
   }
   .t-body {
     @apply text-base leading-6 tracking-[-0.01em];
