@@ -10,11 +10,25 @@ export function useEnquirySubmit(build: (fields: Record<string, string>) => Enqu
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  /** "Verify the code first" message under the CAPTCHA (shown by <Captcha prompt>) */
+  const [captchaPrompt, setCaptchaPrompt] = useState('');
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (pending) return;
     const form = e.currentTarget;
+
+    // Nothing is sent until the CAPTCHA is verified: focus the code box when it is empty,
+    // else the Verify button (data-verified is set by <Captcha> once the code checks out)
+    const captcha = form.querySelector<HTMLInputElement>('input[name="captcha_answer"]');
+    if (captcha && captcha.dataset.verified !== 'true') {
+      const empty = !captcha.value.trim();
+      setCaptchaPrompt(empty ? 'Enter the code from the picture, then press Verify.' : 'Please press Verify to check the code before sending.');
+      setError('');
+      (empty ? captcha : form.querySelector<HTMLElement>('[data-captcha-verify]'))?.focus();
+      return;
+    }
+    setCaptchaPrompt('');
     const fields = readEnquiryForm(form);
     const countryId = Number(fields.country_id);
     const input: EnquiryInput = {
@@ -39,7 +53,7 @@ export function useEnquirySubmit(build: (fields: Record<string, string>) => Enqu
   const fieldProps = (name: string, idPrefix: string) =>
     errors[name] ? { 'aria-invalid': true as const, 'aria-describedby': `${idPrefix}-${name}-error` } : {};
 
-  return { pending, error, errors, onSubmit, fieldProps };
+  return { pending, error, errors, captchaPrompt, onSubmit, fieldProps };
 }
 
 export function FieldError({ name, idPrefix, errors }: { name: string; idPrefix: string; errors: Record<string, string> }) {

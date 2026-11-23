@@ -28,7 +28,7 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
   const [chosen, setChosen] = useState(type && ENQUIRY_TYPES.includes(type) ? type : '');
   // Distribution, dealership and retail: company required, brands of the chosen country
   const business = !product && BRAND_ENQUIRY_TYPES.includes(chosen);
-  const { pending, error, errors, onSubmit, fieldProps } = useEnquirySubmit(
+  const { pending, error, errors, captchaPrompt, onSubmit, fieldProps } = useEnquirySubmit(
     (f) => ({
       ...f,
       name: f.name,
@@ -113,7 +113,7 @@ function EnquiryForm({ type, product, onSent }: { type?: string; product?: Enqui
         />
         <FieldError name="message" idPrefix={ID} errors={errors} />
       </label>
-      <Captcha idPrefix={ID} error={errors.captcha_answer} />
+      <Captcha idPrefix={ID} error={errors.captcha_answer} prompt={captchaPrompt} />
       {error && (
         <p className="text-sm text-danger" role="alert">
           {error}

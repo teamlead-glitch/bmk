@@ -18,7 +18,7 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
   const [sent, setSent] = useState(false);
   const [subject, setSubject] = useState(subjects[0] ?? '');
   const business = BRAND_ENQUIRY_TYPES.includes(subject);
-  const { pending, error, errors, onSubmit, fieldProps } = useEnquirySubmit(
+  const { pending, error, errors, captchaPrompt, onSubmit, fieldProps } = useEnquirySubmit(
     (f) => ({ ...f, type: f.subject, name: f.name, email: f.email, message: f.message }),
     (input) => {
       setSent(true);
@@ -80,7 +80,7 @@ export function ContactForm({ subjects }: { subjects: string[] }) {
             <textarea name="message" rows={5} required maxLength={5000} className="field" {...fieldProps('message', ID)} />
             <FieldError name="message" idPrefix={ID} errors={errors} />
           </label>
-          <Captcha idPrefix={ID} error={errors.captcha_answer} />
+          <Captcha idPrefix={ID} error={errors.captcha_answer} prompt={captchaPrompt} />
           {error && (
             <p className="text-sm text-danger" role="alert">
               {error}

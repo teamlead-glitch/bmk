@@ -10,8 +10,9 @@ type Check = 'idle' | 'checking' | 'ok' | 'wrong';
 
 /** CAPTCHA row of the enquiry forms (design: code picture with refresh, "Enter captcha", Verify).
  *  Sends captcha_token + captcha_answer with the form; POST /api/enquiry/ does the real check.
- *  `error` (the API's errors.captcha_answer) loads a new code: a wrong or expired one can't be reused. */
-export function Captcha({ idPrefix, error }: { idPrefix: string; error?: string }) {
+ *  `error` (the API's errors.captcha_answer) loads a new code: a wrong or expired one can't be reused.
+ *  `prompt`: the form was sent before the code was verified (useEnquirySubmit), shown until it is. */
+export function Captcha({ idPrefix, error, prompt }: { idPrefix: string; error?: string; prompt?: string }) {
   const [code, setCode] = useState<Code | null>(null);
   const [answer, setAnswer] = useState('');
   const [check, setCheck] = useState<Check>('idle');
@@ -37,8 +38,17 @@ export function Captcha({ idPrefix, error }: { idPrefix: string; error?: string 
     setCheck(res.success && res.data.ok ? 'ok' : 'wrong');
   };
 
-  // The API's message shows until the visitor starts typing the new code
-  const message = (!answer && error) || (check === 'wrong' ? 'That code doesn’t match. Check it, or load a new one.' : failed ? 'The code couldn’t be loaded. Press refresh to try again.' : '');
+  // The API's message shows until the visitor starts typing the new code; the "verify first"
+  // prompt until the code is verified (or found wrong, which has its own message)
+  const message =
+    (!answer && error) ||
+    (check === 'wrong'
+      ? 'That code doesn’t match. Check it, or load a new one.'
+      : failed
+        ? 'The code couldn’t be loaded. Press refresh to try again.'
+        : check === 'idle' && prompt
+          ? prompt
+          : '');
   const id = `${idPrefix}-captcha_answer`;
 
   return (
@@ -60,11 +70,10 @@ export function Captcha({ idPrefix, error }: { idPrefix: string; error?: string 
           <input
             id={id}
             name="captcha_answer"
-            required
             inputMode="numeric"
             autoComplete="off"
-            pattern="\d{5}"
             maxLength={5}
+            data-verified={check === 'ok'}
             placeholder="Enter captcha"
             aria-label="Enter the code from the picture"
             className="field min-w-0 flex-1"
@@ -76,7 +85,7 @@ export function Captcha({ idPrefix, error }: { idPrefix: string; error?: string 
             }}
             {...(message ? { 'aria-invalid': true as const, 'aria-describedby': `${id}-error` } : {})}
           />
-          <button type="button" className="btn btn-outline shrink-0 !px-5" onClick={verify} disabled={check === 'checking' || check === 'ok'} aria-live="polite">
+          <button type="button" data-captcha-verify className="btn btn-outline shrink-0 !px-5" onClick={verify} disabled={check === 'checking' || check === 'ok'} aria-live="polite">
             {check === 'ok' ? (
               <>
                 Verified <CheckIcon size={12} />
