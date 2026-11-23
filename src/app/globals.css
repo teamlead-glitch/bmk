@@ -393,14 +393,16 @@
 }
 
 /* Timeline milestones */
+/* min-height, not height: a long title + description makes the card taller instead of
+   squeezing the icon circle (cards in a row stretch to the tallest one) */
 .milestone {
-  @apply relative flex h-[296px] w-[280px] shrink-0 flex-col justify-between overflow-hidden rounded-xl bg-white p-6 text-black transition-[box-shadow,color] duration-500;
+  @apply relative flex min-h-[296px] w-[280px] shrink-0 flex-col justify-between overflow-hidden rounded-xl bg-white p-6 text-black transition-[box-shadow,color] duration-500;
 }
 /* Pinned timeline (desktop): cards give a little height on short screens so
    the whole section stays inside one fold. */
 @media (min-width: 1024px) {
   .history .milestone {
-    height: clamp(244px, 38vh, 296px);
+    min-height: clamp(244px, 38vh, 296px);
   }
 }
 .milestone .m-bg {
@@ -414,7 +416,7 @@
   @apply absolute inset-0 bg-black/50;
 }
 .milestone .m-icon-wrap {
-  @apply relative grid size-16 place-items-center rounded-full border border-black/10 transition-colors duration-500;
+  @apply relative grid size-16 shrink-0 place-items-center rounded-full border border-black/10 transition-colors duration-500;
 }
 .milestone .m-icon {
   @apply size-8 transition-[filter] duration-500;
@@ -447,6 +449,7 @@
   @apply text-white;
 }
 /* Icons ship in one tone; flip them to match the card state */
+/* Tint for transparent SVG/PNG icons; an uploaded JPG/WEBP turns it off (MilestoneCard) */
 .milestone[data-tone='dark'].is-active .m-icon {
   filter: brightness(0) invert(1);
 }

@@ -6,7 +6,7 @@ export interface Milestone {
   year: string;
   title: string;
   description: string;
-  /** Local SVG path for the CMS icon key (default icon when the key is unknown) */
+  /** The icon uploaded in the admin, else a local SVG (default icon when nothing is uploaded) */
   icon: string;
   /** Background photo shown on the active card */
   image: string | null;
