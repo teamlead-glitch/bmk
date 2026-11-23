@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
 import { ContentToc } from '@/components/content-page/ContentToc';
@@ -10,19 +10,25 @@ import { HOME, href } from '@/lib/routes';
 import { mapSeoToMetadata } from '@/lib/seo-mapper';
 
 /** Title, description and share tags from the page's CMS `seo` block */
-export async function cmsPageMetadata(slug: string): Promise<Metadata> {
-  const page = await getCmsPage(slug);
-  if (!page || 'redirect' in page) return {};
+export async function cmsPageMetadata(slug: string, preview?: string): Promise<Metadata> {
+  const page = await getCmsPage(slug, preview);
+  if (!page || 'redirect' in page) return preview ? { robots: { index: false, follow: false } } : {};
   const legal = LEGAL_PAGES.find((p) => p.slug === slug);
-  return mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub });
+  const meta = mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub });
+  return preview ? { ...meta, robots: { index: false, follow: false } } : meta; // previews are never indexed
 }
 
 /** A CMS page (GET /v1/pages/{slug}) at /{slug}/: Privacy, Cookies, Terms or any page made in
- *  the admin. A sticky table of contents is built from its h2 headings. Unknown slug -> 404. */
-export async function ContentPage({ slug }: { slug: string }) {
-  const [page, contact] = await Promise.all([getCmsPage(slug), getContact()]);
+ *  the admin. A sticky table of contents is built from its h2 headings. Unknown slug -> 404.
+ *  `preview`: token from /{slug}/?preview=… (see src/proxy.ts), shows unpublished content. */
+export async function ContentPage({ slug, preview }: { slug: string; preview?: string }) {
+  const [page, contact] = await Promise.all([getCmsPage(slug, preview), getContact()]);
   if (!page) notFound();
-  if ('redirect' in page) permanentRedirect(href(`/${page.redirect}`)); // slug renamed in the admin
+  if ('redirect' in page) {
+    // slug renamed in the admin (a preview keeps its token and is a temporary redirect)
+    if (preview) redirect(`${href(`/${page.redirect}`)}?preview=${encodeURIComponent(preview)}`);
+    permanentRedirect(href(`/${page.redirect}`));
+  }
   const legal = LEGAL_PAGES.find((p) => p.slug === slug); // legal pages: subtitle and "Other policies"
   const others = legal ? LEGAL_PAGES.filter((p) => p.slug !== slug) : [];
   const title = page.title || legal?.name || slug;

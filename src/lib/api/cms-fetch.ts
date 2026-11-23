@@ -110,6 +110,13 @@ function isJunkSlug(url: string): boolean {
   }
 }
 
+/** CMS preview (draft content): straight to the CMS every time. Never cached, never kept as the
+ *  last good copy, so a draft can't leak into the public pages. */
+export async function cmsGetFresh(url: string): Promise<CmsResult> {
+  if (isJunkSlug(url)) return { found: false, json: null };
+  return load(url);
+}
+
 export async function cmsGet(url: string): Promise<CmsResult> {
   if (isJunkSlug(url)) return { found: false, json: null };
 

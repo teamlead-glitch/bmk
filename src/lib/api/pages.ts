@@ -42,9 +42,13 @@ function toSections(html: string): { intro: string; sections: PageSection[] } {
 
 /** null -> 404. { redirect } -> the slug was renamed in the admin: the API answers 301 and fetch
  *  follows it to the current page, so the slug that comes back differs (src/lib/api/slug-redirect.ts). */
-export const getCmsPage = cache(async (slug: string): Promise<DetailsResult<ContentPageData>> => {
+/** `preview`: the token from ?preview= (admin "Preview" link). It is passed on to the CMS, which
+ *  then also returns unpublished pages; the answer is never cached. */
+export const getCmsPage = cache(async (slug: string, preview?: string): Promise<DetailsResult<ContentPageData>> => {
   if (!isSlug(slug)) return null;
-  const data = await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
+  const data = preview
+    ? await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`, { preview }, { fresh: true })
+    : await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
   if (!data) return null;
   const moved = getRedirectSlug(slug, text(data.slug));
   if (moved) return { redirect: moved };
