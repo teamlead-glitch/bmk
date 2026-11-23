@@ -5,7 +5,7 @@
 //   about-page.ts          About page text, mission, vision, core values (settings/about/page)
 //   products.ts            product pages, one page of products (listings, /api/list/products/)
 //   product-listings.ts    All products, category and brand pages (filters, tabs, first page)
-//   brands-categories.ts   brand and category lists (filters, slugs for the build and sitemap)
+//   brands-categories.ts   brand and category lists (filters, slugs for the build)
 //   brand-showcase.ts      homepage Associated Brands + Our Brands, About "Our brands"
 //   contact-settings.ts    site contact details (settings/contact)
 //   enquiry-options.ts     enquiry forms: countries and each country's brands (/api/enquiry/options/)
@@ -14,6 +14,7 @@
 //   home-banner.ts         homepage hero (settings/home-banner)
 //   navigation.ts          mega menu, mobile menu, footer and search panel links
 //   pages.ts               CMS pages: Privacy, Cookies, Terms (pages/{slug})
+//   sitemap.ts             /sitemap.xml (sitemap.xml, served as the CMS returns it)
 //   search.ts              catalogue search: search panel and search page (search?q=, via /api/search/)
 //   home-about.ts          homepage About BMK Group (settings/about/home)
 //   timeline.ts            homepage Our Journey, About › Our journey (timeline-events)
@@ -35,6 +36,7 @@ export * from '@/lib/api/home-about';
 export * from '@/lib/api/home-banner';
 export * from '@/lib/api/navigation';
 export * from '@/lib/api/pages';
+export { getSitemapXml, SITEMAP_REVALIDATE_SECONDS } from '@/lib/api/sitemap';
 export * from '@/lib/api/product-listings';
 export * from '@/lib/api/products';
 export * from '@/lib/api/search';
