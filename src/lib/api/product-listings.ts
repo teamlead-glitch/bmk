@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { getCmsBrand, getCmsBrands, getCmsCategories, type CmsCategory } from '@/lib/api/brands-categories';
 import { brandColor, isSlug, mediaUrl, text } from '@/lib/api/cms-mappers';
 import { getProducts } from '@/lib/api/products';
-import { serverGetData } from '@/lib/api/server-api';
+import { serverGetRecord } from '@/lib/api/server-api';
 import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { CmsListingData, CountedOption } from '@/types/listing';
@@ -35,9 +35,9 @@ export const getAllProductsPage = cache(async (): Promise<CmsListingData> => {
  * /category/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current category). CMS down -> error.tsx.
  */
-export const getCategoryPage = cache(async (slug: string): Promise<DetailsResult<CmsListingData>> => {
+export const getCategoryPage = cache(async (slug: string, preview?: string): Promise<DetailsResult<CmsListingData>> => {
   if (!isSlug(slug)) return null;
-  const c = await serverGetData<CmsCategory>(`/v1/categories/${encodeURIComponent(slug)}`);
+  const c = await serverGetRecord<CmsCategory>(`/v1/categories/${encodeURIComponent(slug)}`, preview); // preview: ?preview= token
   const current = text(c?.slug);
   if (!c || !current) return null;
   const moved = getRedirectSlug(slug, current);
@@ -65,8 +65,8 @@ export const getCategoryPage = cache(async (slug: string): Promise<DetailsResult
  * /brand/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current brand). CMS down -> error.tsx.
  */
-export const getBrandPage = cache(async (slug: string): Promise<DetailsResult<CmsListingData>> => {
-  const b = await getCmsBrand(slug);
+export const getBrandPage = cache(async (slug: string, preview?: string): Promise<DetailsResult<CmsListingData>> => {
+  const b = await getCmsBrand(slug, preview); // preview: ?preview= token
   const current = text(b?.slug);
   if (!b || !current) return null;
   const moved = getRedirectSlug(slug, current);

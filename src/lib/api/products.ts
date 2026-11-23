@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { LISTING_PAGE_SIZE } from '@/constants/listing';
 import { getCmsBrands } from '@/lib/api/brands-categories';
 import { brandColor, isSlug, mediaUrl, text, type CmsRef } from '@/lib/api/cms-mappers';
-import { serverGet, serverGetData } from '@/lib/api/server-api';
+import { serverGet, serverGetRecord } from '@/lib/api/server-api';
 import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
 import type { CmsSeo } from '@/types/common';
 import { cleanHtml } from '@/lib/sanitize-html';
@@ -93,9 +93,9 @@ type CmsProductDetail = {
  * /product/{slug}: null -> 404. { redirect } -> the slug was renamed in the CMS (the API
  * answers 301 and fetch follows it to the current product). CMS down -> error.tsx.
  */
-export const getProduct = cache(async (slug: string): Promise<DetailsResult<ProductDetail>> => {
+export const getProduct = cache(async (slug: string, preview?: string): Promise<DetailsResult<ProductDetail>> => {
   if (!isSlug(slug)) return null;
-  const p = await serverGetData<CmsProductDetail>(`/v1/products/${encodeURIComponent(slug)}`);
+  const p = await serverGetRecord<CmsProductDetail>(`/v1/products/${encodeURIComponent(slug)}`, preview); // preview: ?preview= token
   const current = text(p?.slug);
   if (!p || !current) return null;
   const moved = getRedirectSlug(slug, current);

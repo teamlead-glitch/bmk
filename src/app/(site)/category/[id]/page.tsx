@@ -1,41 +1,17 @@
 import type { Metadata } from 'next';
-import { notFound, permanentRedirect } from 'next/navigation';
-import { Suspense } from 'react';
-import { CmsListing, CmsListingFromUrl } from '@/components/catalogue/CmsListing';
-import { getCategoryPage, getCategorySlugs } from '@/lib/content';
-import { href } from '@/lib/routes';
-import { pageMetadata } from '@/lib/seo';
+import { CategoryPage, categoryMetadata } from '@/components/catalogue/ListingPages';
+import { getCategorySlugs } from '@/lib/content';
 
 type Props = { params: Promise<{ id: string }> };
 
-// /category/{slug}: a CMS category (GET /v1/categories/{slug}) and its products (GET /v1/products)
+// /category/{slug}: a CMS category and its products; preview: src/app/(site)/cms-preview/
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const data = await getCategoryPage(id);
-  if (!data || 'redirect' in data) return {};
-  const category = data.category!;
-  return pageMetadata({
-    title: category.title,
-    description: category.short ?? `${category.title} from the brands BMK Group distributes.`,
-    path: `/category/${category.slug}/`,
-    image: category.banner,
-  });
+  return categoryMetadata((await params).id);
 }
 
-export default async function CategoryPage({ params }: Props) {
-  const { id } = await params;
-  const data = await getCategoryPage(id);
-  if (!data) notFound();
-  if ('redirect' in data) permanentRedirect(href(`/category/${data.redirect}`)); // slug renamed in the CMS
-
-  // The unfiltered first page is in the static HTML (crawlable product links); in the
-  // browser the listing follows the URL's filters and loads more pages as you scroll.
-  return (
-    <Suspense fallback={<CmsListing data={data} />}>
-      <CmsListingFromUrl data={data} />
-    </Suspense>
-  );
+export default async function Page({ params }: Props) {
+  return <CategoryPage slug={(await params).id} />;
 }
 
 // CMS categories are built at deploy time; new ones on first visit, then cached (ISR)

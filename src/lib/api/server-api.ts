@@ -34,6 +34,12 @@ export async function serverGet<T>(
   return found ? (json as T) : null;
 }
 
+/** One CMS record. `preview`: the token from ?preview= (admin "Preview" link), passed on to the
+ *  CMS so unpublished records come back too; such answers are never cached. */
+export async function serverGetRecord<T>(path: string, preview?: string): Promise<T | undefined> {
+  return preview ? serverGetData<T>(path, { preview }, { fresh: true }) : serverGetData<T>(path);
+}
+
 /** `{ data }` of a CMS answer (undefined when not found) */
 export async function serverGetData<T>(
   path: string,

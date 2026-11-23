@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { isSlug, text, type CmsRef } from '@/lib/api/cms-mappers';
-import { serverGetData } from '@/lib/api/server-api';
+import { serverGetData, serverGetRecord } from '@/lib/api/server-api';
 import type { CmsSeo } from '@/types/common';
 
 /* ---------- Brands and categories (CMS: GET /v1/brands, /v1/categories) ---------- */
@@ -44,9 +44,9 @@ export const getBrandSlugs = cache(async (): Promise<string[]> => (await getCmsB
 
 /** One brand with its SEO block (GET /v1/brands/{slug}); null when unknown. A renamed slug
  *  comes back with its current slug (the CMS answers 301 and fetch follows it). */
-export const getCmsBrand = cache(async (slug: string): Promise<CmsBrand | null> =>
-  isSlug(slug) ? ((await serverGetData<CmsBrand>(`/v1/brands/${encodeURIComponent(slug)}`)) ?? null) : null,
+export const getCmsBrand = cache(async (slug: string, preview?: string): Promise<CmsBrand | null> =>
+  isSlug(slug) ? ((await serverGetRecord<CmsBrand>(`/v1/brands/${encodeURIComponent(slug)}`, preview)) ?? null) : null,
 );
 
 /** The brand page's CMS SEO block (page metadata, server side only) */
-export const getBrandSeo = cache(async (slug: string): Promise<CmsSeo | null> => (await getCmsBrand(slug))?.seo ?? null);
+export const getBrandSeo = cache(async (slug: string, preview?: string): Promise<CmsSeo | null> => (await getCmsBrand(slug, preview))?.seo ?? null);

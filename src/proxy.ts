@@ -13,12 +13,14 @@ const gone = () =>
   });
 
 /* ---------- CMS PREVIEW (?preview={token} from the admin) ---------- */
-// /{slug}/?preview={token} is rewritten to the internal route /cms-preview/{slug}/{token}/, which
-// passes the token to the CMS and is rendered fresh on every request; /{slug}/ itself stays
+// /{slug}/, /product/{slug}/, /brand/{slug}/ and /category/{slug}/ with ?preview={token} are
+// rewritten to the internal route /cms-preview/{kind}/{slug}/{token}/ (src/lib/preview.ts), which
+// passes the token to the CMS and is rendered fresh on every request; the public pages stay
 // static (ISR). Any URL with ?preview gets X-Robots-Tag: noindex. The internal route is not a
 // public URL: direct visits answer 404.
 const PREVIEW_ROUTE = '/cms-preview/';
 const CMS_PAGE_PATH = /^\/([a-z0-9-]+)\/?$/;
+const DETAIL_PATH = /^\/(product|brand|category)\/([a-z0-9-]+)\/?$/;
 // The site's own one-segment routes (src/app/(site)/*): they win over a CMS page with that slug
 const SITE_ROUTES = new Set(['about-us', 'contact-us', 'faqs', 'products', 'search', 'brand', 'category', 'product', 'cms-preview']);
 const noindex = { 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'private, no-store' };
@@ -28,14 +30,16 @@ function preview(request: NextRequest): NextResponse | null {
   if (!searchParams.has('preview')) return null;
 
   const token = searchParams.get('preview')?.trim();
-  const slug = CMS_PAGE_PATH.exec(pathname)?.[1];
-  if (token && slug && !SITE_ROUTES.has(slug)) {
+  const detail = DETAIL_PATH.exec(pathname);
+  const page = CMS_PAGE_PATH.exec(pathname)?.[1];
+  const target = detail ? { kind: detail[1], slug: detail[2] } : page && !SITE_ROUTES.has(page) ? { kind: 'page', slug: page } : null;
+  if (token && target) {
     const url = request.nextUrl.clone();
-    url.pathname = `${PREVIEW_ROUTE}${slug}/${encodeURIComponent(token)}/`;
+    url.pathname = `${PREVIEW_ROUTE}${target.kind}/${target.slug}/${encodeURIComponent(token)}/`;
     url.search = '';
     return NextResponse.rewrite(url, { headers: noindex });
   }
-  // Other pages have no preview yet: shown as usual, but not indexed
+  // Other pages have no preview: shown as usual, but not indexed
   return NextResponse.next({ headers: noindex });
 }
 

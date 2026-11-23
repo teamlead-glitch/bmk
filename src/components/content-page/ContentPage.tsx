@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Arrow } from '@/components/common/Arrow';
 import { Crumbs } from '@/components/common/Crumbs';
 import { ContentToc } from '@/components/content-page/ContentToc';
 import { LEGAL_PAGES } from '@/constants/legal';
 import { getCmsPage, getContact } from '@/lib/content';
+import { previewMetadata, redirectRenamed } from '@/lib/preview';
 import { HOME, href } from '@/lib/routes';
 import { mapSeoToMetadata } from '@/lib/seo-mapper';
 
 /** Title, description and share tags from the page's CMS `seo` block */
 export async function cmsPageMetadata(slug: string, preview?: string): Promise<Metadata> {
   const page = await getCmsPage(slug, preview);
-  if (!page || 'redirect' in page) return preview ? { robots: { index: false, follow: false } } : {};
+  if (!page || 'redirect' in page) return previewMetadata({}, preview);
   const legal = LEGAL_PAGES.find((p) => p.slug === slug);
-  const meta = mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub });
-  return preview ? { ...meta, robots: { index: false, follow: false } } : meta; // previews are never indexed
+  return previewMetadata(mapSeoToMetadata(page.seo, { path: `/${slug}/`, title: page.title || legal?.name || slug, description: legal?.sub }), preview);
 }
 
 /** A CMS page (GET /v1/pages/{slug}) at /{slug}/: Privacy, Cookies, Terms or any page made in
@@ -24,11 +24,7 @@ export async function cmsPageMetadata(slug: string, preview?: string): Promise<M
 export async function ContentPage({ slug, preview }: { slug: string; preview?: string }) {
   const [page, contact] = await Promise.all([getCmsPage(slug, preview), getContact()]);
   if (!page) notFound();
-  if ('redirect' in page) {
-    // slug renamed in the admin (a preview keeps its token and is a temporary redirect)
-    if (preview) redirect(`${href(`/${page.redirect}`)}?preview=${encodeURIComponent(preview)}`);
-    permanentRedirect(href(`/${page.redirect}`));
-  }
+  if ('redirect' in page) redirectRenamed(`/${page.redirect}`, preview); // slug renamed in the admin
   const legal = LEGAL_PAGES.find((p) => p.slug === slug); // legal pages: subtitle and "Other policies"
   const others = legal ? LEGAL_PAGES.filter((p) => p.slug !== slug) : [];
   const title = page.title || legal?.name || slug;

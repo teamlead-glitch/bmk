@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { isSlug, text } from '@/lib/api/cms-mappers';
-import { serverGetData } from '@/lib/api/server-api';
+import { serverGetRecord } from '@/lib/api/server-api';
 import { getRedirectSlug, type DetailsResult } from '@/lib/api/slug-redirect';
 import { cleanHtml, htmlToText } from '@/lib/sanitize-html';
 import type { CmsSeo } from '@/types/common';
@@ -46,9 +46,7 @@ function toSections(html: string): { intro: string; sections: PageSection[] } {
  *  then also returns unpublished pages; the answer is never cached. */
 export const getCmsPage = cache(async (slug: string, preview?: string): Promise<DetailsResult<ContentPageData>> => {
   if (!isSlug(slug)) return null;
-  const data = preview
-    ? await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`, { preview }, { fresh: true })
-    : await serverGetData<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`);
+  const data = await serverGetRecord<CmsPageData>(`/v1/pages/${encodeURIComponent(slug)}`, preview);
   if (!data) return null;
   const moved = getRedirectSlug(slug, text(data.slug));
   if (moved) return { redirect: moved };
