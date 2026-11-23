@@ -3,8 +3,8 @@
 export interface CoreValue {
   name: string;
   text: string;
-  /** Local SVG path for the CMS icon key (default icon when the key is unknown) */
-  icon: string;
+  /** Local SVG path for the CMS icon key (verified badge when the key is unknown); null = "None" */
+  icon: string | null;
 }
 
 /** Empty strings mean "not set in the CMS": the component leaves that text out. */

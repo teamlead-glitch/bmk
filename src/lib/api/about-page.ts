@@ -20,12 +20,41 @@ type CmsAboutPage = {
   brands?: { title?: string | null; description?: string | null } | null;
 };
 
-/** CMS icon keys we have an SVG for (public/assets/icons/<key>.svg) */
-const ICONS = new Set(['star', 'verified']);
-const DEFAULT_ICON = 'verified';
-const iconPath = (key: unknown) => {
-  const k = text(key).toLowerCase();
-  return `/assets/icons/${ICONS.has(k) ? k : DEFAULT_ICON}.svg`;
+/** Core value icon picked in the admin (key) -> SVG in public/assets/icons/. One entry per option
+ *  of the admin's icon list, with the other spellings a key may come in (e.g. "users"). */
+const ICON_FILES: Record<string, string> = {
+  star: 'star',
+  verified: 'verified',
+  flag: 'value-flag',
+  trophy: 'value-trophy',
+  rocket: 'value-rocket',
+  'rocket-launch': 'value-rocket',
+  building: 'value-building',
+  office: 'value-building',
+  location: 'value-location',
+  'map-pin': 'value-location',
+  globe: 'value-globe',
+  world: 'value-globe',
+  people: 'value-people',
+  users: 'value-people',
+  team: 'value-people',
+  idea: 'value-idea',
+  lightbulb: 'value-idea',
+  'light-bulb': 'value-idea',
+  delivery: 'value-delivery',
+  truck: 'value-delivery',
+  product: 'value-product',
+  box: 'value-product',
+  package: 'value-product',
+  achievement: 'value-achievement',
+  award: 'value-achievement',
+  medal: 'value-achievement',
+};
+/** No icon picked ("None") -> null (no icon circle); a key we have no SVG for -> the verified badge */
+const iconPath = (key: unknown): string | null => {
+  const k = text(key).toLowerCase().replace(/[\s_]+/g, '-');
+  if (!k || k === 'none') return null;
+  return `/assets/icons/${ICON_FILES[k] ?? 'verified'}.svg`;
 };
 
 export const getAboutPage = cache(async (): Promise<AboutPage> => {

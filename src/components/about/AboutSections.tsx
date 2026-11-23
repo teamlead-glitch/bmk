@@ -77,10 +77,12 @@ export function MissionValues({ mission, vision, values }: { mission: string; vi
             <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {values.map((v) => (
                 <li key={v.name} className="value-card">
-                  <span className="grid size-14 place-items-center rounded-full bg-white">
-                    <img src={v.icon} alt="" className="size-7" />
-                  </span>
-                  <p className="mt-8 text-xl leading-7 font-semibold">{v.name}</p>
+                  {v.icon && (
+                    <span className="mb-8 grid size-14 place-items-center rounded-full bg-white">
+                      <img src={v.icon} alt="" className="size-7" />
+                    </span>
+                  )}
+                  <p className="text-xl leading-7 font-semibold">{v.name}</p>
                   <p className="mt-2 text-[15px] leading-6 text-white/70">{v.text}</p>
                 </li>
               ))}
