@@ -838,6 +838,17 @@ body.nav-hidden .site-nav {
   transform: translateY(-160%);
 }
 
+/* Listing filter sidebar (products, category, brand, search): pinned just under the navbar,
+   and moves up with it when the navbar hides on scroll */
+.filter-rail {
+  position: sticky;
+  top: 8rem;
+  transition: top 0.6s var(--ease-out-expo);
+}
+body.nav-hidden .filter-rail {
+  top: 2.5rem;
+}
+
 /* ── Motion ───────────────────────────────────────────────────────────────
    Quick, subtle: page fade, section reveals, panels and the enquiry popup. */
 /* Page fade runs in JS (main.js). Section reveal: */

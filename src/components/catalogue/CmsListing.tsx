@@ -122,7 +122,7 @@ export function CmsListing({ data, query = NO_FILTERS }: { data: CmsListingData;
         <div className="flex gap-12">
           {sidebar && (
             <aside className="hidden w-[272px] shrink-0 lg:block" aria-label="Filters">
-              <div className="sticky top-48">
+              <div className="filter-rail">
                 <p className="pb-2 text-xs tracking-[0.14em] text-muted uppercase">Filter by</p>
                 {facets}
               </div>
