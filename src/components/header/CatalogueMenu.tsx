@@ -20,8 +20,9 @@ export function CatalogueMenu({ nav, open = false, compact = false, active = fal
         {nav.ownBrands.length > 0 && (
           <>
             <Label>Our brands</Label>
-            {/* Logos, one brand per row (the desktop mega menu shows the same cards) */}
-            <ul className="grid gap-2">
+            {/* Logo cards (the desktop mega menu shows the same cards): one per row on phones,
+                side by side in one row from tablet width (QA 24 Nov: wasted vertical space) */}
+            <ul className="grid gap-2 sm:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))]">
               {nav.ownBrands.map((b) => (
                 <li key={b.id}>
                   {b.site ? (
