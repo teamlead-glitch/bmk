@@ -39,6 +39,19 @@ export const getTimeline = cache(async (): Promise<Milestone[]> => {
     const year = text(e.year);
     const title = text(e.title);
     if (!year || !title) return [];
-    return [{ id: String(e.id ?? i), year, title, description: text(e.description), icon: iconPath(e.icon), image: mediaUrl(e.image?.url) }];
+    const image = mediaUrl(e.image?.url);
+    return [
+      {
+        id: String(e.id ?? i),
+        year,
+        title,
+        description: text(e.description),
+        icon: iconPath(e.icon),
+        // Alt texts as entered in the admin (Icon alt text, Image alt text)
+        iconAlt: e.icon && typeof e.icon === 'object' ? text(e.icon.alt) : '',
+        image,
+        imageAlt: image ? text(e.image?.alt) : '',
+      },
+    ];
   });
 });

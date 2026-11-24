@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element -- decorative photo and SVG icon */
+/* eslint-disable @next/next/no-img-element -- CMS photo and icon (any host, any size) */
 import type { Milestone } from '@/types/timeline';
 
 /** Timeline milestone card (homepage timeline and About › Our journey).
@@ -10,15 +10,14 @@ export function MilestoneCard({ m }: { m: Milestone }) {
   const opaque = /\.(jpe?g|webp)(\?|$)/i.test(m.icon);
   return (
     <li className="milestone" data-tone="dark">
-      <div className="m-bg" aria-hidden="true">
-        {m.image && <img src={m.image} alt="" loading="lazy" />}
-      </div>
+      {/* Alt texts come from the admin (Image alt text / Icon alt text) */}
+      <div className="m-bg">{m.image && <img src={m.image} alt={m.imageAlt} loading="lazy" />}</div>
       {/* shrink-0: a long title/description never squeezes the icon circle */}
       <span className="m-icon-wrap shrink-0">
         <img
           className="m-icon"
           src={m.icon}
-          alt=""
+          alt={m.iconAlt}
           width={32}
           height={32}
           style={opaque ? { filter: 'none', borderRadius: '9999px', objectFit: 'contain' } : undefined}
