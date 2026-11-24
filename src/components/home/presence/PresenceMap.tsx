@@ -181,7 +181,7 @@ export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
 
   /* ---------- Desktop popover placement (xl+) ---------- */
   // The card opens beside the selected pin: right when it fits, else left,
-  // centred on the pin and kept inside the viewport (below the navbar) and the section.
+  // centred on the pin and kept inside the viewport width and the section's height.
   const place = useCallback(() => {
     const c = card.current;
     const pin = pins.current[currentRef.current];
@@ -198,9 +198,6 @@ export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
     const w = c.offsetWidth;
     const h = c.offsetHeight;
     const vw = document.documentElement.clientWidth;
-    const vh = window.innerHeight;
-    const nav = document.getElementById('nav');
-    const navBottom = Math.max(0, nav ? nav.getBoundingClientRect().bottom : 0);
     let side = 'right';
     let x = px + GAP;
     if (x + w > vw - EDGE) {
@@ -208,10 +205,13 @@ export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
       x = px - GAP - w;
     }
     x = gsap.utils.clamp(EDGE, vw - w - EDGE, x);
-    const top = Math.max(EDGE, navBottom + 12, s.top + EDGE);
-    const bottom = Math.min(vh - EDGE, s.bottom - EDGE);
-    let y = py - h / 2;
-    y = bottom - top >= h ? gsap.utils.clamp(top, bottom - h, y) : top;
+    // Vertical bounds come from the section only. They used to include the viewport and the
+    // navbar, but the card stays where it was placed while the page scrolls, so a placement
+    // made with the section half on screen (e.g. after a refresh restores the scroll position)
+    // pushed the card past the section bottom, where overflow-hidden cut it off (QA 24 Nov).
+    const top = s.top + EDGE;
+    const bottom = s.bottom - EDGE;
+    const y = Math.max(top, Math.min(bottom - h, py - h / 2));
     c.style.left = `${Math.round(x - s.left)}px`;
     c.style.top = `${Math.round(y - s.top)}px`;
     c.dataset.side = side;
@@ -222,6 +222,8 @@ export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
     const section = root.current?.closest('section');
     const ro = new ResizeObserver(place);
     if (section) ro.observe(section);
+    // The card's height changes too (web font loads, a location with more companies)
+    if (card.current) ro.observe(card.current);
     const mq = matchMedia('(min-width: 1280px)');
     mq.addEventListener('change', place);
     place();
