@@ -32,8 +32,8 @@ type CmsGroupLocation = {
   location?: string | null;
   country?: { code?: string | null; name?: string | null } | null;
   map_position?: unknown;
-  icon?: { url?: string | null } | null;
-  background?: { url?: string | null } | null;
+  icon?: { url?: string | null; alt?: string | null } | null;
+  background?: { url?: string | null; alt?: string | null } | null;
   group_companies?: CmsCompany[] | null;
 };
 
@@ -131,7 +131,9 @@ export const getGroupLocations = cache(async (): Promise<GroupLocation[]> => {
         position: at,
         geo,
         icon: mediaUrl(l.icon?.url),
+        iconAlt: text(l.icon?.alt), // "Icon alt text" in the admin
         photo: mediaUrl(l.background?.url),
+        photoAlt: text(l.background?.alt), // "Background alt text" in the admin
         href: href('/contact-us', { location: id }),
         companies: (l.group_companies ?? []).map(toCompany).filter((c): c is GroupCompany => !!c),
       },

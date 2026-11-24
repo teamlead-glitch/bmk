@@ -308,7 +308,7 @@ export function PresenceMap({ locations }: { locations: PinnedLocation[] }) {
           <div className="flex items-start justify-between">
             <div ref={iconRef} className="loc-icon grid size-16 place-items-center">
               {loc.icon ? (
-                <img src={loc.icon} alt="" width={64} height={64} className="size-16" />
+                <img src={loc.icon} alt={loc.iconAlt} width={64} height={64} className="size-16" />
               ) : (
                 <span className="grid size-16 place-items-center rounded-full bg-fog">
                   <span className="size-3 rounded-full bg-accent" />

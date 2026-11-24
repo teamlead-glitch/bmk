@@ -102,8 +102,9 @@ function LocationCard({ l, flip }: { l: GroupLocation; flip: boolean }) {
   const markers = companyMarkers(l.companies);
   return (
     <article id={`location-${l.id}`} className={`co-card ${flip ? 'is-flip' : ''} scroll-mt-40`}>
-      {l.photo ? <img className="co-photo" src={l.photo} alt="" loading="lazy" /> : <img className="co-mark" src="/assets/patterns/history-mark-2.svg" alt="" />}
-      <span className="co-badge">{l.icon ? <img src={l.icon} alt="" width={40} height={40} /> : <span className="size-3 rounded-full bg-accent" />}</span>
+      {/* Alt texts from the admin (Group Locations: Background / Icon alt text) */}
+      {l.photo ? <img className="co-photo" src={l.photo} alt={l.photoAlt} loading="lazy" /> : <img className="co-mark" src="/assets/patterns/history-mark-2.svg" alt="" />}
+      <span className="co-badge">{l.icon ? <img src={l.icon} alt={l.iconAlt} width={40} height={40} /> : <span className="size-3 rounded-full bg-accent" />}</span>
       <p className="co-city">{l.city}</p>
       <div className="co-panel">
         <p className="text-xs tracking-[0.14em] text-muted uppercase">

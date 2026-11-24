@@ -85,7 +85,7 @@ export function ContactOffices({
           <div key={e.id} className={`rounded-2xl bg-white p-6 sm:p-8 ${office === e.id ? 'ring-2 ring-navy' : ''}`} data-entity={e.id}>
             <div className="flex items-start gap-4 max-sm:flex-col">
               <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-mist">
-                {c.icon ? <img src={c.icon} alt="" width={36} height={36} className="size-9 object-contain" /> : <span className="size-3 rounded-full bg-accent" />}
+                {c.icon ? <img src={c.icon} alt={c.iconAlt} width={36} height={36} className="size-9 object-contain" /> : <span className="size-3 rounded-full bg-accent" />}
               </span>
               <div className="min-w-0">
                 <p className="text-xs tracking-[0.14em] text-muted uppercase">

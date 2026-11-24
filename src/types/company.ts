@@ -40,8 +40,12 @@ export interface GroupLocation {
   /** Real-world position (About globe); null: not on the globe */
   geo: { lat: number; lng: number } | null;
   icon: string | null;
+  /** Icon alt text from the admin ('' when none) */
+  iconAlt: string;
   /** City photo (About › Our companies card) */
   photo: string | null;
+  /** Background alt text from the admin ('' when none) */
+  photoAlt: string;
   /** "View Details": Contact › Our offices on this location */
   href: string;
   companies: GroupCompany[];
