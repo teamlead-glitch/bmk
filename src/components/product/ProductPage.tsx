@@ -57,24 +57,29 @@ export async function ProductPage({ slug, preview }: { slug: string; preview?: s
         </div>
       </section>
 
-      <ProductSectionBar product={enquiry} sections={[...(hasOverview ? ['overview'] : []), ...(hasSpecs ? ['specifications'] : []), ...(hasRelated ? ['more'] : [])]} />
-      {hasOverview && <ProductOverview name={p.name} html={p.descriptionHtml} />}
-      {hasSpecs && <ProductSpecs groups={p.specGroups} />}
+      {/* The section bar is this wrapper's last child and sticks to the window's bottom: it shows once
+          this content scrolls in and comes to rest on top of the footer (never over the navbar) */}
+      <div className="mt-16">
+        {hasOverview && <ProductOverview name={p.name} html={p.descriptionHtml} />}
+        {hasSpecs && <ProductSpecs groups={p.specGroups} />}
 
-      {hasRelated && (
-        <section id="more" className="scroll-mt-24" data-section>
-          {showBrand && (
-            <div className="on-brand section-y" style={{ ...brandVars(p.brand.color), background: 'var(--brand)', color: 'var(--on)' }}>
-              <ProductStrip title={`More from ${p.brand.name}`} list={p.fromBrand} more={href(`/brand/${p.brand.slug}`)} brandColor={p.brand.color} />
-            </div>
-          )}
-          {showCategory && p.category && (
-            <div className="section-y">
-              <ProductStrip title={`More in ${p.category.name}`} list={p.inCategory} more={href(`/category/${p.category.slug}`)} />
-            </div>
-          )}
-        </section>
-      )}
+        {hasRelated && (
+          <section id="more" className="scroll-mt-24" data-section>
+            {showBrand && (
+              <div className="on-brand section-y" style={{ ...brandVars(p.brand.color), background: 'var(--brand)', color: 'var(--on)' }}>
+                <ProductStrip title={`More from ${p.brand.name}`} list={p.fromBrand} more={href(`/brand/${p.brand.slug}`)} brandColor={p.brand.color} />
+              </div>
+            )}
+            {showCategory && p.category && (
+              <div className="section-y">
+                <ProductStrip title={`More in ${p.category.name}`} list={p.inCategory} more={href(`/category/${p.category.slug}`)} />
+              </div>
+            )}
+          </section>
+        )}
+
+        <ProductSectionBar product={enquiry} sections={[...(hasOverview ? ['overview'] : []), ...(hasSpecs ? ['specifications'] : []), ...(hasRelated ? ['more'] : [])]} />
+      </div>
     </>
   );
 }
