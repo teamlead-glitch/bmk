@@ -23,7 +23,7 @@ export function Facet({ title, options, selected, to, divider = false }: { title
       <summary>
         {title} <ChevIcon />
       </summary>
-      <div className="pb-4">
+      <div className="facet-list pb-4">
         {options.map((o) => (
           <FacetCheck key={o.id} on={selected.includes(o.id)} label={o.name} n={o.n} to={to(o.id)} />
         ))}

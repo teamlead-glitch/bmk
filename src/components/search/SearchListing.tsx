@@ -153,7 +153,7 @@ function Facets({ s }: { s: ListingState }) {
           <summary>
             Category <ChevIcon />
           </summary>
-          <div className="pb-4">
+          <div className="facet-list pb-4">
             {s.catSections.map(({ group, opts }) => (
               <div key={group?.id ?? 'all'}>
                 {group && <p className="mt-3 mb-1 px-2 text-[11px] tracking-[0.14em] text-muted uppercase first:mt-0">{group.name}</p>}
@@ -170,7 +170,7 @@ function Facets({ s }: { s: ListingState }) {
           <summary>
             Brand <ChevIcon />
           </summary>
-          <div className="pb-4">
+          <div className="facet-list pb-4">
             {s.brandOpts.map((o) => (
               <FacetCheck key={o.id} on={s.selB.includes(o.id)} label={o.name} n={o.n} to={s.toggle('brand', o.id)} />
             ))}

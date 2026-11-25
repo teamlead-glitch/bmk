@@ -842,24 +842,26 @@ body.nav-hidden .site-nav {
 }
 
 /* Listing filter sidebar (products, category, brand, search): pinned just under the navbar,
-   and moves up with it when the navbar hides on scroll. When the Category and Brand lists are
-   taller than the window, the sidebar scrolls on its own (the page doesn't scroll with it). */
+   and moves up with it when the navbar hides on scroll. The "Filter by", Category and Brand
+   titles stay put; each option list scrolls on its own (the page doesn't scroll with it).
+   --rail-top: the rail's top offset; each list gets half of the window left after the titles. */
 .filter-rail {
+  --rail-top: 8rem;
   position: sticky;
-  top: 8rem;
-  max-height: calc(100svh - 8rem - 1.5rem);
+  top: var(--rail-top);
+  transition: top 0.6s var(--ease-out-expo);
+}
+body.nav-hidden .filter-rail {
+  --rail-top: 2.5rem;
+}
+.filter-rail .facet-list {
+  max-height: clamp(7rem, calc((100svh - var(--rail-top) - 13rem) / 2), 20rem);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: var(--color-line) transparent;
-  transition:
-    top 0.6s var(--ease-out-expo),
-    max-height 0.6s var(--ease-out-expo);
-}
-body.nav-hidden .filter-rail {
-  top: 2.5rem;
-  max-height: calc(100svh - 2.5rem - 1.5rem);
+  transition: max-height 0.6s var(--ease-out-expo);
 }
 
 /* ── Motion ───────────────────────────────────────────────────────────────
